@@ -96,21 +96,23 @@ struct uprov_device_part
  * @brief Structure storing everything required
  *        to repartition a block device.
  *
- * @member err          - Stores information about the error that occured
- *                        for the given context and may later be retrieved
- *                        by caller.
- * @member free         - If structure allocated with calloc(3) member will be
- *                        set to true so that, we know to call free(3) when
- *                        destroying the context.
- * @member parts        - Array of partitions for the given @block_device.
- * @member block_device - Block device name in string format.
- * @member table_type   - Partition table type used by @block_device.
- * @member part_name    - Used to temporarily acquire and store name
- *                        of a partition. Or the absolute path to
- *                        the block device partition.
- * @member fd           - @block_device open file descriptor.
- * @member sector_sz    - Byte size of each sector of a block device.
- *                        Typically 512 bytes per sector.
+ * @member err             - Stores information about the error that occured
+ *                           for the given context and may later be retrieved
+ *                           by caller.
+ * @member free            - If structure allocated with calloc(3) member will be
+ *                           set to true so that, we know to call free(3) when
+ *                           destroying the context.
+ * @member parts           - Array of partitions for the given @block_device.
+ * @member block_device    - Block device name in string format.
+ * @member block_device_fd - @block_device open file descriptor.
+ * @member ptable_type     - Partition table type contained in @block_device.
+ * @member sector_sz       - Byte size of each sector in @block_device.
+ *                           Typically 512 bytes per sector.
+ * @member part_count      - Size of @parts array. Amount of partitions
+ *                           associated with the context.
+ * @member part_name       - Used to temporarily acquire and store name
+ *                           of a partition. Or the absolute path to
+ *                           the block device partition.
  */
 struct uprov_device
 {
@@ -118,11 +120,11 @@ struct uprov_device
 	bool                        free;
 	struct uprov_device_part    parts[PARTITIONS_MAX];
 	char                        block_device[BLK_NAME_MAX];
-	char                        table_type[TABLE_TYPE_MAX];
-	char                        part_name[PART_NAME_MAX];
-	int                         fd;
-	uint32_t                    sector_sz;
+	int                         block_device_fd;
+	char                        ptable_type[TABLE_TYPE_MAX];
+	uint16_t                    sector_sz;
 	size_t                      part_count;
+	char                        part_name[PART_NAME_MAX];
 };
 
 /*****************************************
@@ -179,18 +181,18 @@ p_device_create_with_fdisk (struct uprov_device *device)
 		return -1;
 	}
 
-	device->fd = open(device->block_device, O_RDWR);
-	if (device->fd == -1) {
+	device->block_device_fd = open(device->block_device, O_RDWR);
+	if (device->block_device_fd == -1) {
 		udo_log_error("open: %s\n", strerror(errno));
 		p_uprov_fdisk_destroy(&fdisk);
 		return -1;
 	}
 
 	err = fdisk_assign_device_by_fd(fdisk.ctx, \
-		device->fd, device->block_device, 0);
+		device->block_device_fd, device->block_device, 0);
 	if (err < 0) {
 		udo_log_error("fdisk_assign_device_by_fd('%d','%s') failed\n",
-		              device->fd, device->block_device);
+		              device->block_device_fd, device->block_device);
 		p_uprov_fdisk_destroy(&fdisk);
 		return -1;
 	}
@@ -198,7 +200,7 @@ p_device_create_with_fdisk (struct uprov_device *device)
 	err = fdisk_get_partitions(fdisk.ctx, &(fdisk.table));
 	if (err != 0) {
 		udo_log_error("fdisk_get_partitions('%d','%s') failed\n",
-		              device->fd, device->block_device);
+		              device->block_device_fd, device->block_device);
 		p_uprov_fdisk_destroy(&fdisk);
 		return -1;
 	}
@@ -207,8 +209,8 @@ p_device_create_with_fdisk (struct uprov_device *device)
 	device->part_count = fdisk_table_get_nents(fdisk.table);
 
 	lb = fdisk_get_label(fdisk.ctx, NULL);
-	strncpy(device->table_type, fdisk_label_get_name(lb), TABLE_TYPE_MAX-1);
-	gpt = UDO_STRTOU(device->table_type);
+	strncpy(device->ptable_type, fdisk_label_get_name(lb), TABLE_TYPE_MAX-1);
+	gpt = UDO_STRTOU(device->ptable_type);
 
 	for (p = 0; p < device->part_count; p++) {
 		part = fdisk_table_get_partition_by_partno(fdisk.table, p);
@@ -309,6 +311,64 @@ uprov_device_create (struct uprov_device *p_device,
  *************************************/
 
 
+/************************************
+ * Start uprov_device_get functions *
+ ************************************/
+
+const char *
+uprov_device_get_block_device (struct uprov_device *device)
+{
+	if (!device || !(*device->block_device))
+		return NULL;
+
+	return device->block_device;
+}
+
+
+int
+uprov_device_get_block_device_fd (struct uprov_device *device)
+{
+	if (!device)
+		return -1;
+
+	return device->block_device_fd;
+}
+
+
+const char *
+uprov_device_get_ptable_type (struct uprov_device *device)
+{
+	if (!device || !(*device->ptable_type))
+		return NULL;
+
+	return device->ptable_type;
+}
+
+
+uint16_t
+uprov_device_get_sector_sz (struct uprov_device *device)
+{
+	if (!device)
+		return UINT16_MAX;
+
+	return device->sector_sz;
+}
+
+
+size_t
+uprov_device_get_part_count (struct uprov_device *device)
+{
+	if (!device)
+		return (size_t)-1;
+
+	return device->part_count;
+}
+
+/**********************************
+ * End uprov_device_get functions *
+ **********************************/
+
+
 /****************************************
  * Start uprov_device_destroy functions *
  ****************************************/
@@ -319,7 +379,7 @@ uprov_device_destroy (struct uprov_device *device)
 	if (!device)
 		return;
 
-	close(device->fd);
+	close(device->block_device_fd);
 
 	if (device->free) {
 		free(device);

@@ -41,8 +41,6 @@ test_device_create (void UDO_UNUSED **state)
 {
 	struct uprov_device *device = NULL;
 
-	udo_log_set_level(UDO_LOG_ALL);
-
 	device = uprov_device_create(NULL, BLOCK_DEVICE);
 	assert_non_null(device);
 
@@ -52,6 +50,94 @@ test_device_create (void UDO_UNUSED **state)
 /***************************************
  * End of test_device_create functions *
  ***************************************/
+
+
+/**************************************
+ * Start of test_device_get functions *
+ **************************************/
+
+static void UDO_UNUSED
+test_device_get_block_device (void UDO_UNUSED **state)
+{
+	const char *block_device = NULL;
+	struct uprov_device *device = NULL;
+
+	device = uprov_device_create(NULL, BLOCK_DEVICE);
+	assert_non_null(device);
+
+	block_device = uprov_device_get_block_device(device);
+	assert_string_equal(block_device, BLOCK_DEVICE);
+
+	uprov_device_destroy(device);
+}
+
+
+static void UDO_UNUSED
+test_device_get_block_device_fd (void UDO_UNUSED **state)
+{
+	int fd = -1;
+	struct uprov_device *device = NULL;
+
+	device = uprov_device_create(NULL, BLOCK_DEVICE);
+	assert_non_null(device);
+
+	fd = uprov_device_get_block_device_fd(device);
+	assert_int_not_equal(fd, -1);
+
+	uprov_device_destroy(device);
+}
+
+
+static void UDO_UNUSED
+test_device_get_ptable_type (void UDO_UNUSED **state)
+{
+	const char *ptable_type = NULL;
+	struct uprov_device *device = NULL;
+
+	device = uprov_device_create(NULL, BLOCK_DEVICE);
+	assert_non_null(device);
+
+	ptable_type = uprov_device_get_block_device(device);
+	assert_non_null(ptable_type);
+
+	uprov_device_destroy(device);
+}
+
+
+static void UDO_UNUSED
+test_device_get_sector_sz (void UDO_UNUSED **state)
+{
+	uint16_t sector_sz = 0;
+	struct uprov_device *device = NULL;
+
+	device = uprov_device_create(NULL, BLOCK_DEVICE);
+	assert_non_null(device);
+
+	sector_sz = uprov_device_get_sector_sz(device);
+	assert_int_not_equal(sector_sz, UINT16_MAX);
+
+	uprov_device_destroy(device);
+}
+
+
+static void UDO_UNUSED
+test_device_get_part_count (void UDO_UNUSED **state)
+{
+	size_t part_count = 0;
+	struct uprov_device *device = NULL;
+
+	device = uprov_device_create(NULL, BLOCK_DEVICE);
+	assert_non_null(device);
+
+	part_count = uprov_device_get_part_count(device);
+	assert_int_not_equal(part_count, (size_t)-1);
+
+	uprov_device_destroy(device);
+}
+
+/************************************
+ * End of test_device_get functions *
+ ************************************/
 
 
 /*********************************************
@@ -75,6 +161,11 @@ main (void)
 {
 	const struct CMUnitTest tests[] = {
 		cmocka_unit_test(test_device_create),
+		cmocka_unit_test(test_device_get_block_device),
+		cmocka_unit_test(test_device_get_block_device_fd),
+		cmocka_unit_test(test_device_get_ptable_type),
+		cmocka_unit_test(test_device_get_sector_sz),
+		cmocka_unit_test(test_device_get_part_count),
 		cmocka_unit_test(test_device_get_sizeof),
 	};
 

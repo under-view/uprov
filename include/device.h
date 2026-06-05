@@ -67,6 +67,79 @@ uprov_device_destroy (struct uprov_device *device);
 
 
 /*
+ * @brief Returns block device name in string format.
+ *
+ * @param device - Pointer to a valid struct uprov_device.
+ *
+ * @returns
+ *	on success: Block device path
+ *	on failure: NULL
+ */
+UDO_API
+const char *
+uprov_device_get_block_device (struct uprov_device *device);
+
+
+/*
+ * @brief Returns file descriptor associated
+ *        with open block device file.
+ *
+ * @param device - Pointer to a valid struct uprov_device.
+ *
+ * @returns
+ *	on success: Block device file descriptor
+ *	on failure: -1
+ */
+UDO_API
+int
+uprov_device_get_block_device_fd (struct uprov_device *device);
+
+
+/*
+ * @brief Returns partition table type in string format.
+ *
+ * @param device - Pointer to a valid struct uprov_device.
+ *
+ * @returns
+ *	on success: Partition table type
+ *	on failure: NULL
+ */
+UDO_API
+const char *
+uprov_device_get_ptable_type (struct uprov_device *device);
+
+
+/*
+ * @brief Returns byte size of each sector
+ *        in caller defined block device.
+ *        Typically 512 bytes per sector.
+ *
+ * @param device - Pointer to a valid struct uprov_device.
+ *
+ * @returns
+ *	on success: Byte size of each sector
+ *	on failure: (uint16_t)-1 or UINT16_MAX
+ */
+UDO_API
+uint16_t
+uprov_device_get_sector_sz (struct uprov_device *device);
+
+
+/*
+ * @brief Returns number of partitions associated with context.
+ *
+ * @param device - Pointer to a valid struct uprov_device.
+ *
+ * @returns
+ *	on success: Amount of partitions in context
+ *	on failure: (size_t)-1
+ */
+UDO_API
+size_t
+uprov_device_get_part_count (struct uprov_device *device);
+
+
+/*
  * @brief Returns size of the internal structure. So,
  *        if caller decides to allocate memory outside
  *        of API interface they know the exact amount
