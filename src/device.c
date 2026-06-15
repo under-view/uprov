@@ -220,37 +220,40 @@ p_device_create_with_fdisk (struct uprov_device *device)
 		device->parts[p].sector_size = fdisk_partition_get_size(part);
 
 		/* Acquire fslabel of a partiton */
-		fdisk_partition_to_string(part, fdisk.ctx,
-					  FDISK_FIELD_FSLABEL,
+		fdisk_partition_to_string(part, fdisk.ctx, \
+					  FDISK_FIELD_FSLABEL, \
 					  &fslabel);
-		strncpy(device->parts[p].fslabel, \
-			(fslabel) ? fslabel : \
-			&(char){'\0'}, FSLABEL_MAX);
-		free(fslabel); fslabel = NULL;
+		if (fslabel) {
+			strncpy(device->parts[p].fslabel, \
+				fslabel, FSLABEL_MAX);
+			free(fslabel); fslabel = NULL;
+		}
 
 		/* Acquire fstype of a partition */
-		fdisk_partition_to_string(part, fdisk.ctx,
-		                          FDISK_FIELD_FSTYPE,
+		fdisk_partition_to_string(part, fdisk.ctx, \
+		                          FDISK_FIELD_FSTYPE, \
 		                          &fstype);
-		strncpy(device->parts[p].fstype, \
-		        (fstype) ? fstype : \
-			&(char){'\0'}, FSTYPE_MAX);
-		free(fstype); fstype = NULL;
+		if (fstype) {
+			strncpy(device->parts[p].fstype, \
+				fstype, FSTYPE_MAX);
+			free(fstype); fstype = NULL;
+		}
 
 		parttype = fdisk_partition_get_type(part);
 
 		if (gpt == IS_GPT) {
-			strncpy(device->parts[p].type.code_str,
-				fdisk_parttype_get_string(parttype),
+			strncpy(device->parts[p].type.code_str, \
+				fdisk_parttype_get_string(parttype), \
 				TYPE_CODE_STR_MAX);
 
-			fdisk_partition_to_string(part, fdisk.ctx,
-						  FDISK_FIELD_NAME,
+			fdisk_partition_to_string(part, fdisk.ctx, \
+						  FDISK_FIELD_NAME, \
 						  &partlabel);
-			strncpy(device->parts[p].partlabel,
-				(partlabel) ? partlabel : \
-				&(char){'\0'}, PARTLABEL_MAX);
-			free(partlabel); partlabel = NULL;
+			if (partlabel) {
+				strncpy(device->parts[p].partlabel, \
+					partlabel, PARTLABEL_MAX);
+				free(partlabel); partlabel = NULL;
+			}
 		} else {
 			device->parts[p].type.code = \
 				fdisk_parttype_get_code(parttype);
