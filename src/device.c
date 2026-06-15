@@ -25,7 +25,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <stdbool.h>
 #include <stdint.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -80,8 +79,8 @@ struct uprov_device_part
 	uint64_t start_sector;
 	uint64_t end_sector;
 	uint64_t sector_size;
-	bool     logical;
-	bool     extended;
+	uint8_t  logical;
+	uint8_t  extended;
 	char     fstype[FSTYPE_MAX];
 	char     fslabel[FSLABEL_MAX];
 	char     partlabel[PARTLABEL_MAX];
@@ -117,7 +116,7 @@ struct uprov_device_part
 struct uprov_device
 {
 	struct udo_log_error_struct err;
-	bool                        free;
+	uint8_t                     free;
 	struct uprov_device_part    parts[PARTITIONS_MAX];
 	char                        block_device[BLK_NAME_MAX];
 	int                         block_device_fd;
