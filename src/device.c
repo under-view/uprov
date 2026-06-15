@@ -363,6 +363,131 @@ uprov_device_get_part_count (struct uprov_device *device)
 	return device->part_count;
 }
 
+
+size_t
+uprov_device_get_part_num (struct uprov_device *device,
+                           const size_t part_index)
+{
+	if (!device)
+		return (size_t)-1;
+
+	return device->parts[part_index].number;
+}
+
+
+uint64_t
+uprov_device_get_part_start_sector (struct uprov_device *device,
+                                    const size_t part_index)
+{
+	if (!device)
+		return UINT64_MAX;
+
+	return device->parts[part_index].start_sector;
+}
+
+
+uint64_t
+uprov_device_get_part_end_sector (struct uprov_device *device,
+                                  const size_t part_index)
+{
+	if (!device)
+		return UINT64_MAX;
+
+	return device->parts[part_index].end_sector;
+}
+
+
+uint64_t
+uprov_device_get_part_sector_size (struct uprov_device *device,
+                                   const size_t part_index)
+{
+	if (!device)
+		return UINT64_MAX;
+
+	return device->parts[part_index].sector_size;
+}
+
+
+uint8_t
+uprov_device_get_part_logical (struct uprov_device *device,
+                               const size_t part_index)
+{
+	if (!device)
+		return UINT8_MAX;
+
+	return device->parts[part_index].logical;
+}
+
+
+uint8_t
+uprov_device_get_part_extended (struct uprov_device *device,
+                                const size_t part_index)
+{
+	if (!device)
+		return UINT8_MAX;
+
+	return device->parts[part_index].extended;
+}
+
+
+const char *
+uprov_device_get_part_fstype (struct uprov_device *device,
+                              const size_t part_index)
+{
+	if (!device || \
+	    !(*device->parts[part_index].fstype))
+		return NULL;
+
+	return device->parts[part_index].fstype;
+}
+
+
+const char *
+uprov_device_get_part_fslabel (struct uprov_device *device,
+                               const size_t part_index)
+{
+	if (!device || \
+	    !(*device->parts[part_index].fslabel))
+		return NULL;
+
+	return device->parts[part_index].fslabel;
+}
+
+
+const char *
+uprov_device_get_part_partlabel (struct uprov_device *device,
+                                 const size_t part_index)
+{
+	if (!device || \
+	    !(*device->parts[part_index].partlabel))
+		return NULL;
+
+	return device->parts[part_index].partlabel;
+}
+
+
+uint32_t
+uprov_device_get_part_type_code (struct uprov_device *device,
+                                 const size_t part_index)
+{
+	if (!device)
+		return UINT32_MAX;
+
+	return device->parts[part_index].type.code;
+}
+
+
+const char *
+uprov_device_get_part_type_code_string (struct uprov_device *device,
+                                        const size_t part_index)
+{
+	if (!device || \
+	    !(*device->parts[part_index].type.code_str))
+		return NULL;
+
+	return device->parts[part_index].type.code_str;
+}
+
 /**********************************
  * End uprov_device_get functions *
  **********************************/

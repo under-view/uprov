@@ -140,6 +140,199 @@ uprov_device_get_part_count (struct uprov_device *device);
 
 
 /*
+ * @brief Returns partition number.
+ *        It's generally @part_index + 1.
+ *
+ * @param device     - Pointer to a valid struct uprov_device.
+ * @param part_index - Must pass valid partition index value.
+ *
+ * @returns
+ * 	on success: Partition number
+ * 	on failure: (size_t)-1
+ */
+UDO_API
+size_t
+uprov_device_get_part_num (struct uprov_device *device,
+                           const size_t part_index);
+
+
+/*
+ * @brief Returns a given partitions start sector.
+ *
+ * @param device     - Pointer to a valid struct uprov_device.
+ * @param part_index - Must pass valid partition index value.
+ *
+ * @returns
+ * 	on success: Partition start sector
+ * 	on failure: (uint64_t)-1 or UINT64_MAX
+ */
+UDO_API
+uint64_t
+uprov_device_get_part_start_sector (struct uprov_device *device,
+                                    const size_t part_index);
+
+
+/*
+ * @brief Returns a given partitions end sector.
+ *
+ * @param device     - Pointer to a valid struct uprov_device.
+ * @param part_index - Must pass valid partition index value.
+ *
+ * @returns
+ * 	on success: Partition end sector
+ * 	on failure: (uint64_t)-1 or UINT64_MAX
+ */
+UDO_API
+uint64_t
+uprov_device_get_part_end_sector (struct uprov_device *device,
+                                  const size_t part_index);
+
+
+/*
+ * @brief Returns amount of sectors a partition has available.
+ *
+ * @param device     - Pointer to a valid struct uprov_device.
+ * @param part_index - Must pass valid partition index value.
+ *
+ * @returns
+ * 	on success: Partition sector count
+ * 	on failure: (uint64_t)-1 or UINT64_MAX
+ */
+UDO_API
+uint64_t
+uprov_device_get_part_sector_size (struct uprov_device *device,
+                                   const size_t part_index);
+
+
+/*
+ * @brief Returns a boolean value determining
+ *        if the partition is logical or not.
+ *
+ *        1 if logical
+ *        0 if not logical
+ *
+ * @param device     - Pointer to a valid struct uprov_device.
+ * @param part_index - Must pass valid partition index value.
+ *
+ * @returns
+ * 	on success: Boolean value 1 if logical partition 0 if not
+ * 	on failure: (uint8_t)-1 or UINT8_MAX
+ */
+UDO_API
+uint8_t
+uprov_device_get_part_logical (struct uprov_device *device,
+                               const size_t part_index);
+
+
+/*
+ * @brief Returns a boolean value determining
+ *        if the partition is extended or not.
+ *
+ *        1 if extended
+ *        0 if not extended
+ *
+ * @param device     - Pointer to a valid struct uprov_device.
+ * @param part_index - Must pass valid partition index value.
+ *
+ * @returns
+ * 	on success: Boolean value 1 if extended partition 0 if not
+ * 	on failure: (uint8_t)-1 or UINT8_MAX
+ */
+UDO_API
+uint8_t
+uprov_device_get_part_extended (struct uprov_device *device,
+                               const size_t part_index);
+
+
+/*
+ * @brief Returns the partitions file
+ *        system type in string format.
+ *
+ * @param device     - Pointer to a valid struct uprov_device.
+ * @param part_index - Must pass valid partition index value.
+ *
+ * @returns
+ * 	on success: File system type in string format
+ * 	on failure: NULL
+ */
+UDO_API
+const char *
+uprov_device_get_part_fstype (struct uprov_device *device,
+                              const size_t part_index);
+
+
+/*
+ * @brief Returns the partitions file
+ *        system label in string format.
+ *
+ * @param device     - Pointer to a valid struct uprov_device.
+ * @param part_index - Must pass valid partition index value.
+ *
+ * @returns
+ * 	on success: File system type in string format
+ * 	on failure: NULL
+ */
+UDO_API
+const char *
+uprov_device_get_part_fslabel (struct uprov_device *device,
+                               const size_t part_index);
+
+
+/*
+ * @brief Returns the partitions PARTLABEL
+ *        in string format. Only used if
+ *        the disk is GPT.
+ *
+ * @param device     - Pointer to a valid struct uprov_device.
+ * @param part_index - Must pass valid partition index value.
+ *
+ * @returns
+ * 	on success: GPT PARTLABEL in string format
+ * 	on failure: NULL
+ */
+UDO_API
+const char *
+uprov_device_get_part_partlabel (struct uprov_device *device,
+                                 const size_t part_index);
+
+
+/*
+ * @brief Returns type code given to a partition
+ *        in unsigned integer format. Used for both
+ *        MBR and GPT disk.
+ *
+ * @param device     - Pointer to a valid struct uprov_device.
+ * @param part_index - Must pass valid partition index value.
+ *
+ * @returns
+ * 	on success: Partition type code in integer format
+ * 	on failure: (uint32_t)-1 or UINT32_MAX
+ */
+UDO_API
+uint32_t
+uprov_device_get_part_type_code (struct uprov_device *device,
+                                 const size_t part_index);
+
+
+/*
+ * @brief Returns the partitions type code
+ *        in string format. Only for both
+ *        MBR and GPT disk.
+ *
+ * @param device     - Pointer to a valid struct uprov_device.
+ * @param part_index - Must pass valid partition index value.
+ *
+ * @returns
+ * 	on success: Partition type code in string format
+ * 	on failure: NULL
+ */
+UDO_API
+const char *
+uprov_device_get_part_type_code_str (struct uprov_device *device,
+                                     const size_t part_index);
+
+
+/*
  * @brief Returns size of the internal structure. So,
  *        if caller decides to allocate memory outside
  *        of API interface they know the exact amount
