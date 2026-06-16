@@ -135,6 +135,25 @@ test_device_get_part_count (void UDO_UNUSED **state)
 	uprov_device_destroy(device);
 }
 
+
+static void UDO_UNUSED
+test_device_get_part_num (void UDO_UNUSED **state)
+{
+	size_t part_num = 0;
+	struct uprov_device *device = NULL;
+
+	device = uprov_device_create(NULL, BLOCK_DEVICE);
+	assert_non_null(device);
+
+	part_num = uprov_device_get_part_num(NULL, 0);
+	assert_int_equal(part_num, (size_t)-1);
+
+	part_num = uprov_device_get_part_num(device, 0);
+	assert_int_equal(part_num, 1);
+
+	uprov_device_destroy(device);
+}
+
 /************************************
  * End of test_device_get functions *
  ************************************/
@@ -166,6 +185,7 @@ main (void)
 		cmocka_unit_test(test_device_get_ptable_type),
 		cmocka_unit_test(test_device_get_sector_sz),
 		cmocka_unit_test(test_device_get_part_count),
+		cmocka_unit_test(test_device_get_part_num),
 		cmocka_unit_test(test_device_get_sizeof),
 	};
 
