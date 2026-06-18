@@ -173,6 +173,25 @@ test_device_get_part_start_sector (void UDO_UNUSED **state)
 	uprov_device_destroy(device);
 }
 
+
+static void UDO_UNUSED
+test_device_get_part_end_sector (void UDO_UNUSED **state)
+{
+	uint64_t end_sector = 0;
+	struct uprov_device *device = NULL;
+
+	device = uprov_device_create(NULL, BLOCK_DEVICE);
+	assert_non_null(device);
+
+	end_sector = uprov_device_get_part_end_sector(NULL, 0);
+	assert_true(end_sector == UINT64_MAX);
+
+	end_sector = uprov_device_get_part_end_sector(device, 0);
+	assert_false(end_sector == UINT64_MAX);
+
+	uprov_device_destroy(device);
+}
+
 /************************************
  * End of test_device_get functions *
  ************************************/
