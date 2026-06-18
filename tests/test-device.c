@@ -192,6 +192,25 @@ test_device_get_part_end_sector (void UDO_UNUSED **state)
 	uprov_device_destroy(device);
 }
 
+
+static void UDO_UNUSED
+test_device_get_part_sector_size (void UDO_UNUSED **state)
+{
+	uint64_t sector_size = 0;
+	struct uprov_device *device = NULL;
+
+	device = uprov_device_create(NULL, BLOCK_DEVICE);
+	assert_non_null(device);
+
+	sector_size = uprov_device_get_part_sector_size(NULL, 0);
+	assert_true(sector_size == UINT64_MAX);
+
+	sector_size = uprov_device_get_part_sector_size(device, 0);
+	assert_false(sector_size == UINT64_MAX);
+
+	uprov_device_destroy(device);
+}
+
 /************************************
  * End of test_device_get functions *
  ************************************/
@@ -225,6 +244,8 @@ main (void)
 		cmocka_unit_test(test_device_get_part_count),
 		cmocka_unit_test(test_device_get_part_num),
 		cmocka_unit_test(test_device_get_part_start_sector),
+		cmocka_unit_test(test_device_get_part_end_sector),
+		cmocka_unit_test(test_device_get_part_sector_size),
 		cmocka_unit_test(test_device_get_sizeof),
 	};
 
