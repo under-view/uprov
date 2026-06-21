@@ -268,6 +268,32 @@ test_device_get_part_fstype (void UDO_UNUSED **state)
 	uprov_device_destroy(device);
 }
 
+
+static void UDO_UNUSED
+test_device_get_part_partlabel (void UDO_UNUSED **state)
+{
+	const char *partlabel = NULL;
+	struct uprov_device *device = NULL;
+
+	udo_log_set_level(UDO_LOG_ALL);
+
+	device = uprov_device_create(NULL, BLOCK_DEVICE);
+	assert_non_null(device);
+
+	partlabel = uprov_device_get_part_partlabel(NULL, 0);
+	assert_null(partlabel);
+
+	/*
+	 * TODO: update test so that disk type
+	 * and partitions are created during the test.
+	 *
+	 * partlabel = uprov_device_get_part_partlabel(device, 1);
+	 * assert_non_null(partlabel);
+	 */
+
+	uprov_device_destroy(device);
+}
+
 /************************************
  * End of test_device_get functions *
  ************************************/
@@ -306,6 +332,7 @@ main (void)
 		cmocka_unit_test(test_device_get_part_logical),
 		cmocka_unit_test(test_device_get_part_extended),
 		cmocka_unit_test(test_device_get_part_fstype),
+		cmocka_unit_test(test_device_get_part_partlabel),
 		cmocka_unit_test(test_device_get_sizeof),
 	};
 
