@@ -320,8 +320,14 @@ uprov_device_create (struct uprov_device *p_device,
 const char *
 uprov_device_get_block_device (struct uprov_device *device)
 {
-	if (!device || !(*device->block_device))
+	if (!device)
 		return NULL;
+
+	if (!(*device->block_device)) {
+		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
+		                  "Block device name not found.\n");
+		return NULL;
+	}
 
 	return device->block_device;
 }
@@ -340,8 +346,14 @@ uprov_device_get_block_device_fd (struct uprov_device *device)
 const char *
 uprov_device_get_ptable_type (struct uprov_device *device)
 {
-	if (!device || !(*device->ptable_type))
+	if (!device)
 		return NULL;
+
+	if (!(*device->ptable_type)) {
+		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
+		                  "Partition table type name not found.\n");
+		return NULL;
+	}
 
 	return device->ptable_type;
 }
@@ -437,9 +449,14 @@ const char *
 uprov_device_get_part_fstype (struct uprov_device *device,
                               const size_t part_index)
 {
-	if (!device || \
-	    !(*device->parts[part_index].fstype))
+	if (!device)
 		return NULL;
+
+	if (!(*device->parts[part_index].fstype)) {
+		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
+		                  "File system type not set.\n");
+		return NULL;
+	}
 
 	return device->parts[part_index].fstype;
 }
@@ -449,9 +466,14 @@ const char *
 uprov_device_get_part_fslabel (struct uprov_device *device,
                                const size_t part_index)
 {
-	if (!device || \
-	    !(*device->parts[part_index].fslabel))
+	if (!device)
 		return NULL;
+
+	if (!(*device->parts[part_index].fslabel)) {
+		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
+		                  "File system label not set.\n");
+		return NULL;
+	}
 
 	return device->parts[part_index].fslabel;
 }
@@ -461,9 +483,20 @@ const char *
 uprov_device_get_part_partlabel (struct uprov_device *device,
                                  const size_t part_index)
 {
-	if (!device || \
-	    !(*device->parts[part_index].partlabel))
+	if (!device)
 		return NULL;
+
+	if (UDO_STRTOU(device->ptable_type) != IS_GPT) {
+		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
+		                  "Not a GPT disk\n");
+		return NULL;
+	}
+
+	if (!(*device->parts[part_index].partlabel)) {
+		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
+		                  "GPT PARTLABEL not set.\n");
+		return NULL;
+	}
 
 	return device->parts[part_index].partlabel;
 }
@@ -476,6 +509,12 @@ uprov_device_get_part_type_code (struct uprov_device *device,
 	if (!device)
 		return UINT32_MAX;
 
+	if (UDO_STRTOU(device->ptable_type) == IS_GPT) {
+		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
+		                  "Not an MBR disk\n");
+		return UINT32_MAX;
+	}
+
 	return device->parts[part_index].type.code;
 }
 
@@ -487,6 +526,18 @@ uprov_device_get_part_type_code_string (struct uprov_device *device,
 	if (!device || \
 	    !(*device->parts[part_index].type.code_str))
 		return NULL;
+
+	if (UDO_STRTOU(device->ptable_type) != IS_GPT) {
+		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
+		                  "Not a GPT disk\n");
+		return NULL;
+	}
+
+	if (!(*device->parts[part_index].type.code_str)) {
+		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
+		                  "GPT partition type code not set.\n");
+		return NULL;
+	}
 
 	return device->parts[part_index].type.code_str;
 }
