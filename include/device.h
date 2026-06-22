@@ -328,8 +328,8 @@ uprov_device_get_part_type_code (struct uprov_device *device,
  */
 UDO_API
 const char *
-uprov_device_get_part_type_code_str (struct uprov_device *device,
-                                     const size_t part_index);
+uprov_device_get_part_type_code_string (struct uprov_device *device,
+                                        const size_t part_index);
 
 
 /*
