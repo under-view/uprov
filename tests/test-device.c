@@ -156,6 +156,26 @@ test_device_get_part_num (void UDO_UNUSED **state)
 
 
 static void UDO_UNUSED
+test_device_get_part_name (void UDO_UNUSED **state)
+{
+	const char *part_name = NULL;
+	struct uprov_device *device = NULL;
+
+	device = uprov_device_create(NULL, BLOCK_DEVICE);
+	assert_non_null(device);
+
+	part_name = uprov_device_get_part_name(NULL, 0);
+	assert_null(part_name);
+
+	part_name = uprov_device_get_part_name(device, 2);
+	assert_non_null(strstr(part_name, BLOCK_DEVICE));
+	assert_non_null(strstr(part_name, "3"));
+
+	uprov_device_destroy(device);
+}
+
+
+static void UDO_UNUSED
 test_device_get_part_start_sector (void UDO_UNUSED **state)
 {
 	uint64_t start_sector = 0;
@@ -396,6 +416,7 @@ main (void)
 		cmocka_unit_test(test_device_get_sector_sz),
 		cmocka_unit_test(test_device_get_part_count),
 		cmocka_unit_test(test_device_get_part_num),
+		cmocka_unit_test(test_device_get_part_name),
 		cmocka_unit_test(test_device_get_part_start_sector),
 		cmocka_unit_test(test_device_get_part_end_sector),
 		cmocka_unit_test(test_device_get_part_sector_size),

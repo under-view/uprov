@@ -390,6 +390,48 @@ uprov_device_get_part_num (struct uprov_device *device,
 }
 
 
+static const char *
+p_get_part_name_format (const char *block_device)
+{
+	uint32_t var = 0;
+
+	while (*block_device) {
+		var += (uint32_t) *block_device;
+		switch (var) {
+			case 617: /* /dev/hd */
+			case 628: /* /dev/sd */
+			case 631: /* /dev/vd */
+				return "%s%d";
+			case 851: /* /dev/nvme */
+			case 855: /* /dev/loop  */
+			case 1043: /* /dev/mmcblk  */
+				return "%sp%d";
+			default:
+				break;
+		}
+
+		block_device++;
+	}
+
+	return "%s%d";
+}
+
+
+const char *
+uprov_device_get_part_name (struct uprov_device *device,
+                            const size_t part_index)
+{
+	if (!device)
+		return NULL;
+
+	snprintf(device->part_name, PART_NAME_MAX, \
+		p_get_part_name_format(device->block_device), \
+		device->block_device, device->parts[part_index].number);
+
+	return device->part_name;
+}
+
+
 uint64_t
 uprov_device_get_part_start_sector (struct uprov_device *device,
                                     const size_t part_index)

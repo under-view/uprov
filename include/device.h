@@ -157,6 +157,22 @@ uprov_device_get_part_num (struct uprov_device *device,
 
 
 /*
+ * @brief Returns a block devices logical partition name.
+ *
+ * @param device     - Pointer to a valid struct uprov_device.
+ * @param part_index - Must pass valid partition index value.
+ *
+ * @returns
+ * 	on success: Logical partition name
+ * 	on failure: NULL
+ */
+UDO_API
+const char *
+uprov_device_get_part_name (struct uprov_device *device,
+                            const size_t part_index);
+
+
+/*
  * @brief Returns a given partitions start sector.
  *
  * @param device     - Pointer to a valid struct uprov_device.
