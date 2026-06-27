@@ -21,7 +21,12 @@ file_offset_bits = get_option('file-offset-bits')
 
 inc = include_directories('include')
 
-pargs += ['-D_FILE_OFFSET_BITS=@0@'.format(file_offset_bits)]
+pargs += [
+  '-DUPROV_VERSION_MAJOR=@0@'.format(so_version.split('.')[0]),
+  '-DUPROV_VERSION_MINOR=@0@'.format(so_version.split('.')[1]),
+  '-DUPROV_VERSION_PATCH=@0@'.format(so_version.split('.')[2]),
+  '-D_FILE_OFFSET_BITS=@0@'.format(file_offset_bits)
+]
 
 subdir('include')
 subdir('src')
