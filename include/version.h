@@ -22,10 +22,47 @@
  * SOFTWARE.
  */
 
-#ifndef UPROV_H
-#define UPROV_H
+#ifndef UPROV_VERSION_H
+#define UPROV_VERSION_H
 
-#include "device.h"
-#include "version.h"
+#include <udo/macros.h>
 
-#endif /* UPROV_H */
+/*
+ * @brief Returns version of library in C string format.
+ *
+ * @returns
+ * 	Library version
+ */
+#define uprov_version_get() \
+	UDO_STRINGIFY(UPROV_VERSION_MAJOR) "." \
+	UDO_STRINGIFY(UPROV_VERSION_MINOR) "." \
+	UDO_STRINGIFY(UPROV_VERSION_PATCH)
+
+
+/*
+ * @brief Returns library version major in integer format.
+ *
+ * @returns
+ * 	Library version major
+ */
+#define uprov_version_get_major() UPROV_VERSION_MAJOR
+
+
+/*
+ * @brief Returns library version minor in integer format.
+ *
+ * @returns
+ * 	Library version minor
+ */
+#define uprov_version_get_minor() UPROV_VERSION_MINOR
+
+
+/*
+ * @brief Returns library version patch in integer format.
+ *
+ * @returns
+ * 	Library version patch
+ */
+#define uprov_version_get_patch() UPROV_VERSION_PATCH
+
+#endif /* UPROV_VERSION_H */

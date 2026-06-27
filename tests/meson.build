@@ -1,7 +1,10 @@
 libcmocka = dependency('cmocka', required: true)
 block_device = get_option('block-device')
 
-progs = [ 'test-device.c' ]
+progs = [
+  'test-device.c',
+  'test-version.c',
+]
 
 original_args = pargs
 foreach p : progs
