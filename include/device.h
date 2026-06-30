@@ -37,13 +37,13 @@ struct uprov_device;
  * @brief Given a block device parse with libfdisk and populate
  *        it's partitions in a struct uprov_device context.
  *
- * @param device       - May be NULL or a pointer to a struct uprov_device.
- *                       If NULL memory will be allocated and return to
- *                       caller. If not NULL address passed will be used
- *                       to store the newly created struct uprov_device
- *                       context.
- * @param block_device - Pointer to string storing name of block device
- *                       to associate with a struct uprov_device context.
+ * @param device - May be NULL or a pointer to a struct uprov_device.
+ *                 If NULL memory will be allocated and return to
+ *                 caller. If not NULL address passed will be used
+ *                 to store the newly created struct uprov_device
+ *                 context.
+ * @param fname  - Pointer to string storing name of block device
+ *                 to associate with a struct uprov_device context.
  *
  * @returns
  *	on success: Pointer to a struct uprov_device
@@ -52,7 +52,7 @@ struct uprov_device;
 UDO_API
 struct uprov_device *
 uprov_device_create (struct uprov_device *device,
-                     const char *block_device);
+                     const char *fname);
 
 
 /*
@@ -67,32 +67,33 @@ uprov_device_destroy (struct uprov_device *device);
 
 
 /*
- * @brief Returns block device name in string format.
+ * @brief Returns absolute path to file in string format.
  *
  * @param device - Pointer to a valid struct uprov_device.
  *
  * @returns
- *	on success: Block device path
+ *	on success: Absolute path to file
  *	on failure: NULL
  */
 UDO_API
 const char *
-uprov_device_get_block_device (struct uprov_device *device);
+uprov_device_get_fname (struct uprov_device *device);
 
 
 /*
  * @brief Returns file descriptor associated
- *        with open block device file.
+ *        with open file passed to create
+ *        function.
  *
  * @param device - Pointer to a valid struct uprov_device.
  *
  * @returns
- *	on success: Block device file descriptor
+ *	on success: Open file descriptor
  *	on failure: -1
  */
 UDO_API
 int
-uprov_device_get_block_device_fd (struct uprov_device *device);
+uprov_device_get_fname_fd (struct uprov_device *device);
 
 
 /*

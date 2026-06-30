@@ -57,23 +57,23 @@ test_device_create (void UDO_UNUSED **state)
  **************************************/
 
 static void UDO_UNUSED
-test_device_get_block_device (void UDO_UNUSED **state)
+test_device_get_fname (void UDO_UNUSED **state)
 {
-	const char *block_device = NULL;
+	const char *fname = NULL;
 	struct uprov_device *device = NULL;
 
 	device = uprov_device_create(NULL, BLOCK_DEVICE);
 	assert_non_null(device);
 
-	block_device = uprov_device_get_block_device(device);
-	assert_string_equal(block_device, BLOCK_DEVICE);
+	fname = uprov_device_get_fname(device);
+	assert_string_equal(fname, BLOCK_DEVICE);
 
 	uprov_device_destroy(device);
 }
 
 
 static void UDO_UNUSED
-test_device_get_block_device_fd (void UDO_UNUSED **state)
+test_device_get_fname_fd (void UDO_UNUSED **state)
 {
 	int fd = -1;
 	struct uprov_device *device = NULL;
@@ -81,7 +81,7 @@ test_device_get_block_device_fd (void UDO_UNUSED **state)
 	device = uprov_device_create(NULL, BLOCK_DEVICE);
 	assert_non_null(device);
 
-	fd = uprov_device_get_block_device_fd(device);
+	fd = uprov_device_get_fname_fd(device);
 	assert_int_not_equal(fd, -1);
 
 	uprov_device_destroy(device);
@@ -97,7 +97,7 @@ test_device_get_ptable_type (void UDO_UNUSED **state)
 	device = uprov_device_create(NULL, BLOCK_DEVICE);
 	assert_non_null(device);
 
-	ptable_type = uprov_device_get_block_device(device);
+	ptable_type = uprov_device_get_fname(device);
 	assert_non_null(ptable_type);
 
 	uprov_device_destroy(device);
@@ -410,8 +410,8 @@ main (void)
 {
 	const struct CMUnitTest tests[] = {
 		cmocka_unit_test(test_device_create),
-		cmocka_unit_test(test_device_get_block_device),
-		cmocka_unit_test(test_device_get_block_device_fd),
+		cmocka_unit_test(test_device_get_fname),
+		cmocka_unit_test(test_device_get_fname_fd),
 		cmocka_unit_test(test_device_get_ptable_type),
 		cmocka_unit_test(test_device_get_sector_sz),
 		cmocka_unit_test(test_device_get_part_count),

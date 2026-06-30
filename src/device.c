@@ -95,31 +95,31 @@ struct uprov_device_part
  * @brief Structure storing everything required
  *        to repartition a block device.
  *
- * @member err             - Stores information about the error that occured
- *                           for the given context and may later be retrieved
- *                           by caller.
- * @member free            - If structure allocated with calloc(3) member will be
- *                           set to true so that, we know to call free(3) when
- *                           destroying the context.
- * @member parts           - Array of partitions for the given @block_device.
- * @member block_device    - Block device name in string format.
- * @member block_device_fd - @block_device open file descriptor.
- * @member ptable_type     - Partition table type contained in @block_device.
- * @member sector_sz       - Byte size of each sector in @block_device.
- *                           Typically 512 bytes per sector.
- * @member part_count      - Size of @parts array. Amount of partitions
- *                           associated with the context.
- * @member part_name       - Used to temporarily acquire and store name
- *                           of a partition. Or the absolute path to
- *                           the block device partition.
+ * @member err         - Stores information about the error that occured
+ *                       for the given context and may later be retrieved
+ *                       by caller.
+ * @member free        - If structure allocated with calloc(3) member will be
+ *                       set to true so that, we know to call free(3) when
+ *                       destroying the context.
+ * @member parts       - Array of partitions for the given @fname.
+ * @member fname       - Block device name in string format.
+ * @member fname_fd    - @fname open file descriptor.
+ * @member ptable_type - Partition table type contained in @fname.
+ * @member sector_sz   - Byte size of each sector in @fname.
+ *                       Typically 512 bytes per sector.
+ * @member part_count  - Size of @parts array. Amount of partitions
+ *                       associated with the context.
+ * @member part_name   - Used to temporarily acquire and store name
+ *                       of a partition. Or the absolute path to
+ *                       the block device partition.
  */
 struct uprov_device
 {
 	struct udo_log_error_struct err;
 	uint8_t                     free;
 	struct uprov_device_part    parts[PARTITIONS_MAX];
-	char                        block_device[BLK_NAME_MAX];
-	int                         block_device_fd;
+	char                        fname[BLK_NAME_MAX];
+	int                         fname_fd;
 	char                        ptable_type[TABLE_TYPE_MAX];
 	uint16_t                    sector_sz;
 	size_t                      part_count;
@@ -180,18 +180,18 @@ p_device_create_with_fdisk (struct uprov_device *device)
 		return -1;
 	}
 
-	device->block_device_fd = open(device->block_device, O_RDWR);
-	if (device->block_device_fd == -1) {
+	device->fname_fd = open(device->fname, O_RDWR);
+	if (device->fname_fd == -1) {
 		udo_log_error("open: %s\n", strerror(errno));
 		p_uprov_fdisk_destroy(&fdisk);
 		return -1;
 	}
 
 	err = fdisk_assign_device_by_fd(fdisk.ctx, \
-		device->block_device_fd, device->block_device, 0);
+		device->fname_fd, device->fname, 0);
 	if (err < 0) {
 		udo_log_error("fdisk_assign_device_by_fd('%d','%s') failed\n",
-		              device->block_device_fd, device->block_device);
+		              device->fname_fd, device->fname);
 		p_uprov_fdisk_destroy(&fdisk);
 		return -1;
 	}
@@ -199,7 +199,7 @@ p_device_create_with_fdisk (struct uprov_device *device)
 	err = fdisk_get_partitions(fdisk.ctx, &(fdisk.table));
 	if (err != 0) {
 		udo_log_error("fdisk_get_partitions('%d','%s') failed\n",
-		              device->block_device_fd, device->block_device);
+		              device->fname_fd, device->fname);
 		p_uprov_fdisk_destroy(&fdisk);
 		return -1;
 	}
@@ -277,13 +277,13 @@ p_device_create_with_fdisk (struct uprov_device *device)
 
 struct uprov_device *
 uprov_device_create (struct uprov_device *p_device,
-                     const char *block_device)
+                     const char *fname)
 {
 	int ret = -1;
 
 	struct uprov_device *device = p_device;
 
-	if (!block_device) {
+	if (!fname) {
 		udo_log_error("Incorrect data passed\n");
 		return NULL;
 	}
@@ -296,8 +296,8 @@ uprov_device_create (struct uprov_device *p_device,
 		}
 	}
 
-	strncpy(&(device->block_device[0]), \
-		block_device, BLK_NAME_MAX - 1);
+	strncpy(&(device->fname[0]), \
+		fname, BLK_NAME_MAX - 1);
 
 	ret = p_device_create_with_fdisk(device);
 	if (ret == -1) {
@@ -318,28 +318,28 @@ uprov_device_create (struct uprov_device *p_device,
  ************************************/
 
 const char *
-uprov_device_get_block_device (struct uprov_device *device)
+uprov_device_get_fname (struct uprov_device *device)
 {
 	if (!device)
 		return NULL;
 
-	if (!(*device->block_device)) {
+	if (!(*device->fname)) {
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
 		                  "Block device name not found.\n");
 		return NULL;
 	}
 
-	return device->block_device;
+	return device->fname;
 }
 
 
 int
-uprov_device_get_block_device_fd (struct uprov_device *device)
+uprov_device_get_fname_fd (struct uprov_device *device)
 {
 	if (!device)
 		return -1;
 
-	return device->block_device_fd;
+	return device->fname_fd;
 }
 
 
@@ -391,12 +391,12 @@ uprov_device_get_part_num (struct uprov_device *device,
 
 
 static const char *
-p_get_part_name_format (const char *block_device)
+p_get_part_name_format (const char *fname)
 {
 	uint32_t var = 0;
 
-	while (*block_device) {
-		var += (uint32_t) *block_device;
+	while (*fname) {
+		var += (uint32_t) *fname;
 		switch (var) {
 			case 617: /* /dev/hd */
 			case 628: /* /dev/sd */
@@ -410,7 +410,7 @@ p_get_part_name_format (const char *block_device)
 				break;
 		}
 
-		block_device++;
+		fname++;
 	}
 
 	return "%s%d";
@@ -425,8 +425,8 @@ uprov_device_get_part_name (struct uprov_device *device,
 		return NULL;
 
 	snprintf(device->part_name, PART_NAME_MAX, \
-		p_get_part_name_format(device->block_device), \
-		device->block_device, device->parts[part_index].number);
+		p_get_part_name_format(device->fname), \
+		device->fname, device->parts[part_index].number);
 
 	return device->part_name;
 }
@@ -599,7 +599,7 @@ uprov_device_destroy (struct uprov_device *device)
 	if (!device)
 		return;
 
-	close(device->block_device_fd);
+	close(device->fname_fd);
 
 	if (device->free) {
 		free(device);
