@@ -29,6 +29,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
+#include <sys/stat.h>
 
 #include <linux/fs.h>
 
@@ -163,6 +164,8 @@ p_device_create_with_fdisk (struct uprov_device *device)
 	uint8_t gpt;
 	int err = -1;
 
+	struct stat sb;
+
 	struct p_uprov_fdisk fdisk;
 
 	struct fdisk_label *lb = NULL;
@@ -173,16 +176,25 @@ p_device_create_with_fdisk (struct uprov_device *device)
 
 	memset(&fdisk, 0, sizeof(struct p_uprov_fdisk));
 
-	fdisk.ctx = fdisk_new_context();
-	if (!(fdisk.ctx)) {
-		udo_log_error("fdisk_new_context failed\n");
-		return -1;
-	}
-
 	device->fname_fd = open(device->fname, O_RDWR);
 	if (device->fname_fd == -1) {
 		udo_log_error("open: %s\n", strerror(errno));
 		p_uprov_fdisk_destroy(&fdisk);
+		return -1;
+	}
+
+	err = fstat(device->fname_fd, &sb);
+	if (err == -1) {
+		udo_log_error("fstat: %s\n", strerror(errno));
+		return -1;
+	}
+
+	if ((sb.st_mode & S_IFMT) != S_IFBLK)
+		return 0;
+
+	fdisk.ctx = fdisk_new_context();
+	if (!(fdisk.ctx)) {
+		udo_log_error("fdisk_new_context failed\n");
 		return -1;
 	}
 
