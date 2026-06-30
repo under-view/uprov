@@ -118,7 +118,7 @@ struct uprov_device
 	struct udo_log_error_struct err;
 	uint8_t                     free;
 	struct uprov_device_part    parts[PARTITIONS_MAX];
-	char                        fname[BLK_NAME_MAX];
+	char                        fname[UDO_FILE_PATH_MAX];
 	int                         fname_fd;
 	char                        ptable_type[TABLE_TYPE_MAX];
 	uint16_t                    sector_sz;
@@ -307,8 +307,8 @@ uprov_device_create (struct uprov_device *p_device,
 		}
 	}
 
-	strncpy(&(device->fname[0]), \
-		fname, BLK_NAME_MAX - 1);
+	strncpy(&(device->fname[0]), fname, \
+		UDO_FILE_PATH_MAX - 1);
 
 	ret = p_device_create_with_fdisk(device);
 	if (ret == -1) {
