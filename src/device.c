@@ -48,7 +48,7 @@
 
 /*
  * @brief Structure defining a single partition entry.
- *        For a caller given partitioned block device.
+ *        For a caller given partitioned file.
  *
  * @member number        - Partition number.
  * @member start_sector  - The starting sector of a partition.
@@ -92,8 +92,7 @@ struct uprov_device_part
 
 
 /*
- * @brief Structure storing everything required
- *        to repartition a block device.
+ * @brief Structure storing everything required to partition a file.
  *
  * @member err         - Stores information about the error that occured
  *                       for the given context and may later be retrieved

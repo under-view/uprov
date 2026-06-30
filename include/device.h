@@ -34,15 +34,20 @@ struct uprov_device;
 
 
 /*
- * @brief Given a block device parse with libfdisk and populate
+ * @brief Given a file parse with libfdisk and populate
  *        it's partitions in a struct uprov_device context.
+ *
+ *        If empty file given function returns pointer to an
+ *        unpopulate struct uprov_device. Caller will later
+ *        need to make a call to uprov_device_resize_wholedisk(3)
+ *        to create the disk.
  *
  * @param device - May be NULL or a pointer to a struct uprov_device.
  *                 If NULL memory will be allocated and return to
  *                 caller. If not NULL address passed will be used
  *                 to store the newly created struct uprov_device
  *                 context.
- * @param fname  - Pointer to string storing name of block device
+ * @param fname  - Pointer to string storing absolute path to file
  *                 to associate with a struct uprov_device context.
  *
  * @returns
@@ -101,7 +106,8 @@ uprov_device_get_ptable_type (struct uprov_device *device);
 
 /*
  * @brief Returns byte size of each sector
- *        in caller defined block device.
+ *        in caller defined file.
+ *
  *        Typically 512 bytes per sector.
  *
  * @param device - Pointer to a valid struct uprov_device.
@@ -148,6 +154,8 @@ uprov_device_get_part_num (struct uprov_device *device,
 
 /*
  * @brief Returns a block devices logical partition name.
+ *        If file not a block device NULL is return with
+ *        error properly set.
  *
  * @param device     - Pointer to a valid struct uprov_device.
  * @param part_index - Must pass valid partition index value.
