@@ -56,17 +56,6 @@ uprov_device_create (struct uprov_device *device,
 
 
 /*
- * @brief Frees any allocated memory and closes FD's (if open) create after
- *        uprov_device_create() call.
- *
- * @param device - Pointer to a valid struct uprov_device.
- */
-UDO_API
-void
-uprov_device_destroy (struct uprov_device *device);
-
-
-/*
  * @brief Returns absolute path to file in string format.
  *
  * @param device - Pointer to a valid struct uprov_device.
@@ -347,6 +336,17 @@ UDO_API
 const char *
 uprov_device_get_part_type_code_string (struct uprov_device *device,
                                         const size_t part_index);
+
+
+/*
+ * @brief Frees any allocated memory and closes FD's (if open) create after
+ *        uprov_device_create() call.
+ *
+ * @param device - Pointer to a valid struct uprov_device.
+ */
+UDO_API
+void
+uprov_device_destroy (struct uprov_device *device);
 
 
 /*
