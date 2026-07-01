@@ -132,19 +132,40 @@ struct uprov_device
 
 struct p_uprov_fdisk
 {
-	struct fdisk_context *ctx;
-	struct fdisk_table   *table;
+	struct fdisk_context   *ctx;
+	struct fdisk_table     *table;
+	struct fdisk_partition *part;
+	struct fdisk_parttype  *parttype;
 };
+
+
+static void
+p_uprov_fdisk_part_destroy (struct p_uprov_fdisk *fdisk)
+{
+	if (fdisk->parttype) {
+		fdisk_unref_parttype(fdisk->parttype);
+		fdisk->parttype = NULL;
+	}
+
+	if (fdisk->part) {
+		fdisk_unref_partition(fdisk->part);
+		fdisk->part = NULL;
+	}
+}
 
 
 static void
 p_uprov_fdisk_destroy (struct p_uprov_fdisk *fdisk)
 {
-	if (fdisk->table)
+	if (fdisk->table) {
 		fdisk_unref_table(fdisk->table);
+		fdisk->table = NULL;
+	}
+
 	if (fdisk->ctx) {
 		fdisk_deassign_device(fdisk->ctx, 1);
 		fdisk_unref_context(fdisk->ctx);
+		fdisk->ctx = NULL;
 	}
 }
 
@@ -169,8 +190,6 @@ p_device_create_with_fdisk (struct uprov_device *device)
 	struct p_uprov_fdisk fdisk;
 
 	struct fdisk_label *lb = NULL;
-	struct fdisk_partition *part = NULL;
-	struct fdisk_parttype  *parttype = NULL;
 
 	char *fstype = NULL, *fslabel = NULL, *partlabel = NULL;
 
@@ -201,7 +220,7 @@ p_device_create_with_fdisk (struct uprov_device *device)
 	err = fdisk_assign_device_by_fd(fdisk.ctx, \
 		device->fname_fd, device->fname, 0);
 	if (err < 0) {
-		udo_log_error("fdisk_assign_device_by_fd('%d','%s') failed\n",
+		udo_log_error("fdisk_assign_device_by_fd('%d','%s') failed\n", \
 		              device->fname_fd, device->fname);
 		p_uprov_fdisk_destroy(&fdisk);
 		return -1;
@@ -209,7 +228,7 @@ p_device_create_with_fdisk (struct uprov_device *device)
 
 	err = fdisk_get_partitions(fdisk.ctx, &(fdisk.table));
 	if (err != 0) {
-		udo_log_error("fdisk_get_partitions('%d','%s') failed\n",
+		udo_log_error("fdisk_get_partitions('%d','%s') failed\n", \
 		              device->fname_fd, device->fname);
 		p_uprov_fdisk_destroy(&fdisk);
 		return -1;
@@ -223,15 +242,15 @@ p_device_create_with_fdisk (struct uprov_device *device)
 	gpt = UDO_STRTOU(device->ptable_type);
 
 	for (p = 0; p < device->part_count; p++) {
-		part = fdisk_table_get_partition_by_partno(fdisk.table, p);
+		fdisk.part = fdisk_table_get_partition_by_partno(fdisk.table, p);
 
-		device->parts[p].number = fdisk_partition_get_partno(part) + 1;
-		device->parts[p].start_sector = fdisk_partition_get_start(part);
-		device->parts[p].end_sector = fdisk_partition_get_end(part);
-		device->parts[p].sector_size = fdisk_partition_get_size(part);
+		device->parts[p].number = fdisk_partition_get_partno(fdisk.part) + 1;
+		device->parts[p].start_sector = fdisk_partition_get_start(fdisk.part);
+		device->parts[p].end_sector = fdisk_partition_get_end(fdisk.part);
+		device->parts[p].sector_size = fdisk_partition_get_size(fdisk.part);
 
 		/* Acquire fslabel of a partiton */
-		fdisk_partition_to_string(part, fdisk.ctx, \
+		fdisk_partition_to_string(fdisk.part, fdisk.ctx, \
 					  FDISK_FIELD_FSLABEL, \
 					  &fslabel);
 		if (fslabel) {
@@ -241,7 +260,7 @@ p_device_create_with_fdisk (struct uprov_device *device)
 		}
 
 		/* Acquire fstype of a partition */
-		fdisk_partition_to_string(part, fdisk.ctx, \
+		fdisk_partition_to_string(fdisk.part, fdisk.ctx, \
 		                          FDISK_FIELD_FSTYPE, \
 		                          &fstype);
 		if (fstype) {
@@ -250,14 +269,14 @@ p_device_create_with_fdisk (struct uprov_device *device)
 			free(fstype); fstype = NULL;
 		}
 
-		parttype = fdisk_partition_get_type(part);
+		fdisk.parttype = fdisk_partition_get_type(fdisk.part);
 
 		if (gpt == IS_GPT) {
 			strncpy(device->parts[p].type.code_str, \
-				fdisk_parttype_get_string(parttype), \
+				fdisk_parttype_get_string(fdisk.parttype), \
 				TYPE_CODE_STR_MAX);
 
-			fdisk_partition_to_string(part, fdisk.ctx, \
+			fdisk_partition_to_string(fdisk.part, fdisk.ctx, \
 						  FDISK_FIELD_NAME, \
 						  &partlabel);
 			if (partlabel) {
@@ -267,17 +286,16 @@ p_device_create_with_fdisk (struct uprov_device *device)
 			}
 		} else {
 			device->parts[p].type.code = \
-				fdisk_parttype_get_code(parttype);
+				fdisk_parttype_get_code(fdisk.parttype);
 
-			if (fdisk_partition_is_nested(part)) {
+			if (fdisk_partition_is_nested(fdisk.part)) {
 				device->parts[p].logical = true;
-			} else if (fdisk_partition_is_container(part)) {
+			} else if (fdisk_partition_is_container(fdisk.part)) {
 				device->parts[p].extended = true;
 			}
 		}
 
-		fdisk_unref_parttype(parttype); parttype = NULL;
-		fdisk_unref_partition(part); part = NULL;
+		p_uprov_fdisk_part_destroy(&fdisk);
 	}
 
 	p_uprov_fdisk_destroy(&fdisk);
