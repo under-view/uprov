@@ -365,9 +365,11 @@ p_parse_part_string (struct p_uprov_disk UDO_UNUSED *udisk,
 
 	while (*part_string) {
 		if (*part_string == ' ' || \
+		    *part_string == ':' || \
 		    *part_string == '\n')
 		{
 			part_string++;
+			continue;
 		}
 
 		word += *part_string;
@@ -381,8 +383,8 @@ p_parse_part_string (struct p_uprov_disk UDO_UNUSED *udisk,
 				fprintf(stdout, "gpt\n");
 				word = 0;
 				break;
-			case 498: /* PTABLE: */
-				fprintf(stdout, "PTABLE:\n");
+			case 440: /* PTABLE */
+				fprintf(stdout, "PTABLE\n");
 				word = 0;
 				break;
 			default:
