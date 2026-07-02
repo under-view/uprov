@@ -361,10 +361,32 @@ static int
 p_parse_part_string (struct p_uprov_disk UDO_UNUSED *udisk,
                      const char *part_string)
 {
+	uint16_t word = 0;
+
 	while (*part_string) {
-		switch (UDO_STRTOU(part_string)) {
+		if (*part_string == ' ' || \
+		    *part_string == '\n')
+		{
+			part_string++;
+		}
+
+		word += *part_string;
+
+		switch (word) {
+			case 321: /* mbr */
+				fprintf(stdout, "mbr\n");
+				word = 0;
+				break;
+			case 331: /* gpt */
+				fprintf(stdout, "gpt\n");
+				word = 0;
+				break;
+			case 498: /* PTABLE: */
+				fprintf(stdout, "PTABLE:\n");
+				word = 0;
+				break;
 			default:
-				return -1;
+				break;
 		}
 
 		part_string++;

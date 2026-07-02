@@ -115,10 +115,10 @@ test_device_resize_wholedisk (void UDO_UNUSED **state)
 	assert_non_null(device);
 
 	err = uprov_device_resize_wholedisk(device, create_mbr_disk);
-	assert_int_equal(err, -1);
+	assert_int_equal(err, 0);
 
 	err = uprov_device_resize_wholedisk(device, create_gpt_disk);
-	assert_int_equal(err, -1);
+	assert_int_equal(err, 0);
 
 	uprov_device_destroy(device);
 }
