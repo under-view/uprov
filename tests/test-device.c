@@ -33,6 +33,46 @@
 #include "device.h"
 
 /*****************************************
+ * Start of global test-device functions *
+ *****************************************/
+
+static const char \
+create_gpt_disk[] = \
+	"PTABLE: gpt\n" \
+	;
+
+
+static const char \
+create_mbr_disk[] = \
+	"PTABLE: mbr\n" \
+	;
+
+
+static struct udo_file_ops * UDO_UNUSED
+p_device_create_empty_file (const char *fname,
+                            const size_t size)
+{
+	struct udo_file_ops *flops = NULL;
+
+	struct udo_file_ops_create_info file_info;
+
+	memset(&file_info, 0, sizeof(file_info));
+
+	file_info.size = size;
+	file_info.fname = fname;
+	flops = udo_file_ops_create(NULL, &file_info);
+	if (!flops)
+		return NULL;
+
+	return flops;
+}
+
+/***************************************
+ * End of global test-device functions *
+ ***************************************/
+
+
+/*****************************************
  * Start of test_device_create functions *
  *****************************************/
 
@@ -49,6 +89,42 @@ test_device_create (void UDO_UNUSED **state)
 
 /***************************************
  * End of test_device_create functions *
+ ***************************************/
+
+
+/*****************************************
+ * Start of test_device_resize functions *
+ *****************************************/
+
+static void UDO_UNUSED
+test_device_resize_wholedisk (void UDO_UNUSED **state)
+{
+	int err = -1;
+
+	struct udo_file_ops *flops = NULL;
+	struct uprov_device *device = NULL;
+
+	const char *fname = "/tmp/gpt-file.wic";
+
+	flops = p_device_create_empty_file(fname, UDO_PAGE_SIZE*3);
+	assert_non_null(flops);
+
+	udo_file_ops_destroy(flops, UDO_PAGE_SIZE*3);
+
+	device = uprov_device_create(NULL, fname);
+	assert_non_null(device);
+
+	err = uprov_device_resize_wholedisk(device, create_mbr_disk);
+	assert_int_equal(err, -1);
+
+	err = uprov_device_resize_wholedisk(device, create_gpt_disk);
+	assert_int_equal(err, -1);
+
+	uprov_device_destroy(device);
+}
+
+/***************************************
+ * End of test_device_resize functions *
  ***************************************/
 
 
@@ -410,6 +486,7 @@ main (void)
 {
 	const struct CMUnitTest tests[] = {
 		cmocka_unit_test(test_device_create),
+		cmocka_unit_test(test_device_resize_wholedisk),
 		cmocka_unit_test(test_device_get_fname),
 		cmocka_unit_test(test_device_get_fname_fd),
 		cmocka_unit_test(test_device_get_ptable_type),

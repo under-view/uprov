@@ -61,6 +61,26 @@ uprov_device_create (struct uprov_device *device,
 
 
 /*
+ * @brief Repartition file with caller defined partition information.
+ *
+ * @param device      - May be NULL or a pointer to a struct uprov_device.
+ *                      If NULL memory will be allocated and return to
+ *                      caller. If not NULL address passed will be used
+ *                      to store the newly created struct uprov_device
+ *                      context.
+ * @param part_string - String used to determine how to repartition disk.
+ *
+ * @returns
+ *	on success: 0
+ *	on failure: -1
+ */
+UDO_API
+int
+uprov_device_resize_wholedisk (struct uprov_device *device,
+                               const char *part_string);
+
+
+/*
  * @brief Returns absolute path to file in string format.
  *
  * @param device - Pointer to a valid struct uprov_device.

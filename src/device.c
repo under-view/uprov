@@ -342,6 +342,63 @@ uprov_device_create (struct uprov_device *p_device,
  *************************************/
 
 
+/***************************************
+ * Start uprov_device_resize functions *
+ ***************************************/
+
+struct p_uprov_disk_part
+{
+	int temp;
+};
+
+struct p_uprov_disk
+{
+	struct p_uprov_disk_part parts[PARTITIONS_MAX];
+};
+
+
+static int
+p_parse_part_string (struct p_uprov_disk UDO_UNUSED *udisk,
+                     const char *part_string)
+{
+	while (*part_string) {
+		switch (UDO_STRTOU(part_string)) {
+			default:
+				return -1;
+		}
+
+		part_string++;
+	}
+
+	return 0;
+}
+
+
+int
+uprov_device_resize_wholedisk (struct uprov_device *device,
+                               const char *part_string)
+{
+	int err = -1;
+
+	struct p_uprov_disk disk;
+
+	if (!device || !part_string) {
+		udo_log_error("Incorrect data passed\n");
+		return -1;
+	}
+
+	err = p_parse_part_string(&disk, part_string);
+	if (err == -1)
+		return -1;
+
+	return 0;
+}
+
+/*************************************
+ * End uprov_device_resize functions *
+ *************************************/
+
+
 /************************************
  * Start uprov_device_get functions *
  ************************************/
