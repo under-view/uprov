@@ -63,6 +63,24 @@ uprov_device_create (struct uprov_device *device,
 /*
  * @brief Repartition file with caller defined partition information.
  *
+ *        1 - START(SECTOR)
+ *        2 - SIZE(SECTORS)
+ *        3 - PARTITION_TYPE_CODE
+ *        4 - FILE_SYSTEM_TYPE
+ *        5 - FILE_SYSTEM_LABEL
+ *
+ *        Acceptable format:
+ *
+ *            PTABLE: mbr
+ *            PART: 1:2:3:4:5:
+ *            PART: 1:2:3:4:5:
+ *            PART: 1:2:3:4:5:
+ *
+ *            PTABLE: gpt
+ *            PART: 1:2:3:4:5:
+ *            PART: 1:2:3:4:5:
+ *            PART: 1:2:3:4:5:
+ *
  * @param device      - May be NULL or a pointer to a struct uprov_device.
  *                      If NULL memory will be allocated and return to
  *                      caller. If not NULL address passed will be used

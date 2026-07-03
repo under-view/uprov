@@ -346,19 +346,61 @@ uprov_device_create (struct uprov_device *p_device,
  * Start uprov_device_resize functions *
  ***************************************/
 
-struct p_uprov_disk_part
-{
-	int temp;
-};
-
 struct p_uprov_disk
 {
-	struct p_uprov_disk_part parts[PARTITIONS_MAX];
+	struct uprov_device_part parts[PARTITIONS_MAX];
 };
 
 
 static int
-p_parse_part_string (struct p_uprov_disk UDO_UNUSED *udisk,
+p_create_part (struct uprov_device UDO_UNUSED *device,
+               const char *part_string)
+{
+	char temp[512];
+
+	int ti = 0, iter = 0;
+
+	while (*part_string != '\n') {
+		switch (*part_string) {
+			case ' ':
+				part_string++;
+				continue;
+			case ':':
+				fprintf(stdout, "%s\n", temp);
+				switch (iter) {
+					case 1: /* Partition start sector */
+						break;
+					case 2: /* Partition sector size */
+						break;
+					case 3: /* Partition type code */
+						break;
+					case 4: /* Partition file system type */
+						break;
+					case 5: /* Partition file system label */
+						break;
+					default:
+						break;
+				}
+
+				iter++; ti = 0;
+				temp[ti] = '\0';
+
+				break;
+			default:
+				temp[ti++] = *part_string;
+				temp[ti] = '\0';
+				break;
+		}
+
+		part_string++;
+	}
+
+	return 0;
+}
+
+
+static int
+p_parse_part_string (struct uprov_device UDO_UNUSED *device,
                      const char *part_string)
 {
 	uint16_t word = 0;
@@ -366,7 +408,6 @@ p_parse_part_string (struct p_uprov_disk UDO_UNUSED *udisk,
 	while (*part_string) {
 		switch (*part_string) {
 			case ' ':
-			case ':':
 			case '\n':
 				part_string++;
 				continue;
@@ -384,8 +425,13 @@ p_parse_part_string (struct p_uprov_disk UDO_UNUSED *udisk,
 				fprintf(stdout, "gpt\n");
 				word = 0;
 				break;
-			case 440: /* PTABLE */
-				fprintf(stdout, "PTABLE\n");
+			case 369: /* PART: */
+				fprintf(stdout, "PART:");
+				p_create_part(device, part_string);
+				word = 0;
+				break;
+			case 498: /* PTABLE: */
+				fprintf(stdout, "PTABLE:\n");
 				word = 0;
 				break;
 			default:
@@ -405,14 +451,12 @@ uprov_device_resize_wholedisk (struct uprov_device *device,
 {
 	int err = -1;
 
-	struct p_uprov_disk disk;
-
 	if (!device || !part_string) {
 		udo_log_error("Incorrect data passed\n");
 		return -1;
 	}
 
-	err = p_parse_part_string(&disk, part_string);
+	err = p_parse_part_string(device, part_string);
 	if (err == -1)
 		return -1;
 
