@@ -346,12 +346,6 @@ uprov_device_create (struct uprov_device *p_device,
  * Start uprov_device_resize functions *
  ***************************************/
 
-struct p_uprov_disk
-{
-	struct uprov_device_part parts[PARTITIONS_MAX];
-};
-
-
 static int
 p_create_part (struct uprov_device UDO_UNUSED *device,
                const char *part_string)
