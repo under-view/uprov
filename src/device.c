@@ -364,15 +364,16 @@ p_parse_part_string (struct p_uprov_disk UDO_UNUSED *udisk,
 	uint16_t word = 0;
 
 	while (*part_string) {
-		if (*part_string == ' ' || \
-		    *part_string == ':' || \
-		    *part_string == '\n')
-		{
-			part_string++;
-			continue;
+		switch (*part_string) {
+			case ' ':
+			case ':':
+			case '\n':
+				part_string++;
+				continue;
+			default:
+				word += *part_string;
+				break;
 		}
-
-		word += *part_string;
 
 		switch (word) {
 			case 321: /* mbr */
