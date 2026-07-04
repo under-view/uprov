@@ -362,13 +362,13 @@ p_create_part (struct uprov_device_part *part,
 				continue;
 			case ':':
 				switch (iter) {
-					case 1: /* Partition start sector */
+					case 0: /* Partition start sector */
 						part->start_sector = atoll(temp);
 						break;
-					case 2: /* Partition sector size */
+					case 1: /* Partition sector size */
 						part->sector_size = atoll(temp);
 						break;
-					case 3: /* Partition type code */
+					case 2: /* Partition type code */
 						if (mbr) {
 							part->type.code = atoll(temp);
 						} else {
@@ -376,10 +376,10 @@ p_create_part (struct uprov_device_part *part,
 								temp, TYPE_CODE_STR_MAX);
 						}
 						break;
-					case 4: /* Partition file system type */
+					case 3: /* Partition file system type */
 						memcpy(&(part->fstype[0]), temp, FSTYPE_MAX);
 						break;
-					case 5: /* Partition file system label */
+					case 4: /* Partition file system label */
 						memcpy(&(part->fslabel[0]), temp, FSLABEL_MAX);
 						break;
 					default:
@@ -434,6 +434,7 @@ p_parse_part_string (struct uprov_device UDO_UNUSED *device,
 				word = 0;
 				break;
 			case 369: /* PART: */
+				part_string++;
 				part = &(device->parts[device->part_count++]);
 				p_create_part(part, part_string, mbr);
 				word = 0;
