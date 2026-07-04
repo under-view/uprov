@@ -349,13 +349,18 @@ uprov_device_create (struct uprov_device *p_device,
 static int
 p_create_part (struct uprov_device_part *part,
                const char *part_string,
-               const uint8_t mbr)
+               const uint8_t mbr,
+               uint16_t *len)
 {
-	char temp[FSTYPE_MAX];
-
 	int ti = 0, iter = 0;
 
+	char temp[FSTYPE_MAX];
+
+	*len = 0;
+
 	while (*part_string != '\n') {
+		*len += 1;
+
 		switch (*part_string) {
 			case ' ':
 				part_string++;
@@ -404,13 +409,13 @@ p_create_part (struct uprov_device_part *part,
 
 
 static int
-p_parse_part_string (struct uprov_device UDO_UNUSED *device,
+p_parse_part_string (struct uprov_device *device,
                      const char *part_string)
 {
 	size_t pidx;
 
 	uint8_t mbr = 0;
-	uint16_t word = 0;
+	uint16_t word = 0, len = 0;
 
 	struct uprov_device_part *part = NULL;
 
@@ -436,7 +441,8 @@ p_parse_part_string (struct uprov_device UDO_UNUSED *device,
 			case 369: /* PART: */
 				part_string++;
 				part = &(device->parts[device->part_count++]);
-				p_create_part(part, part_string, mbr);
+				p_create_part(part, part_string, mbr, &len);
+				part_string = ((char*)part_string + len);
 				word = 0;
 				break;
 			case 498: /* PTABLE: */
@@ -450,12 +456,21 @@ p_parse_part_string (struct uprov_device UDO_UNUSED *device,
 	}
 
 	for (pidx = 0; pidx < device->part_count; pidx++) {
-		fprintf(stdout, "PART: %lu:%lu:%u:%s:%s:\n", \
-			device->parts[pidx].start_sector, \
-			device->parts[pidx].sector_size, \
-			device->parts[pidx].type.code, \
-			device->parts[pidx].fstype, \
-			device->parts[pidx].fslabel);
+		if (mbr) {
+			fprintf(stdout, "PART: %lu:%lu:%u:%s:%s:\n", \
+				device->parts[pidx].start_sector, \
+				device->parts[pidx].sector_size, \
+				device->parts[pidx].type.code, \
+				device->parts[pidx].fstype, \
+				device->parts[pidx].fslabel);
+		} else {
+			fprintf(stdout, "PART: %lu:%lu:%s:%s:%s:\n", \
+				device->parts[pidx].start_sector, \
+				device->parts[pidx].sector_size, \
+				device->parts[pidx].type.code_str, \
+				device->parts[pidx].fstype, \
+				device->parts[pidx].fslabel);
+		}
 	}
 
 	return 0;
