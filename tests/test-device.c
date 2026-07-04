@@ -39,12 +39,16 @@
 static const char \
 create_gpt_disk[] = \
 	"PTABLE: gpt\n" \
+	"PART: 34:2048:21686148-6449-6E6F-744E-656564454649:none:BIOS_BOOT:\n" \
+	"PART: 2082:98304:C12A7328-F81F-11D2-BA4B-00A0C93EC93B:vfat:EFI_SYSTEM:\n" \
+	"PART: 100386:159744:0FC63DAF-8483-4772-8E79-3D69D8477DE4:ext4:GRUB_DATA:\n" \
 	;
 
 
 static const char \
 create_mbr_disk[] = \
 	"PTABLE: mbr\n" \
+	"PART: 2048:10485760:83:ext4:LABEL_ONE:\n" \
 	;
 
 
@@ -116,6 +120,8 @@ test_device_resize_wholedisk (void UDO_UNUSED **state)
 
 	err = uprov_device_resize_wholedisk(device, create_mbr_disk);
 	assert_int_equal(err, 0);
+
+	uprov_device_destroy_parts(device);
 
 	err = uprov_device_resize_wholedisk(device, create_gpt_disk);
 	assert_int_equal(err, 0);
