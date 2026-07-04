@@ -396,6 +396,17 @@ uprov_device_destroy (struct uprov_device *device);
 
 
 /*
+ * @brief Zero's out memory storing data related
+ *        to the current partition table.
+ *
+ * @param device - Pointer to a valid struct uprov_device.
+ */
+UDO_API
+void
+uprov_device_destroy_parts (struct uprov_device *device);
+
+
+/*
  * @brief Returns size of the internal structure. So,
  *        if caller decides to allocate memory outside
  *        of API interface they know the exact amount
