@@ -347,10 +347,11 @@ uprov_device_create (struct uprov_device *p_device,
  ***************************************/
 
 static int
-p_create_part (struct uprov_device UDO_UNUSED *device,
-               const char *part_string)
+p_create_part (struct uprov_device_part *part,
+               const char *part_string,
+               const uint8_t mbr)
 {
-	char temp[512];
+	char temp[FSTYPE_MAX];
 
 	int ti = 0, iter = 0;
 
@@ -360,17 +361,26 @@ p_create_part (struct uprov_device UDO_UNUSED *device,
 				part_string++;
 				continue;
 			case ':':
-				fprintf(stdout, "%s\n", temp);
 				switch (iter) {
 					case 1: /* Partition start sector */
+						part->start_sector = atoll(temp);
 						break;
 					case 2: /* Partition sector size */
+						part->sector_size = atoll(temp);
 						break;
 					case 3: /* Partition type code */
+						if (mbr) {
+							part->type.code = atoll(temp);
+						} else {
+							memcpy(&(part->type.code_str[0]), \
+								temp, TYPE_CODE_STR_MAX);
+						}
 						break;
 					case 4: /* Partition file system type */
+						memcpy(&(part->fstype[0]), temp, FSTYPE_MAX);
 						break;
 					case 5: /* Partition file system label */
+						memcpy(&(part->fslabel[0]), temp, FSLABEL_MAX);
 						break;
 					default:
 						break;
@@ -397,7 +407,12 @@ static int
 p_parse_part_string (struct uprov_device UDO_UNUSED *device,
                      const char *part_string)
 {
+	size_t pidx;
+
+	uint8_t mbr = 0;
 	uint16_t word = 0;
+
+	struct uprov_device_part *part = NULL;
 
 	while (*part_string) {
 		switch (*part_string) {
@@ -412,20 +427,18 @@ p_parse_part_string (struct uprov_device UDO_UNUSED *device,
 
 		switch (word) {
 			case 321: /* mbr */
-				fprintf(stdout, "mbr\n");
 				word = 0;
+				mbr = 1;
 				break;
 			case 331: /* gpt */
-				fprintf(stdout, "gpt\n");
 				word = 0;
 				break;
 			case 369: /* PART: */
-				fprintf(stdout, "PART:");
-				p_create_part(device, part_string);
+				part = &(device->parts[device->part_count++]);
+				p_create_part(part, part_string, mbr);
 				word = 0;
 				break;
 			case 498: /* PTABLE: */
-				fprintf(stdout, "PTABLE:\n");
 				word = 0;
 				break;
 			default:
@@ -433,6 +446,15 @@ p_parse_part_string (struct uprov_device UDO_UNUSED *device,
 		}
 
 		part_string++;
+	}
+
+	for (pidx = 0; pidx < device->part_count; pidx++) {
+		fprintf(stdout, "PART: %lu:%lu:%u:%s:%s:\n", \
+			device->parts[pidx].start_sector, \
+			device->parts[pidx].sector_size, \
+			device->parts[pidx].type.code, \
+			device->parts[pidx].fstype, \
+			device->parts[pidx].fslabel);
 	}
 
 	return 0;

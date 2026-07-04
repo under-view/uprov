@@ -67,7 +67,7 @@ uprov_device_create (struct uprov_device *device,
  *        2 - SIZE(SECTORS)
  *        3 - PARTITION_TYPE_CODE
  *        4 - FILE_SYSTEM_TYPE
- *        5 - FILE_SYSTEM_LABEL
+ *        5 - FILE_SYSTEM_LABEL (Space character unsupported)
  *
  *        Acceptable format:
  *
