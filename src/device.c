@@ -157,6 +157,8 @@ p_uprov_fdisk_part_destroy (struct p_uprov_fdisk *fdisk)
 static void
 p_uprov_fdisk_destroy (struct p_uprov_fdisk *fdisk)
 {
+	p_uprov_fdisk_part_destroy(fdisk);
+
 	if (fdisk->table) {
 		fdisk_unref_table(fdisk->table);
 		fdisk->table = NULL;
@@ -412,8 +414,6 @@ static int
 p_parse_part_string (struct uprov_device *device,
                      const char *part_string)
 {
-	size_t pidx;
-
 	uint8_t mbr = 0;
 	uint16_t word = 0, len = 0;
 
@@ -455,24 +455,6 @@ p_parse_part_string (struct uprov_device *device,
 		part_string++;
 	}
 
-	for (pidx = 0; pidx < device->part_count; pidx++) {
-		if (mbr) {
-			fprintf(stdout, "PART: %lu:%lu:%u:%s:%s:\n", \
-				device->parts[pidx].start_sector, \
-				device->parts[pidx].sector_size, \
-				device->parts[pidx].type.code, \
-				device->parts[pidx].fstype, \
-				device->parts[pidx].fslabel);
-		} else {
-			fprintf(stdout, "PART: %lu:%lu:%s:%s:%s:\n", \
-				device->parts[pidx].start_sector, \
-				device->parts[pidx].sector_size, \
-				device->parts[pidx].type.code_str, \
-				device->parts[pidx].fstype, \
-				device->parts[pidx].fslabel);
-		}
-	}
-
 	return 0;
 }
 
@@ -481,7 +463,10 @@ int
 uprov_device_resize_wholedisk (struct uprov_device *device,
                                const char *part_string)
 {
+	size_t pidx;
 	int err = -1;
+	uint8_t gpt = 0;
+	struct p_uprov_fdisk fdisk;
 
 	if (!device || !part_string) {
 		udo_log_error("Incorrect data passed\n");
@@ -491,6 +476,63 @@ uprov_device_resize_wholedisk (struct uprov_device *device,
 	err = p_parse_part_string(device, part_string);
 	if (err == -1)
 		return -1;
+
+	memset(&fdisk, 0, sizeof(fdisk));
+
+	fdisk.ctx = fdisk_new_context();
+	if (!(fdisk.ctx)) {
+		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
+				"fdisk_new_context failed\n");
+		return -1;
+	}
+
+	fdisk.part = fdisk_new_partition();
+	if (!(fdisk.part)) {
+		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
+			"Failed to get new partition context.\n");
+		p_uprov_fdisk_destroy(&fdisk);
+		return -1;
+	}
+
+	fdisk.parttype = fdisk_new_parttype();
+	if (!(fdisk.parttype)) {
+		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
+			"Failed to get new partition type context.\n");
+		p_uprov_fdisk_destroy(&fdisk);
+		return -1;
+	}
+
+	err = fdisk_assign_device_by_fd(fdisk.ctx, \
+		device->fname_fd, device->fname, 0);
+	if (err < 0) {
+		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
+			"fdisk_assign_device_by_fd('%d','%s') failed\n", \
+			device->fname_fd, device->fname);
+		p_uprov_fdisk_destroy(&fdisk);
+		return -1;
+	}
+
+	gpt = UDO_STRTOU(device->ptable_type);
+
+	for (pidx = 0; pidx < device->part_count; pidx++) {
+		if (gpt) {
+			fprintf(stdout, "PART: %lu:%lu:%s:%s:%s:\n", \
+				device->parts[pidx].start_sector, \
+				device->parts[pidx].sector_size, \
+				device->parts[pidx].type.code_str, \
+				device->parts[pidx].fstype, \
+				device->parts[pidx].fslabel);
+		} else {
+			fprintf(stdout, "PART: %lu:%lu:%u:%s:%s:\n", \
+				device->parts[pidx].start_sector, \
+				device->parts[pidx].sector_size, \
+				device->parts[pidx].type.code, \
+				device->parts[pidx].fstype, \
+				device->parts[pidx].fslabel);
+		}
+	}
+
+	p_uprov_fdisk_destroy(&fdisk);
 
 	return 0;
 }
