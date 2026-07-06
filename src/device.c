@@ -432,11 +432,13 @@ p_parse_part_string (struct uprov_device *device,
 
 		switch (word) {
 			case 321: /* mbr */
-				word = 0;
 				mbr = 1;
+				word = 0;
+				memcpy(&(device->ptable_type[0]),"mbr",sizeof("mbr"));
 				break;
 			case 331: /* gpt */
 				word = 0;
+				memcpy(&(device->ptable_type[0]),"gpt",sizeof("gpt"));
 				break;
 			case 369: /* PART: */
 				part_string++;
@@ -463,7 +465,7 @@ int
 uprov_device_resize_wholedisk (struct uprov_device *device,
                                const char *part_string)
 {
-	size_t pidx;
+	size_t p;
 	int err = -1;
 	uint8_t gpt = 0;
 	struct p_uprov_fdisk fdisk;
@@ -514,22 +516,53 @@ uprov_device_resize_wholedisk (struct uprov_device *device,
 
 	gpt = UDO_STRTOU(device->ptable_type);
 
-	for (pidx = 0; pidx < device->part_count; pidx++) {
-		if (gpt) {
-			fprintf(stdout, "PART: %lu:%lu:%s:%s:%s:\n", \
-				device->parts[pidx].start_sector, \
-				device->parts[pidx].sector_size, \
-				device->parts[pidx].type.code_str, \
-				device->parts[pidx].fstype, \
-				device->parts[pidx].fslabel);
+	err = fdisk_create_disklabel(fdisk.ctx, device->ptable_type);
+	if (err < 0) {
+		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
+				"Failed to create disk label '%s'.\n", \
+				device->ptable_type);
+		p_uprov_fdisk_destroy(&fdisk);
+		return -1;
+	}
+
+	for (p = 0; p < device->part_count; p++) {
+		fdisk_reset_partition(fdisk.part);
+
+		/* Defaults */
+		fdisk_partition_set_partno(fdisk.part, p);
+		fdisk_partition_start_follow_default(fdisk.part, 1);
+		fdisk_partition_end_follow_default(fdisk.part, 0);
+		fdisk_partition_partno_follow_default(fdisk.part, 1);
+		fdisk_partition_size_explicit(fdisk.part, 1);
+
+		if (gpt == IS_GPT) {
+			fdisk_parttype_set_typestr(fdisk.parttype, \
+				device->parts[p].type.code_str);
+			fdisk_partition_set_name(fdisk.part, \
+				device->parts[p].partlabel);
 		} else {
-			fprintf(stdout, "PART: %lu:%lu:%u:%s:%s:\n", \
-				device->parts[pidx].start_sector, \
-				device->parts[pidx].sector_size, \
-				device->parts[pidx].type.code, \
-				device->parts[pidx].fstype, \
-				device->parts[pidx].fslabel);
+			fdisk_parttype_set_code(fdisk.parttype, \
+				device->parts[p].type.code);
 		}
+
+		fdisk_partition_set_type(fdisk.part, fdisk.parttype);
+		fdisk_partition_set_start(fdisk.part, device->parts[p].start_sector);
+		fdisk_partition_set_size(fdisk.part, device->parts[p].sector_size);
+
+		err = fdisk_add_partition(fdisk.ctx, fdisk.part, NULL);
+		if (err) {
+			udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
+					"fdisk_add_partition: failed " \
+					"to add partition '%d'\n", p+1);
+			p_uprov_fdisk_destroy(&fdisk);
+			return -1;
+		}
+	}
+
+	err = fdisk_write_disklabel(fdisk.ctx);
+	if (err < 0) {
+		p_uprov_fdisk_destroy(&fdisk);
+		return -1;
 	}
 
 	p_uprov_fdisk_destroy(&fdisk);
