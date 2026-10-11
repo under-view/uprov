@@ -42,13 +42,15 @@ struct uprov_device;
  *        need to make a call to uprov_device_resize_wholedisk(3)
  *        to create the disk.
  *
- * @param device - May be NULL or a pointer to a struct uprov_device.
- *                 If NULL memory will be allocated and return to
- *                 caller. If not NULL address passed will be used
- *                 to store the newly created struct uprov_device
- *                 context.
- * @param fname  - Pointer to string storing absolute path to file
- *                 to associate with a struct uprov_device context.
+ * @param device   - May be NULL or a pointer to a struct uprov_device.
+ *                   If NULL memory will be allocated and return to
+ *                   caller. If not NULL address passed will be used
+ *                   to store the newly created struct uprov_device
+ *                   context.
+ * @param fname    - Pointer to string storing absolute path to file
+ *                   to associate with a struct uprov_device context.
+ * @param ask_type - Must pass an enum fdisk_ask_type enumerator.
+ *                   Used for libfdisk debug output.
  *
  * @returns
  *	on success: Pointer to a struct uprov_device
@@ -57,7 +59,8 @@ struct uprov_device;
 UDO_API
 struct uprov_device *
 uprov_device_create (struct uprov_device *device,
-                     const char *fname);
+                     const char *fname,
+                     const uint32_t ask_type);
 
 
 /*
@@ -87,6 +90,8 @@ uprov_device_create (struct uprov_device *device,
  *                      to store the newly created struct uprov_device
  *                      context.
  * @param part_string - String used to determine how to repartition disk.
+ * @param ask_type    - Must pass an enum fdisk_ask_type enumerator.
+ *                      Used for libfdisk debug output.
  *
  * @returns
  *	on success: 0
@@ -95,7 +100,8 @@ uprov_device_create (struct uprov_device *device,
 UDO_API
 int
 uprov_device_resize_wholedisk (struct uprov_device *device,
-                               const char *part_string);
+                               const char *part_string,
+                               const uint32_t ask_type);
 
 
 /*

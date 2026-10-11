@@ -171,6 +171,33 @@ p_uprov_fdisk_destroy (struct p_uprov_fdisk *fdisk)
 	}
 }
 
+
+static int
+p_ask_callback (struct fdisk_context UDO_UNUSED *cxt,
+                struct fdisk_ask *ask,
+                void UDO_UNUSED *data)
+{
+	switch (fdisk_ask_get_type(ask)) {
+		case FDISK_ASKTYPE_INFO:
+			udo_log_info("%s\n", fdisk_ask_print_get_mesg(ask));
+			break;
+
+		case FDISK_ASKTYPE_WARNX:
+			udo_log_warning("%s\n", fdisk_ask_print_get_mesg(ask));
+			break;
+
+		case FDISK_ASKTYPE_WARN:
+			udo_log_error("%s\n", fdisk_ask_print_get_mesg(ask));
+			errno = fdisk_ask_print_get_errno(ask);
+			break;
+
+		default:
+			break;
+	}
+
+	return 0;
+}
+
 /***************************************
  * End of global to C source functions *
  ***************************************/
@@ -181,7 +208,8 @@ p_uprov_fdisk_destroy (struct p_uprov_fdisk *fdisk)
  ***************************************/
 
 static int
-p_device_create_with_fdisk (struct uprov_device *device)
+p_device_create_with_fdisk (struct uprov_device *device,
+                            const uint32_t ask_type)
 {
 	uint32_t p;
 	uint8_t gpt;
@@ -218,6 +246,10 @@ p_device_create_with_fdisk (struct uprov_device *device)
 		udo_log_error("fdisk_new_context failed\n");
 		return -1;
 	}
+
+	fdisk_init_debug(ask_type);
+	fdisk_disable_dialogs(fdisk.ctx, 1);
+	fdisk_set_ask(fdisk.ctx, p_ask_callback, NULL);
 
 	err = fdisk_assign_device_by_fd(fdisk.ctx, \
 		device->fname_fd, device->fname, 0);
@@ -308,7 +340,8 @@ p_device_create_with_fdisk (struct uprov_device *device)
 
 struct uprov_device *
 uprov_device_create (struct uprov_device *p_device,
-                     const char *fname)
+                     const char *fname,
+                     const uint32_t ask_type)
 {
 	int ret = -1;
 
@@ -330,7 +363,7 @@ uprov_device_create (struct uprov_device *p_device,
 	strncpy(&(device->fname[0]), fname, \
 		UDO_FILE_PATH_MAX - 1);
 
-	ret = p_device_create_with_fdisk(device);
+	ret = p_device_create_with_fdisk(device, ask_type);
 	if (ret == -1) {
 		uprov_device_destroy(device);
 		return NULL;
@@ -463,7 +496,8 @@ p_parse_part_string (struct uprov_device *device,
 
 int
 uprov_device_resize_wholedisk (struct uprov_device *device,
-                               const char *part_string)
+                               const char *part_string,
+                               const uint32_t ask_type)
 {
 	size_t p;
 	int err = -1;
@@ -487,6 +521,10 @@ uprov_device_resize_wholedisk (struct uprov_device *device,
 				"fdisk_new_context failed\n");
 		return -1;
 	}
+
+	fdisk_init_debug(ask_type);
+	fdisk_disable_dialogs(fdisk.ctx, 1);
+	fdisk_set_ask(fdisk.ctx, p_ask_callback, NULL);
 
 	fdisk.part = fdisk_new_partition();
 	if (!(fdisk.part)) {
