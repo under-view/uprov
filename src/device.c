@@ -377,7 +377,7 @@ p_create_part (struct uprov_device_part *part,
 						break;
 					case 2: /* Partition type code */
 						if (mbr) {
-							part->type.code = atoll(temp);
+							part->type.code = strtoul(temp, NULL, 16);
 						} else {
 							memcpy(&(part->type.code_str[0]), \
 								temp, TYPE_CODE_STR_MAX);
