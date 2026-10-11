@@ -113,6 +113,13 @@ test_device_resize_wholedisk (void UDO_UNUSED **state)
 
 	const char *fname = "/tmp/gpt-file.wic";
 
+	const uint32_t ask_type = \
+		FDISK_ASKTYPE_WARN | \
+		FDISK_ASKTYPE_WARNX | \
+		FDISK_ASKTYPE_INFO;
+
+	udo_log_set_level(UDO_LOG_ALL);
+
 	flops = p_device_create_empty_file(fname, UDO_PAGE_SIZE*3);
 	assert_non_null(flops);
 
@@ -121,12 +128,12 @@ test_device_resize_wholedisk (void UDO_UNUSED **state)
 	device = uprov_device_create(NULL, fname, FDISK_ASKTYPE_NONE);
 	assert_non_null(device);
 
-	err = uprov_device_resize_wholedisk(device, create_mbr_disk, FDISK_ASKTYPE_NONE);
+	err = uprov_device_resize_wholedisk(device, create_mbr_disk, ask_type);
 	assert_int_equal(err, 0);
 
 	uprov_device_destroy_parts(device);
 
-	err = uprov_device_resize_wholedisk(device, create_gpt_disk, FDISK_ASKTYPE_NONE);
+	err = uprov_device_resize_wholedisk(device, create_gpt_disk, ask_type);
 	assert_int_equal(err, 0);
 
 	uprov_device_destroy(device);
