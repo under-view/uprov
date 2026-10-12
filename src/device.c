@@ -912,19 +912,12 @@ uprov_device_destroy (struct uprov_device *device)
 void
 uprov_device_destroy_parts (struct uprov_device *device)
 {
-	size_t p;
-
 	if (!device)
 		return;
 
-	memset(&(device->ptable_type[0]), 0, TABLE_TYPE_MAX);
-
-	for (p = 0; p < device->part_count; p++) {
-		memset(&(device->parts[p]), 0, \
-			sizeof(struct uprov_device_part));
-	}
-
 	device->part_count = 0;
+	memset(&(device->parts[0]), 0, sizeof(device->parts));
+	memset(&(device->ptable_type[0]), 0, sizeof(device->ptable_type));
 }
 
 /**************************************
