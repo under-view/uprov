@@ -573,6 +573,10 @@ uprov_device_resize_wholedisk (struct uprov_device *device,
 		fdisk_partition_partno_follow_default(fdisk.part, 1);
 		fdisk_partition_size_explicit(fdisk.part, 1);
 
+		fdisk_partition_set_type(fdisk.part, fdisk.parttype);
+		fdisk_partition_set_start(fdisk.part, device->parts[p].start_sector);
+		fdisk_partition_set_size(fdisk.part, device->parts[p].sector_size);
+
 		if (gpt == IS_GPT) {
 			fdisk_parttype_set_typestr(fdisk.parttype, \
 				device->parts[p].type.code_str);
@@ -582,10 +586,6 @@ uprov_device_resize_wholedisk (struct uprov_device *device,
 			fdisk_parttype_set_code(fdisk.parttype, \
 				device->parts[p].type.code);
 		}
-
-		fdisk_partition_set_type(fdisk.part, fdisk.parttype);
-		fdisk_partition_set_start(fdisk.part, device->parts[p].start_sector);
-		fdisk_partition_set_size(fdisk.part, device->parts[p].sector_size);
 
 		err = fdisk_add_partition(fdisk.ctx, fdisk.part, NULL);
 		if (err) {

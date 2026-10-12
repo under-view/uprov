@@ -41,21 +41,21 @@
 static const char \
 create_gpt_disk[] = \
 	"PTABLE: gpt\n" \
-	"PART: 34:2048:21686148-6449-6E6F-744E-656564454649:none:BIOS_BOOT:\n" \
-	"PART: 2082:98304:C12A7328-F81F-11D2-BA4B-00A0C93EC93B:vfat:EFI_SYSTEM:\n" \
-	"PART: 100386:159744:0FC63DAF-8483-4772-8E79-3D69D8477DE4:ext4:GRUB_DATA:\n" \
-	"PART: 260130:2027880:0FC63DAF-8483-4772-8E79-3D69D8477DE4:ext4:ROOTFS:\n" \
+	"PART: 2048:2048:21686148-6449-6E6F-744E-656564454649:none:BIOS_BOOT:\n" \
+	"PART: 4096:98304:C12A7328-F81F-11D2-BA4B-00A0C93EC93B:vfat:EFI_SYSTEM:\n" \
+	"PART: 102400:159744:0FC63DAF-8483-4772-8E79-3D69D8477DE4:ext4:GRUB_DATA:\n" \
+	"PART: 262144:159744:0FC63DAF-8483-4772-8E79-3D69D8477DE4:ext4:ROOTFS:\n" \
 	;
 
 
 static const char \
 create_mbr_disk[] = \
 	"PTABLE: mbr\n" \
-	"PART: 2048:10485760:83:ext4:LABEL_ONE:\n" \
+	"PART: 2048:98304:83:ext4:LABEL_ONE:\n" \
 	;
 
 
-static struct udo_file_ops * UDO_UNUSED
+static struct udo_file_ops *
 p_device_create_empty_file (const char *fname,
                             const size_t size)
 {
@@ -113,6 +113,8 @@ test_device_resize_wholedisk (void UDO_UNUSED **state)
 
 	const char *fname = "/tmp/gpt-file.wic";
 
+	const size_t file_size = (size_t) (1<<29);
+
 	const uint32_t ask_type = \
 		FDISK_ASKTYPE_WARN | \
 		FDISK_ASKTYPE_WARNX | \
@@ -120,10 +122,12 @@ test_device_resize_wholedisk (void UDO_UNUSED **state)
 
 	udo_log_set_level(UDO_LOG_ALL);
 
-	flops = p_device_create_empty_file(fname, UDO_PAGE_SIZE*3);
+	/* Start of MBR test */
+
+	flops = p_device_create_empty_file(fname, file_size);
 	assert_non_null(flops);
 
-	udo_file_ops_destroy(flops, UDO_PAGE_SIZE*3);
+	udo_file_ops_destroy(flops, file_size);
 
 	device = uprov_device_create(NULL, fname, FDISK_ASKTYPE_NONE);
 	assert_non_null(device);
@@ -131,12 +135,31 @@ test_device_resize_wholedisk (void UDO_UNUSED **state)
 	err = uprov_device_resize_wholedisk(device, create_mbr_disk, ask_type);
 	assert_int_equal(err, 0);
 
-	uprov_device_destroy_parts(device);
+	uprov_device_destroy(device);
+
+	remove(fname);
+
+	/* End of MBR test */
+
+
+	/* Start of GPT test */
+
+	flops = p_device_create_empty_file(fname, file_size);
+	assert_non_null(flops);
+
+	udo_file_ops_destroy(flops, file_size);
+
+	device = uprov_device_create(NULL, fname, FDISK_ASKTYPE_NONE);
+	assert_non_null(device);
 
 	err = uprov_device_resize_wholedisk(device, create_gpt_disk, ask_type);
 	assert_int_equal(err, 0);
 
 	uprov_device_destroy(device);
+
+	remove(fname);
+
+	/* End of GPT test */
 }
 
 /***************************************
