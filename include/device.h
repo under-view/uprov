@@ -39,7 +39,7 @@ struct uprov_device;
  *
  *        If empty file given function returns pointer to an
  *        unpopulate struct uprov_device. Caller will later
- *        need to make a call to uprov_device_resize_wholedisk(3)
+ *        need to make a call to uprov_device_repart_wholedisk(3)
  *        to populate the struct uprov_device and create the disk.
  *
  * @param device   - May be NULL or a pointer to a struct uprov_device.
@@ -99,7 +99,7 @@ uprov_device_create (struct uprov_device *device,
  */
 UDO_API
 int
-uprov_device_resize_wholedisk (struct uprov_device *device,
+uprov_device_repart_wholedisk (struct uprov_device *device,
                                const char *part_string,
                                const uint32_t ask_type);
 

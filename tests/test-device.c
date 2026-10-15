@@ -104,7 +104,7 @@ test_device_create (void UDO_UNUSED **state)
  *****************************************/
 
 static void UDO_UNUSED
-test_device_resize_wholedisk (void UDO_UNUSED **state)
+test_device_repart_wholedisk (void UDO_UNUSED **state)
 {
 	int err = -1;
 
@@ -130,7 +130,7 @@ test_device_resize_wholedisk (void UDO_UNUSED **state)
 
 	/* Start of MBR test */
 
-	err = uprov_device_resize_wholedisk(device, create_mbr_disk, ask_type);
+	err = uprov_device_repart_wholedisk(device, create_mbr_disk, ask_type);
 	assert_int_equal(err, 0);
 
 	/* End of MBR test */
@@ -139,7 +139,7 @@ test_device_resize_wholedisk (void UDO_UNUSED **state)
 
 	/* Start of GPT test */
 
-	err = uprov_device_resize_wholedisk(device, create_gpt_disk, ask_type);
+	err = uprov_device_repart_wholedisk(device, create_gpt_disk, ask_type);
 	assert_int_equal(err, 0);
 
 	/* End of GPT test */
@@ -512,7 +512,7 @@ main (void)
 {
 	const struct CMUnitTest tests[] = {
 		cmocka_unit_test(test_device_create),
-		cmocka_unit_test(test_device_resize_wholedisk),
+		cmocka_unit_test(test_device_repart_wholedisk),
 		cmocka_unit_test(test_device_get_fname),
 		cmocka_unit_test(test_device_get_fname_fd),
 		cmocka_unit_test(test_device_get_ptable_type),

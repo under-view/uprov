@@ -495,7 +495,7 @@ p_parse_part_string (struct uprov_device *device,
 
 
 int
-uprov_device_resize_wholedisk (struct uprov_device *device,
+uprov_device_repart_wholedisk (struct uprov_device *device,
                                const char *part_string,
                                const uint32_t ask_type)
 {
