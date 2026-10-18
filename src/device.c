@@ -378,7 +378,7 @@ uprov_device_create (struct uprov_device *p_device,
 
 
 /***************************************
- * Start uprov_device_resize functions *
+ * Start uprov_device_repart functions *
  ***************************************/
 
 static int
@@ -445,7 +445,8 @@ p_create_part (struct uprov_device_part *part,
 
 static int
 p_parse_part_string (struct uprov_device *device,
-                     const char *part_string)
+                     const char *part_string,
+                     const size_t part_index)
 {
 	uint8_t mbr = 0;
 	uint16_t word = 0, len = 0;
@@ -475,7 +476,8 @@ p_parse_part_string (struct uprov_device *device,
 				break;
 			case 369: /* PART: */
 				part_string++;
-				part = &(device->parts[device->part_count++]);
+				part = &(device->parts[(part_index != (size_t)-1) ? \
+						part_index : device->part_count++]);
 				p_create_part(part, part_string, mbr, &len);
 				part_string = ((char*)part_string + len);
 				word = 0;
@@ -509,7 +511,7 @@ uprov_device_repart_wholedisk (struct uprov_device *device,
 		return -1;
 	}
 
-	err = p_parse_part_string(device, part_string);
+	err = p_parse_part_string(device, part_string, (size_t)-1);
 	if (err == -1)
 		return -1;
 
@@ -608,8 +610,29 @@ uprov_device_repart_wholedisk (struct uprov_device *device,
 	return 0;
 }
 
+
+int
+uprov_device_repart_part (struct uprov_device *device,
+                          const size_t part_index,
+                          const char *part_string,
+                          const uint32_t UDO_UNUSED ask_type)
+{
+	int err = -1;
+
+	if (!device || !part_string) {
+		udo_log_error("Incorrect data passed\n");
+		return -1;
+	}
+
+	err = p_parse_part_string(device, part_string, part_index);
+	if (err == -1)
+		return -1;
+
+	return 0;
+}
+
 /*************************************
- * End uprov_device_resize functions *
+ * End uprov_device_repart functions *
  *************************************/
 
 

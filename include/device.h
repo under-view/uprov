@@ -105,6 +105,45 @@ uprov_device_repart_wholedisk (struct uprov_device *device,
 
 
 /*
+ * @brief Repartition file with caller defined partition information.
+ *
+ *        At least one item must contain a value.
+ *        The other values will default to original
+ *        value if already populated.
+ *
+ *        1 - START(SECTOR)
+ *        2 - SIZE(SECTORS)
+ *        3 - PARTITION_TYPE_CODE
+ *        4 - FILE_SYSTEM_TYPE
+ *        5 - FILE_SYSTEM_LABEL (Space character unsupported)
+ *
+ *        Acceptable format:
+ *
+ *            PART: 1:2:3:4:5:
+ *
+ * @param device      - May be NULL or a pointer to a struct uprov_device.
+ *                      If NULL memory will be allocated and return to
+ *                      caller. If not NULL address passed will be used
+ *                      to store the newly created struct uprov_device
+ *                      context.
+ * @param part_index  - Must pass valid partition index value.
+ * @param part_string - String used to determine how to repartition disk.
+ * @param ask_type    - Must pass an enum fdisk_ask_type enumerator.
+ *                      Used for libfdisk debug output.
+ *
+ * @returns
+ *	on success: 0
+ *	on failure: -1
+ */
+UDO_API
+int
+uprov_device_repart_part (struct uprov_device *device,
+                          const size_t part_index,
+                          const char *part_string,
+                          const uint32_t ask_type);
+
+
+/*
  * @brief Returns absolute path to file in string format.
  *
  * @param device - Pointer to a valid struct uprov_device.
