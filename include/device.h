@@ -109,7 +109,9 @@ uprov_device_repart_wholedisk (struct uprov_device *device,
  *
  *        At least one item must contain a value.
  *        The other values will default to original
- *        value if already populated.
+ *        value if already populated. This function
+ *        assumes that the disk has already been
+ *        partitioned. See uprov_device_repart_wholedisk(3).
  *
  *        1 - START(SECTOR)
  *        2 - SIZE(SECTORS)

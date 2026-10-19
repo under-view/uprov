@@ -48,10 +48,22 @@ create_gpt_disk[] = \
 	;
 
 
+static const char UDO_UNUSED \
+repart_gpt_disk[] = \
+	"PART: 102400:159744:0FC63DAF-8483-4772-8E79-3D69D8477DE4:vfat:GRUB_DATA:" \
+	;
+
+
 static const char \
 create_mbr_disk[] = \
 	"PTABLE: mbr\n" \
 	"PART: 2048:98304:83:ext4:LABEL_ONE:\n" \
+	;
+
+
+static const char \
+repart_mbr_disk[] = \
+	"PART: 2048:98304:83:vfat:LABEL_TWO:" \
 	;
 
 
@@ -140,6 +152,61 @@ test_device_repart_wholedisk (void UDO_UNUSED **state)
 	/* Start of GPT test */
 
 	err = uprov_device_repart_wholedisk(device, create_gpt_disk, ask_type);
+	assert_int_equal(err, 0);
+
+	/* End of GPT test */
+
+	uprov_device_destroy(device);
+
+	remove(fname);
+}
+
+
+static void UDO_UNUSED
+test_device_repart_part (void UDO_UNUSED **state)
+{
+	int err = -1;
+
+	struct udo_file_ops *flops = NULL;
+	struct uprov_device *device = NULL;
+
+	const char *fname = "/tmp/disk-file.wic";
+
+	const size_t file_size = (size_t) (1<<29);
+
+	const uint32_t ask_type = \
+		FDISK_ASKTYPE_WARN | \
+		FDISK_ASKTYPE_WARNX | \
+		FDISK_ASKTYPE_INFO;
+
+	udo_log_set_level(UDO_LOG_ALL);
+
+	flops = p_device_create_empty_file(fname, file_size);
+	assert_non_null(flops);
+
+	udo_file_ops_destroy(flops, file_size);
+
+	device = uprov_device_create(NULL, fname, FDISK_ASKTYPE_NONE);
+	assert_non_null(device);
+
+	/* Start of MBR test */
+
+	err = uprov_device_repart_wholedisk(device, create_mbr_disk, ask_type);
+	assert_int_equal(err, 0);
+
+	err = uprov_device_repart_part(device, 0, repart_mbr_disk, ask_type);
+	assert_int_equal(err, 0);
+
+	/* End of MBR test */
+
+	uprov_device_destroy_parts(device);
+
+	/* Start of GPT test */
+
+	err = uprov_device_repart_wholedisk(device, create_gpt_disk, ask_type);
+	assert_int_equal(err, 0);
+
+	err = uprov_device_repart_part(device, 2, repart_gpt_disk, ask_type);
 	assert_int_equal(err, 0);
 
 	/* End of GPT test */
@@ -513,6 +580,7 @@ main (void)
 	const struct CMUnitTest tests[] = {
 		cmocka_unit_test(test_device_create),
 		cmocka_unit_test(test_device_repart_wholedisk),
+		cmocka_unit_test(test_device_repart_part),
 		cmocka_unit_test(test_device_get_fname),
 		cmocka_unit_test(test_device_get_fname_fd),
 		cmocka_unit_test(test_device_get_ptable_type),

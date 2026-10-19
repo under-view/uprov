@@ -381,6 +381,13 @@ uprov_device_create (struct uprov_device *p_device,
  * Start uprov_device_repart functions *
  ***************************************/
 
+/*
+ * Defined in section 5.3.1
+ * https://uefi.org/specs/UEFI/2.10/05_GUID_Partition_Table_Format.html
+ */
+#define BACKUP_GPT_SECTORS 34
+#define MBR_SECTOR_GAP (1<<11)
+
 static int
 p_create_part (struct uprov_device_part *part,
                const char *part_string,
@@ -476,8 +483,13 @@ p_parse_part_string (struct uprov_device *device,
 				break;
 			case 369: /* PART: */
 				part_string++;
-				part = &(device->parts[(part_index != (size_t)-1) ? \
-						part_index : device->part_count++]);
+				if (part_index == (size_t)-1) {
+					part = &(device->parts[device->part_count++]);
+				} else {
+					part = &(device->parts[part_index]);
+					mbr = (UDO_STRTOU(device->ptable_type) == 321) ? 1 : 0;
+				}
+
 				p_create_part(part, part_string, mbr, &len);
 				part_string = ((char*)part_string + len);
 				word = 0;
@@ -493,6 +505,98 @@ p_parse_part_string (struct uprov_device *device,
 	}
 
 	return 0;
+}
+
+
+static void
+p_device_parts_resize_mbr (struct uprov_device *device,
+                           const size_t part_index,
+                           const uint64_t total_sectors)
+{
+	size_t p, p2, epdx = 0;
+
+	bool extended_found = false;
+
+	for (p = part_index; p < device->part_count; p++) {
+		p2 = p + 1;
+
+		device->parts[p].end_sector = \
+			device->parts[p].start_sector + \
+			device->parts[p].sector_size - 1;
+
+		device->parts[p2].end_sector = \
+			device->parts[p2].start_sector + \
+			device->parts[p2].sector_size - 1;
+
+		device->parts[p2].start_sector = (extended_found) ? \
+			device->parts[p].start_sector + \
+			device->parts[p].sector_size + \
+			MBR_SECTOR_GAP : device->parts[p].end_sector + 1;
+
+		/* If extended partition type code found. */
+		if (device->parts[p].extended) {
+			epdx = p; extended_found = true;
+
+			device->parts[p2].start_sector = \
+				device->parts[p].start_sector + MBR_SECTOR_GAP;
+		}
+	}
+
+	/*
+	 * Resize final partition to end of drive and
+	 * last extended partition to the end of the drive.
+	 */
+	p--;
+
+	device->parts[p].sector_size = \
+		total_sectors - device->parts[p].start_sector;
+
+	device->parts[p].end_sector = \
+		device->parts[p].start_sector + \
+		device->parts[p].sector_size - 1;
+
+	if (extended_found) {
+		device->parts[epdx].sector_size = \
+			total_sectors - device->parts[epdx].start_sector;
+		device->parts[epdx].end_sector = total_sectors;
+	}
+}
+
+
+static void
+p_device_parts_resize_gpt (struct uprov_device *device,
+                           const size_t part_index,
+                           const uint64_t total_sectors)
+{
+	size_t p, p2;
+
+	for (p = part_index; p < device->part_count; p++) {
+		p2 = p + 1;
+
+		device->parts[p].end_sector = \
+			device->parts[p].start_sector + \
+			device->parts[p].sector_size - 1;
+
+		device->parts[p2].start_sector = \
+			device->parts[p].end_sector + 1;
+
+		device->parts[p2].end_sector = \
+			device->parts[p2].start_sector + \
+			device->parts[p2].sector_size - 1;
+	}
+
+	/*
+	 * Resize final partition to end of drive.
+	 */
+	p--;
+
+	device->parts[p].sector_size = \
+		(total_sectors - BACKUP_GPT_SECTORS) - \
+		device->parts[p].start_sector;
+
+	device->parts[p].end_sector = \
+		device->parts[p].start_sector + \
+		device->parts[p].sector_size;
 }
 
 
@@ -615,9 +719,13 @@ int
 uprov_device_repart_part (struct uprov_device *device,
                           const size_t part_index,
                           const char *part_string,
-                          const uint32_t UDO_UNUSED ask_type)
+                          const uint32_t ask_type)
 {
+	size_t p;
 	int err = -1;
+	uint8_t gpt = 0;
+	uint64_t total_sectors = 0;
+	struct p_uprov_fdisk fdisk;
 
 	if (!device || !part_string) {
 		udo_log_error("Incorrect data passed\n");
@@ -627,6 +735,88 @@ uprov_device_repart_part (struct uprov_device *device,
 	err = p_parse_part_string(device, part_string, part_index);
 	if (err == -1)
 		return -1;
+
+	memset(&fdisk, 0, sizeof(fdisk));
+
+	fdisk.ctx = fdisk_new_context();
+	if (!(fdisk.ctx)) {
+		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
+				"fdisk_new_context failed\n");
+		return -1;
+	}
+
+	fdisk.part = fdisk_new_partition();
+	if (!(fdisk.part)) {
+		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
+			"Failed to get new partition context.\n");
+		p_uprov_fdisk_destroy(&fdisk);
+		return -1;
+	}
+
+	fdisk.parttype = fdisk_new_parttype();
+	if (!(fdisk.parttype)) {
+		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
+			"Failed to get new partition type context.\n");
+		p_uprov_fdisk_destroy(&fdisk);
+		return -1;
+	}
+
+	fdisk_init_debug(ask_type);
+	fdisk_disable_dialogs(fdisk.ctx, 1);
+	fdisk_set_ask(fdisk.ctx, p_ask_callback, NULL);
+
+	err = fdisk_assign_device_by_fd(fdisk.ctx, \
+		device->fname_fd, device->fname, 0);
+	if (err < 0) {
+		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
+			"fdisk_assign_device_by_fd('%d','%s') failed\n", \
+			device->fname_fd, device->fname);
+		p_uprov_fdisk_destroy(&fdisk);
+		return -1;
+	}
+
+	gpt = UDO_STRTOU(device->ptable_type);
+
+	/* Protects MRB & GPT sectors from being wiped */
+	fdisk_enable_bootbits_protection(fdisk.ctx, 1);
+
+	p = part_index;
+	gpt = UDO_STRTOU(device->ptable_type);
+	total_sectors = fdisk_get_nsectors(fdisk.ctx);
+
+	if (gpt) {
+		p_device_parts_resize_gpt(device, p, total_sectors);
+	} else {
+		p_device_parts_resize_mbr(device, p, total_sectors);
+	}
+
+	for (; p < device->part_count; p++) {
+		fdisk_reset_partition(fdisk.part);
+
+		/* Defaults */
+		fdisk_partition_start_follow_default(fdisk.part, 1);
+		fdisk_partition_end_follow_default(fdisk.part, 0);
+		fdisk_partition_partno_follow_default(fdisk.part, 1);
+		fdisk_partition_size_explicit(fdisk.part, 1);
+
+		fdisk_partition_set_type(fdisk.part, fdisk.parttype);
+		fdisk_partition_set_start(fdisk.part, device->parts[p].start_sector);
+		fdisk_partition_set_size(fdisk.part, device->parts[p].sector_size);
+
+		if (gpt == IS_GPT) {
+			fdisk_parttype_set_typestr(fdisk.parttype, \
+				device->parts[p].type.code_str);
+			fdisk_partition_set_name(fdisk.part, \
+				device->parts[p].partlabel);
+		} else {
+			fdisk_parttype_set_code(fdisk.parttype, \
+				device->parts[p].type.code);
+		}
+
+		fdisk_set_partition(fdisk.ctx, p, fdisk.part);
+	}
+
+	p_uprov_fdisk_destroy(&fdisk);
 
 	return 0;
 }
