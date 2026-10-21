@@ -180,13 +180,15 @@ p_device_fdisk_print_table (struct fdisk_context *ctx,
 
 	struct fdisk_partition *pa = NULL;
 
+	udo_log_warning("[total_sectors=%lu]\n", fdisk_get_nsectors(ctx));
+
 	for (p = 0; p < part_count; p++) {
 		fdisk_get_partition(ctx, p, &pa);
 		if (!pa) continue;
 
-		udo_log_info("partition[%u] = %p [partno=%zu, start=%ju, " \
+		udo_log_info("partition[%u] = [partno=%zu, start=%ju, " \
 		             "end=%ju, size=%ju%s%s%s]\n", \
-		             p+1, pa, fdisk_partition_get_partno(pa), \
+		             p+1, fdisk_partition_get_partno(pa), \
 		             (uintmax_t) fdisk_partition_get_start(pa), \
 		             (uintmax_t) fdisk_partition_get_end(pa), \
 		             (uintmax_t) fdisk_partition_get_size(pa), \
