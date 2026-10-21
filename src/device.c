@@ -172,6 +172,33 @@ p_uprov_fdisk_destroy (struct p_uprov_fdisk *fdisk)
 }
 
 
+static void UDO_UNUSED /* For debug purposes only */
+p_device_fdisk_print_table (struct fdisk_context *ctx,
+                            const size_t part_count)
+{
+	size_t p;
+
+	struct fdisk_partition *pa = NULL;
+
+	for (p = 0; p < part_count; p++) {
+		fdisk_get_partition(ctx, p, &pa);
+		if (!pa) continue;
+
+		udo_log_info("partition[%u] = %p [partno=%zu, start=%ju, " \
+		             "end=%ju, size=%ju%s%s%s]\n", \
+		             p+1, pa, fdisk_partition_get_partno(pa), \
+		             (uintmax_t) fdisk_partition_get_start(pa), \
+		             (uintmax_t) fdisk_partition_get_end(pa), \
+		             (uintmax_t) fdisk_partition_get_size(pa), \
+		             fdisk_partition_is_nested(pa) ? " nested" : "", \
+		             fdisk_partition_is_freespace(pa) ? " freespace" : "", \
+		             fdisk_partition_is_container(pa) ? " extended" : "");
+
+		fdisk_unref_partition(pa); pa = NULL;
+	}
+}
+
+
 static int
 p_ask_callback (struct fdisk_context UDO_UNUSED *cxt,
                 struct fdisk_ask *ask,
