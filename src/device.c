@@ -514,14 +514,16 @@ p_parse_part_string (struct uprov_device *device,
 				part_string++;
 				if (part_index == (size_t)-1) {
 					part = &(device->parts[device->part_count++]);
+					p_create_part(part, part_string, mbr, &len);
+					part_string = ((char*)part_string + len);
+					word = 0;
 				} else {
 					part = &(device->parts[part_index]);
 					mbr = (UDO_STRTOU(device->ptable_type) == 321) ? 1 : 0;
+					p_create_part(part, part_string, mbr, &len);
+					return 0;
 				}
 
-				p_create_part(part, part_string, mbr, &len);
-				part_string = ((char*)part_string + len);
-				word = 0;
 				break;
 			case 498: /* PTABLE: */
 				word = 0;
@@ -539,6 +541,7 @@ p_parse_part_string (struct uprov_device *device,
 
 static void
 p_device_parts_resize_mbr (struct uprov_device *device,
+                           struct fdisk_context *ctx,
                            const size_t part_index,
                            const uint64_t total_sectors)
 {
@@ -548,6 +551,8 @@ p_device_parts_resize_mbr (struct uprov_device *device,
 
 	for (p = part_index; p < device->part_count; p++) {
 		p2 = p + 1;
+
+		fdisk_delete_partition(ctx, p);
 
 		device->parts[p].end_sector = \
 			device->parts[p].start_sector + \
@@ -594,6 +599,7 @@ p_device_parts_resize_mbr (struct uprov_device *device,
 
 static void
 p_device_parts_resize_gpt (struct uprov_device *device,
+                           struct fdisk_context *ctx,
                            const size_t part_index,
                            const uint64_t total_sectors)
 {
@@ -601,6 +607,8 @@ p_device_parts_resize_gpt (struct uprov_device *device,
 
 	for (p = part_index; p < device->part_count; p++) {
 		p2 = p + 1;
+
+		fdisk_delete_partition(ctx, p);
 
 		device->parts[p].end_sector = \
 			device->parts[p].start_sector + \
@@ -814,9 +822,9 @@ uprov_device_repart_part (struct uprov_device *device,
 	total_sectors = fdisk_get_nsectors(fdisk.ctx);
 
 	if (gpt) {
-		p_device_parts_resize_gpt(device, p, total_sectors);
+		p_device_parts_resize_gpt(device, fdisk.ctx, p, total_sectors);
 	} else {
-		p_device_parts_resize_mbr(device, p, total_sectors);
+		p_device_parts_resize_mbr(device, fdisk.ctx, p, total_sectors);
 	}
 
 	for (; p < device->part_count; p++) {
@@ -842,11 +850,20 @@ uprov_device_repart_part (struct uprov_device *device,
 				device->parts[p].type.code);
 		}
 
-		err = fdisk_set_partition(fdisk.ctx, p, fdisk.part);
-		if (err < 0) {
+		err = fdisk_add_partition(fdisk.ctx, fdisk.part, NULL);
+		if (err) {
+			udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
+			                  "fdisk_add_partition: failed " \
+			                  "to add partition '%d'\n", p+1);
 			p_uprov_fdisk_destroy(&fdisk);
 			return -1;
 		}
+	}
+
+	err = fdisk_write_disklabel(fdisk.ctx);
+	if (err < 0) {
+		p_uprov_fdisk_destroy(&fdisk);
+		return -1;
 	}
 
 	p_uprov_fdisk_destroy(&fdisk);
