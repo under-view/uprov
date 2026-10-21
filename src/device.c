@@ -842,7 +842,11 @@ uprov_device_repart_part (struct uprov_device *device,
 				device->parts[p].type.code);
 		}
 
-		fdisk_set_partition(fdisk.ctx, p, fdisk.part);
+		err = fdisk_set_partition(fdisk.ctx, p, fdisk.part);
+		if (err < 0) {
+			p_uprov_fdisk_destroy(&fdisk);
+			return -1;
+		}
 	}
 
 	p_uprov_fdisk_destroy(&fdisk);
