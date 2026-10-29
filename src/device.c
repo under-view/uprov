@@ -130,7 +130,7 @@ struct uprov_device
  * Start of global to C source functions *
  *****************************************/
 
-struct p_uprov_fdisk
+struct p_device_fdisk
 {
 	struct fdisk_context   *ctx;
 	struct fdisk_table     *table;
@@ -140,7 +140,7 @@ struct p_uprov_fdisk
 
 
 static void
-p_uprov_fdisk_part_destroy (struct p_uprov_fdisk *fdisk)
+p_device_fdisk_part_destroy (struct p_device_fdisk *fdisk)
 {
 	if (fdisk->parttype) {
 		fdisk_unref_parttype(fdisk->parttype);
@@ -155,9 +155,9 @@ p_uprov_fdisk_part_destroy (struct p_uprov_fdisk *fdisk)
 
 
 static void
-p_uprov_fdisk_destroy (struct p_uprov_fdisk *fdisk)
+p_device_fdisk_destroy (struct p_device_fdisk *fdisk)
 {
-	p_uprov_fdisk_part_destroy(fdisk);
+	p_device_fdisk_part_destroy(fdisk);
 
 	if (fdisk->table) {
 		fdisk_unref_table(fdisk->table);
@@ -202,9 +202,9 @@ p_device_fdisk_print_table (struct fdisk_context *ctx,
 
 
 static int
-p_ask_callback (struct fdisk_context UDO_UNUSED *cxt,
-                struct fdisk_ask *ask,
-                void UDO_UNUSED *data)
+p_device_ask_callback (struct fdisk_context UDO_UNUSED *cxt,
+                       struct fdisk_ask *ask,
+                       void UDO_UNUSED *data)
 {
 	switch (fdisk_ask_get_type(ask)) {
 		case FDISK_ASKTYPE_INFO:
@@ -246,18 +246,18 @@ p_device_create_with_fdisk (struct uprov_device *device,
 
 	struct stat sb;
 
-	struct p_uprov_fdisk fdisk;
+	struct p_device_fdisk fdisk;
 
 	struct fdisk_label *lb = NULL;
 
 	char *fstype = NULL, *fslabel = NULL, *partlabel = NULL;
 
-	memset(&fdisk, 0, sizeof(struct p_uprov_fdisk));
+	memset(&fdisk, 0, sizeof(struct p_device_fdisk));
 
 	device->fname_fd = open(device->fname, O_RDWR);
 	if (device->fname_fd == -1) {
 		udo_log_error("open: %s\n", strerror(errno));
-		p_uprov_fdisk_destroy(&fdisk);
+		p_device_fdisk_destroy(&fdisk);
 		return -1;
 	}
 
@@ -278,14 +278,14 @@ p_device_create_with_fdisk (struct uprov_device *device,
 
 	fdisk_init_debug(ask_type);
 	fdisk_disable_dialogs(fdisk.ctx, 1);
-	fdisk_set_ask(fdisk.ctx, p_ask_callback, NULL);
+	fdisk_set_ask(fdisk.ctx, p_device_ask_callback, NULL);
 
 	err = fdisk_assign_device_by_fd(fdisk.ctx, \
 		device->fname_fd, device->fname, 0);
 	if (err < 0) {
 		udo_log_error("fdisk_assign_device_by_fd('%d','%s') failed\n", \
 		              device->fname_fd, device->fname);
-		p_uprov_fdisk_destroy(&fdisk);
+		p_device_fdisk_destroy(&fdisk);
 		return -1;
 	}
 
@@ -293,7 +293,7 @@ p_device_create_with_fdisk (struct uprov_device *device,
 	if (err != 0) {
 		udo_log_error("fdisk_get_partitions('%d','%s') failed\n", \
 		              device->fname_fd, device->fname);
-		p_uprov_fdisk_destroy(&fdisk);
+		p_device_fdisk_destroy(&fdisk);
 		return -1;
 	}
 
@@ -358,10 +358,10 @@ p_device_create_with_fdisk (struct uprov_device *device,
 			}
 		}
 
-		p_uprov_fdisk_part_destroy(&fdisk);
+		p_device_fdisk_part_destroy(&fdisk);
 	}
 
-	p_uprov_fdisk_destroy(&fdisk);
+	p_device_fdisk_destroy(&fdisk);
 
 	return 0;
 }
@@ -418,10 +418,10 @@ uprov_device_create (struct uprov_device *p_device,
 #define MBR_SECTOR_GAP (1<<11)
 
 static int
-p_create_part (struct uprov_device_part *part,
-               const char *part_string,
-               const uint8_t mbr,
-               uint16_t *len)
+p_device_create_part (struct uprov_device_part *part,
+                      const char *part_string,
+                      const uint8_t mbr,
+                      uint16_t *len)
 {
 	int ti = 0, iter = 0;
 
@@ -480,9 +480,9 @@ p_create_part (struct uprov_device_part *part,
 
 
 static int
-p_parse_part_string (struct uprov_device *device,
-                     const char *part_string,
-                     const size_t part_index)
+p_device_parse_part_string (struct uprov_device *device,
+                            const char *part_string,
+                            const size_t part_index)
 {
 	uint8_t mbr = 0;
 	uint16_t word = 0, len = 0;
@@ -514,13 +514,13 @@ p_parse_part_string (struct uprov_device *device,
 				part_string++;
 				if (part_index == (size_t)-1) {
 					part = &(device->parts[device->part_count++]);
-					p_create_part(part, part_string, mbr, &len);
+					p_device_create_part(part, part_string, mbr, &len);
 					part_string = ((char*)part_string + len);
 					word = 0;
 				} else {
 					part = &(device->parts[part_index]);
 					mbr = (UDO_STRTOU(device->ptable_type) == 321) ? 1 : 0;
-					p_create_part(part, part_string, mbr, &len);
+					p_device_create_part(part, part_string, mbr, &len);
 					return 0;
 				}
 
@@ -645,14 +645,14 @@ uprov_device_repart_wholedisk (struct uprov_device *device,
 	size_t p;
 	int err = -1;
 	uint8_t gpt = 0;
-	struct p_uprov_fdisk fdisk;
+	struct p_device_fdisk fdisk;
 
 	if (!device || !part_string) {
 		udo_log_error("Incorrect data passed\n");
 		return -1;
 	}
 
-	err = p_parse_part_string(device, part_string, (size_t)-1);
+	err = p_device_parse_part_string(device, part_string, (size_t)-1);
 	if (err == -1)
 		return -1;
 
@@ -667,13 +667,13 @@ uprov_device_repart_wholedisk (struct uprov_device *device,
 
 	fdisk_init_debug(ask_type);
 	fdisk_disable_dialogs(fdisk.ctx, 1);
-	fdisk_set_ask(fdisk.ctx, p_ask_callback, NULL);
+	fdisk_set_ask(fdisk.ctx, p_device_ask_callback, NULL);
 
 	fdisk.part = fdisk_new_partition();
 	if (!(fdisk.part)) {
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
 			"Failed to get new partition context.\n");
-		p_uprov_fdisk_destroy(&fdisk);
+		p_device_fdisk_destroy(&fdisk);
 		return -1;
 	}
 
@@ -681,7 +681,7 @@ uprov_device_repart_wholedisk (struct uprov_device *device,
 	if (!(fdisk.parttype)) {
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
 			"Failed to get new partition type context.\n");
-		p_uprov_fdisk_destroy(&fdisk);
+		p_device_fdisk_destroy(&fdisk);
 		return -1;
 	}
 
@@ -691,7 +691,7 @@ uprov_device_repart_wholedisk (struct uprov_device *device,
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
 			"fdisk_assign_device_by_fd('%d','%s') failed\n", \
 			device->fname_fd, device->fname);
-		p_uprov_fdisk_destroy(&fdisk);
+		p_device_fdisk_destroy(&fdisk);
 		return -1;
 	}
 
@@ -702,7 +702,7 @@ uprov_device_repart_wholedisk (struct uprov_device *device,
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
 				"Failed to create disk label '%s'.\n", \
 				device->ptable_type);
-		p_uprov_fdisk_destroy(&fdisk);
+		p_device_fdisk_destroy(&fdisk);
 		return -1;
 	}
 
@@ -735,18 +735,18 @@ uprov_device_repart_wholedisk (struct uprov_device *device,
 			udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
 					"fdisk_add_partition: failed " \
 					"to add partition '%d'\n", p+1);
-			p_uprov_fdisk_destroy(&fdisk);
+			p_device_fdisk_destroy(&fdisk);
 			return -1;
 		}
 	}
 
 	err = fdisk_write_disklabel(fdisk.ctx);
 	if (err < 0) {
-		p_uprov_fdisk_destroy(&fdisk);
+		p_device_fdisk_destroy(&fdisk);
 		return -1;
 	}
 
-	p_uprov_fdisk_destroy(&fdisk);
+	p_device_fdisk_destroy(&fdisk);
 
 	return 0;
 }
@@ -762,14 +762,14 @@ uprov_device_repart_part (struct uprov_device *device,
 	int err = -1;
 	uint8_t gpt = 0;
 	uint64_t total_sectors = 0;
-	struct p_uprov_fdisk fdisk;
+	struct p_device_fdisk fdisk;
 
 	if (!device || !part_string) {
 		udo_log_error("Incorrect data passed\n");
 		return -1;
 	}
 
-	err = p_parse_part_string(device, part_string, part_index);
+	err = p_device_parse_part_string(device, part_string, part_index);
 	if (err == -1)
 		return -1;
 
@@ -786,7 +786,7 @@ uprov_device_repart_part (struct uprov_device *device,
 	if (!(fdisk.part)) {
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
 			"Failed to get new partition context.\n");
-		p_uprov_fdisk_destroy(&fdisk);
+		p_device_fdisk_destroy(&fdisk);
 		return -1;
 	}
 
@@ -794,13 +794,13 @@ uprov_device_repart_part (struct uprov_device *device,
 	if (!(fdisk.parttype)) {
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
 			"Failed to get new partition type context.\n");
-		p_uprov_fdisk_destroy(&fdisk);
+		p_device_fdisk_destroy(&fdisk);
 		return -1;
 	}
 
 	fdisk_init_debug(ask_type);
 	fdisk_disable_dialogs(fdisk.ctx, 1);
-	fdisk_set_ask(fdisk.ctx, p_ask_callback, NULL);
+	fdisk_set_ask(fdisk.ctx, p_device_ask_callback, NULL);
 
 	err = fdisk_assign_device_by_fd(fdisk.ctx, \
 		device->fname_fd, device->fname, 0);
@@ -808,7 +808,7 @@ uprov_device_repart_part (struct uprov_device *device,
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
 			"fdisk_assign_device_by_fd('%d','%s') failed\n", \
 			device->fname_fd, device->fname);
-		p_uprov_fdisk_destroy(&fdisk);
+		p_device_fdisk_destroy(&fdisk);
 		return -1;
 	}
 
@@ -855,18 +855,18 @@ uprov_device_repart_part (struct uprov_device *device,
 			udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
 			                  "fdisk_add_partition: failed " \
 			                  "to add partition '%d'\n", p+1);
-			p_uprov_fdisk_destroy(&fdisk);
+			p_device_fdisk_destroy(&fdisk);
 			return -1;
 		}
 	}
 
 	err = fdisk_write_disklabel(fdisk.ctx);
 	if (err < 0) {
-		p_uprov_fdisk_destroy(&fdisk);
+		p_device_fdisk_destroy(&fdisk);
 		return -1;
 	}
 
-	p_uprov_fdisk_destroy(&fdisk);
+	p_device_fdisk_destroy(&fdisk);
 
 	return 0;
 }
