@@ -954,7 +954,7 @@ uprov_device_get_part_num (struct uprov_device *device,
 
 
 static const char *
-p_get_part_name_format (const char *fname)
+p_device_get_part_name_format (const char *fname)
 {
 	uint32_t var = 0;
 
@@ -988,7 +988,7 @@ uprov_device_get_part_name (struct uprov_device *device,
 		return NULL;
 
 	snprintf(device->part_name, PART_NAME_MAX, \
-		p_get_part_name_format(device->fname), \
+		p_device_get_part_name_format(device->fname), \
 		device->fname, device->parts[part_index].number);
 
 	return device->part_name;
