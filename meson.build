@@ -48,8 +48,7 @@ libuprov_a = static_library(
   install: true
 )
 
-executable(project_name,
-           'src/executables/uprov.c',
+executable(project_name, exec_fs,
            link_with: libuprov,
            include_directories: inc,
            dependencies: [libudo],
