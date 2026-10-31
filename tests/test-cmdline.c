@@ -35,10 +35,51 @@
 
 #include "cmdline.h"
 
+/******************************************
+ * Start of test_cmdline_create functions *
+ ******************************************/
+
+static void UDO_UNUSED
+test_cmdline_create (void UDO_UNUSED **state)
+{
+	char *test_flags[] = { "uprov" };
+
+	struct uprov_cmdline *cmdline = NULL;
+
+	cmdline = uprov_cmdline_create(NULL, test_flags, \
+		sizeof(test_flags) / sizeof(char*));
+	assert_non_null(cmdline);
+
+	uprov_cmdline_destroy(cmdline);
+}
+
+/****************************************
+ * End of test_cmdline_create functions *
+ ****************************************/
+
+
+/**********************************************
+ * Start of test_cmdline_get_sizeof functions *
+ **********************************************/
+
+static void UDO_UNUSED
+test_cmdline_get_sizeof (void UDO_UNUSED **state)
+{
+	int size = 0;
+	size = uprov_cmdline_get_sizeof();
+	assert_int_not_equal(size, 0);
+}
+
+/********************************************
+ * End of test_cmdline_get_sizeof functions *
+ ********************************************/
+
 int
 main (void)
 {
 	const struct CMUnitTest tests[] = {
+		cmocka_unit_test(test_cmdline_create),
+		cmocka_unit_test(test_cmdline_get_sizeof),
 	};
 
 	return cmocka_run_group_tests(tests, NULL, NULL);

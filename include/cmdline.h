@@ -27,4 +27,59 @@
 
 #include <udo/macros.h>
 
+/*
+ * Stores information about the uprov_cmdline context.
+ */
+struct uprov_cmdline;
+
+
+/*
+ * @brief Given flags or arguments from executable. Parse
+ *        and create a struct uprov_cmdline context storing
+ *        flags passed to executable.
+ *
+ * @param cmdline - May be NULL or a pointer to a struct uprov_cmdline.
+ *                  If NULL memory will be allocated and return to
+ *                  caller. If not NULL address passed will be used
+ *                  to store the newly created struct uprov_cmdline
+ *                  context.
+ * @param argv    - Executable flags or arguments strings.
+ * @param argc    - Amount of arguments passed to executable.
+ *                  Array size of @argv.
+ *
+ * @returns
+ *	on success: Pointer to a struct uprov_cmdline
+ *	on failure: NULL
+ */
+UDO_API
+struct uprov_cmdline *
+uprov_cmdline_create (struct uprov_cmdline *cmdline,
+                      char *argv[],
+                      int argc);
+
+
+/*
+ * @brief Frees any allocated memory and closes FD's (if open) create after
+ *        uprov_cmdline_create() call.
+ *
+ * @param device - Pointer to a valid struct uprov_cmdline.
+ */
+UDO_API
+void
+uprov_cmdline_destroy (struct uprov_cmdline *cmdline);
+
+
+/*
+ * @brief Returns size of the internal structure. So,
+ *        if caller decides to allocate memory outside
+ *        of API interface they know the exact amount
+ *        of bytes.
+ *
+ * @returns
+ *	on success: sizeof(struct uprov_cmdline)
+ *	on failure: sizeof(struct uprov_cmdline)
+ */
+int
+uprov_cmdline_get_sizeof (void);
+
 #endif /* UPROV_CMDLINE_H */
