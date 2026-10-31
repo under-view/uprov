@@ -29,62 +29,21 @@
 
 #include <udo/udo.h>
 
+#include "cmdline.h"
 #include "uprov.h"
-
-static void
-help_msg (const char *bin_name)
-{
-	udo_log_print(UDO_LOG_SUCCESS, "Usage: %s <options>\n", bin_name);
-	udo_log_print(UDO_LOG_WARNING, "Example: %s --resize 1\n", bin_name);
-	udo_log_print(UDO_LOG_INFO,    "Options:\n");
-	udo_log_print(UDO_LOG_ERROR,   "\t-r,--resize <partition number> "); udo_log_print(UDO_LOG_INFO, "Resize a drive partition to extend\n");
-	udo_log_print(UDO_LOG_INFO,    "\t                               "); udo_log_print(UDO_LOG_INFO, "it out to the end of drive.\n");
-	exit(EXIT_FAILURE);
-}
-
 
 int
 main (int argc, char *argv[])
 {
-	int c;
-	int opt_index = 0;
+	struct uprov_cmdline *cmdline = NULL;
 
-	static struct option options[] = {
-		{"resize",  required_argument, 0, 'r' },
-		{"help",    no_argument,       0, 'h' },
-		{0,         0,                 0,  0  }
-	};
+	udo_log_set_level(UDO_LOG_ALL);
 
-	if (argc < 2) {
-		udo_log_print(UDO_LOG_ERROR, "[x] No option specified!!\n\n");
-		help_msg(argv[0]);
-	}
+	cmdline = uprov_cmdline_create(NULL, argv, argc);
+	if (!cmdline)
+		return 1;
 
-	// Allows us to control what's displayed upon invalid option.
-	opterr = 0;
-
-	while (1) {
-		c = getopt_long(argc, argv, "hr:", options, &opt_index);
-		if (c == -1)
-			break;
-
-		switch (c) {
-			case 'r':
-				int part_num = atoi(optarg);
-				fprintf(stdout, "Resizeing partition %d\n", part_num);
-				break;
-			case 'h':
-				help_msg(argv[0]);
-				break;
-			case '?':
-				udo_log_print(UDO_LOG_ERROR, "[x] Invalid option specified!!\n\n");
-				help_msg(argv[0]);
-				break;
-			default:
-				help_msg(argv[0]);
-				break;
-		}
-	}
+	uprov_cmdline_destroy(cmdline);
 
 	return 0;
 }
