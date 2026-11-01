@@ -59,7 +59,7 @@ struct uprov_cmdline
  ****************************************/
 
 UDO_STATIC_INLINE
-struct option *
+const struct option *
 p_cmdline_get_opts (void)
 {
 	static struct option
@@ -70,15 +70,15 @@ p_cmdline_get_opts (void)
 		{0, 0, 0, 0 }
 	};
 
-	return (struct option*)&(cmdline_opts);
+	return &(cmdline_opts[0]);
 }
 
 
 UDO_STATIC_INLINE
-char *
+const char *
 p_cmdline_get_opts_str (void)
 {
-	return "r:h";
+	return "hr:";
 }
 
 
@@ -128,9 +128,16 @@ uprov_cmdline_create (struct uprov_cmdline *p_cmdline,
 	 */
 	opterr = 0;
 
+	/*
+	 * Besure argv elements always start
+	 * at the beginning. optind is a global
+	 * used by getopt_long(3)
+	 */
+	optind = 1;
+
 	while (1) {
 		c = getopt_long(argc, argv, \
-		                p_cmdline_get_opts_str(),  \
+		                p_cmdline_get_opts_str(), \
 		                p_cmdline_get_opts(), \
 		                &opt_index);
 		if (c == -1)

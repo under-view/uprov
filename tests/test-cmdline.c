@@ -48,8 +48,8 @@ test_cmdline_create (void UDO_UNUSED **state)
 
 	struct uprov_cmdline *cmdline = NULL;
 
-	cmdline = uprov_cmdline_create(NULL, test_flags, \
-		sizeof(test_flags) / sizeof(char*));
+	cmdline = uprov_cmdline_create(NULL, \
+		test_flags, UDO_ARRAY_SIZE(test_flags));
 	assert_non_null(cmdline);
 
 	uprov_cmdline_destroy(cmdline);
@@ -73,8 +73,23 @@ test_cmdline_flags_zero (void UDO_UNUSED **state)
 
 	udo_log_set_level(UDO_LOG_ALL);
 
-	cmdline = uprov_cmdline_create(NULL, test_flags, \
-		sizeof(test_flags) / sizeof(char*));
+	cmdline = uprov_cmdline_create(NULL, \
+		test_flags, UDO_ARRAY_SIZE(test_flags));
+	assert_null(cmdline);
+}
+
+
+static void UDO_UNUSED
+test_cmdline_flags_help (void UDO_UNUSED **state)
+{
+	char *test_flags[] = { "./uprov", "--help" };
+
+	struct uprov_cmdline *cmdline = NULL;
+
+	udo_log_set_level(UDO_LOG_ALL);
+
+	cmdline = uprov_cmdline_create(NULL, \
+		test_flags, UDO_ARRAY_SIZE(test_flags));
 	assert_null(cmdline);
 }
 
@@ -105,6 +120,7 @@ main (void)
 	const struct CMUnitTest tests[] = {
 		cmocka_unit_test(test_cmdline_create),
 		cmocka_unit_test(test_cmdline_flags_zero),
+		cmocka_unit_test(test_cmdline_flags_help),
 		cmocka_unit_test(test_cmdline_get_sizeof),
 	};
 
