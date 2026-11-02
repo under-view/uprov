@@ -65,7 +65,8 @@ p_cmdline_get_opts (void)
 	static struct option
 	cmdline_opts[] = \
 	{
-		{"resize", required_argument, 0, 'r' },
+		{"config", required_argument, 0, 'c' },
+		{"resize", no_argument, 0, 'r' },
 		{"help", no_argument, 0, 'h' },
 		{0, 0, 0, 0 }
 	};
@@ -78,7 +79,7 @@ UDO_STATIC_INLINE
 const char *
 p_cmdline_get_opts_str (void)
 {
-	return "hr:";
+	return "hrc:d:";
 }
 
 
@@ -86,13 +87,15 @@ static void
 p_cmdline_help_msg (const char *bin_name)
 {
 	udo_log_print(UDO_LOG_WARNING, "Usage:\n");
-	udo_log_print(UDO_LOG_INFO, "\t%s <options>\n\n", bin_name);
+	udo_log_print(UDO_LOG_INFO,    "\t%s <options>\n\n", bin_name);
 	udo_log_print(UDO_LOG_WARNING, "Example:\n");
-	udo_log_print(UDO_LOG_INFO, "\t%s --resize 1\n\n", bin_name);
-	udo_log_print(UDO_LOG_WARNING,    "Options:\n");
-	udo_log_print(UDO_LOG_SUCCESS, "\t-r,--resize <partition number> "); udo_log_print(UDO_LOG_INFO, "Resize a drive partition to extend\n");
-	udo_log_print(UDO_LOG_INFO,    "\t                               "); udo_log_print(UDO_LOG_INFO, "it out to the end of drive.\n");
-	udo_log_print(UDO_LOG_SUCCESS, "\t-h,--help                      "); udo_log_print(UDO_LOG_INFO, "See this message.\n");
+	udo_log_print(UDO_LOG_INFO,    "\t%s --device /dev/sda -c part-config.txt\n\n", bin_name);
+	udo_log_print(UDO_LOG_WARNING, "Options:\n");
+	udo_log_print(UDO_LOG_INFO,    "\t-c,--config <config file>"); udo_log_print(UDO_LOG_INFO, "Partition configuration file.\n");
+	udo_log_print(UDO_LOG_INFO,    "\t-d,--device <device file>"); udo_log_print(UDO_LOG_INFO, "Block device file.\n");
+	udo_log_print(UDO_LOG_SUCCESS, "\t-r,--resize-last         "); udo_log_print(UDO_LOG_INFO, "Resize a drive partition to extend\n");
+	udo_log_print(UDO_LOG_INFO,    "\t                         "); udo_log_print(UDO_LOG_INFO, "it out to the end of drive.\n");
+	udo_log_print(UDO_LOG_SUCCESS, "\t-h,--help                "); udo_log_print(UDO_LOG_INFO, "See this message.\n");
 }
 
 
