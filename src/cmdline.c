@@ -44,14 +44,12 @@
  *                       destroying the context.
  * @member empty_flags - Stores integer holding command line
  *                       flags that contain no arguments.
- * @member part_num    - Stores partition number to update.
  */
 struct uprov_cmdline
 {
 	struct udo_log_error_struct err;
 	uint8_t                     free;
 	uint8_t                     empty_flags;
-	size_t                      part_num;
 };
 
 /****************************************
@@ -148,10 +146,6 @@ uprov_cmdline_create (struct uprov_cmdline *p_cmdline,
 
 		switch (c) {
 			case 'r':
-				cmdline->part_num = atoi(optarg);
-				udo_log_print(UDO_LOG_WARNING, \
-				              "Resizing partition %d\n", \
-				              cmdline->part_num);
 				break;
 
 			case 'h':

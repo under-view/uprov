@@ -44,7 +44,7 @@
 static void UDO_UNUSED
 test_cmdline_create (void UDO_UNUSED **state)
 {
-	char *test_flags[] = { "uprov", "-r", "8" };
+	char *test_flags[] = { "uprov", "-r" };
 
 	struct uprov_cmdline *cmdline = NULL;
 
