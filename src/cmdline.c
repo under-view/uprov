@@ -63,11 +63,11 @@ p_cmdline_help_msg (const char *bin_name)
 	udo_log_print(UDO_LOG_WARNING, "Example:\n");
 	udo_log_print(UDO_LOG_INFO,    "\t%s --device /dev/sda -c part-config.txt\n\n", bin_name);
 	udo_log_print(UDO_LOG_WARNING, "Options:\n");
-	udo_log_print(UDO_LOG_INFO,    "\t-c,--config <config file>"); udo_log_print(UDO_LOG_INFO, "Partition configuration file.\n");
-	udo_log_print(UDO_LOG_INFO,    "\t-d,--device <device file>"); udo_log_print(UDO_LOG_INFO, "Block device file.\n");
-	udo_log_print(UDO_LOG_SUCCESS, "\t-r,--resize-last         "); udo_log_print(UDO_LOG_INFO, "Resize a drive partition to extend\n");
-	udo_log_print(UDO_LOG_INFO,    "\t                         "); udo_log_print(UDO_LOG_INFO, "it out to the end of drive.\n");
-	udo_log_print(UDO_LOG_SUCCESS, "\t-h,--help                "); udo_log_print(UDO_LOG_INFO, "See this message.\n");
+	udo_log_print(UDO_LOG_SUCCESS, "\t-c,--config <required>"); udo_log_print(UDO_LOG_INFO, "\tPartition configuration file.\n");
+	udo_log_print(UDO_LOG_SUCCESS, "\t-d,--device <required>"); udo_log_print(UDO_LOG_INFO, "\tBlock device file.\n");
+	udo_log_print(UDO_LOG_SUCCESS, "\t-r,--resize-last      "); udo_log_print(UDO_LOG_INFO, "\tResize a drive partition to extend\n");
+	udo_log_print(UDO_LOG_SUCCESS, "\t                      "); udo_log_print(UDO_LOG_INFO, "\tit out to the end of drive.\n");
+	udo_log_print(UDO_LOG_SUCCESS, "\t-h,--help             "); udo_log_print(UDO_LOG_INFO, "\tSee this message.\n");
 }
 
 
