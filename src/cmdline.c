@@ -25,7 +25,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <getopt.h>
 
 #include <udo/log.h>
 
@@ -56,31 +55,6 @@ struct uprov_cmdline
  * Start uprov_cmdline_create functions *
  ****************************************/
 
-UDO_STATIC_INLINE
-const struct option *
-p_cmdline_get_opts (void)
-{
-	static struct option
-	cmdline_opts[] = \
-	{
-		{"config", required_argument, 0, 'c' },
-		{"resize", no_argument, 0, 'r' },
-		{"help", no_argument, 0, 'h' },
-		{0, 0, 0, 0 }
-	};
-
-	return &(cmdline_opts[0]);
-}
-
-
-UDO_STATIC_INLINE
-const char *
-p_cmdline_get_opts_str (void)
-{
-	return "hrc:d:";
-}
-
-
 static void
 p_cmdline_help_msg (const char *bin_name)
 {
@@ -102,7 +76,9 @@ uprov_cmdline_create (struct uprov_cmdline *p_cmdline,
                       char *argv[],
                       int argc)
 {
-	int c, opt_index = 0;
+	int a;
+
+	char *ret = NULL;
 
 	struct uprov_cmdline *cmdline = p_cmdline;
 
@@ -123,33 +99,22 @@ uprov_cmdline_create (struct uprov_cmdline *p_cmdline,
 		}
 	}
 
-	/*
-	 * Allows us to control what's
-	 * displayed upon invalid option.
-	 */
-	opterr = 0;
-
-	/*
-	 * Besure argv elements always start
-	 * at the beginning. optind is a global
-	 * used by getopt_long(3)
-	 */
-	optind = 1;
-
-	while (1) {
-		c = getopt_long(argc, argv, \
-		                p_cmdline_get_opts_str(), \
-		                p_cmdline_get_opts(), \
-		                &opt_index);
-		if (c == -1)
-			break;
-
-		switch (c) {
-			case 'r':
+	for (a = 1; a < argc; a++) {
+		switch (UDO_STRTOU_UTOC(argv[a], '=', &ret)) {
+			case 144: /* -c */
+			case 720: /* --config */
 				break;
 
-			case 'h':
-			case '?':
+			case 145: /* -d */
+			case 714: /* --device */
+				break;
+
+			case 159: /* -r */
+			case 1229: /* --resize-last */
+				break;
+
+			case 149: /* -h */
+			case 515: /* --help */
 			default:
 				p_cmdline_help_msg(argv[0]);
 				uprov_cmdline_destroy(cmdline);

@@ -71,8 +71,6 @@ test_cmdline_flags_zero (void UDO_UNUSED **state)
 
 	struct uprov_cmdline *cmdline = NULL;
 
-	udo_log_set_level(UDO_LOG_ALL);
-
 	cmdline = uprov_cmdline_create(NULL, \
 		test_flags, UDO_ARRAY_SIZE(test_flags));
 	assert_null(cmdline);
@@ -86,8 +84,11 @@ test_cmdline_flags_help (void UDO_UNUSED **state)
 
 	struct uprov_cmdline *cmdline = NULL;
 
-	udo_log_set_level(UDO_LOG_ALL);
+	cmdline = uprov_cmdline_create(NULL, \
+		test_flags, UDO_ARRAY_SIZE(test_flags));
+	assert_null(cmdline);
 
+	test_flags[1] = "-h";
 	cmdline = uprov_cmdline_create(NULL, \
 		test_flags, UDO_ARRAY_SIZE(test_flags));
 	assert_null(cmdline);
