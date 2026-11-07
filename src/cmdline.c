@@ -30,6 +30,8 @@
 
 #include "cmdline.h"
 
+#define DEV_FILE_PATH_MAX (1<<6)
+
 /*
  * @brief Structure defining storing information about the
  *        flag passed to the executable and the arguments
@@ -43,12 +45,16 @@
  *                       destroying the context.
  * @member empty_flags - Stores integer holding command line
  *                       flags that contain no arguments.
+ * @member repart_file - File to repartition.
+ * @member config_file - File path to configuration file.
  */
 struct uprov_cmdline
 {
 	struct udo_log_error_struct err;
 	uint8_t                     free;
 	uint8_t                     empty_flags;
+	char                        repart_file[UDO_FILE_PATH_MAX];
+	char                        config_file[UDO_FILE_PATH_MAX];
 };
 
 /****************************************
@@ -61,10 +67,11 @@ p_cmdline_help_msg (const char *bin_name)
 	udo_log_print(UDO_LOG_WARNING, "Usage:\n");
 	udo_log_print(UDO_LOG_INFO,    "\t%s <options>\n\n", bin_name);
 	udo_log_print(UDO_LOG_WARNING, "Example:\n");
-	udo_log_print(UDO_LOG_INFO,    "\t%s --device /dev/sda -c part-config.txt\n\n", bin_name);
+	udo_log_print(UDO_LOG_INFO,    "\t%s --file /dev/sda -c part-config.txt\n", bin_name);
+	udo_log_print(UDO_LOG_INFO,    "\t%s --file some-part.img -c part-config.txt\n\n", bin_name);
 	udo_log_print(UDO_LOG_WARNING, "Options:\n");
 	udo_log_print(UDO_LOG_SUCCESS, "\t-c,--config <required>"); udo_log_print(UDO_LOG_INFO, "\tPartition configuration file.\n");
-	udo_log_print(UDO_LOG_SUCCESS, "\t-d,--device <required>"); udo_log_print(UDO_LOG_INFO, "\tBlock device file.\n");
+	udo_log_print(UDO_LOG_SUCCESS, "\t-f,--file <required>  "); udo_log_print(UDO_LOG_INFO, "\tFile to repartition.\n");
 	udo_log_print(UDO_LOG_SUCCESS, "\t-r,--resize-last      "); udo_log_print(UDO_LOG_INFO, "\tResize a drive partition to extend\n");
 	udo_log_print(UDO_LOG_SUCCESS, "\t                      "); udo_log_print(UDO_LOG_INFO, "\tit out to the end of drive.\n");
 	udo_log_print(UDO_LOG_SUCCESS, "\t-h,--help             "); udo_log_print(UDO_LOG_INFO, "\tSee this message.\n");
@@ -105,8 +112,8 @@ uprov_cmdline_create (struct uprov_cmdline *p_cmdline,
 			case 720: /* --config */
 				break;
 
-			case 145: /* -d */
-			case 714: /* --device */
+			case 147: /* -f */
+			case 506: /* --file */
 				break;
 
 			case 159: /* -r */
