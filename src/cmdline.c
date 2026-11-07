@@ -46,16 +46,16 @@
  *                       destroying the context.
  * @member empty_flags - Stores integer holding command line
  *                       flags that contain no arguments.
- * @member part_file   - File path to file to partition.
  * @member config_file - File path to configuration file.
+ * @member part_file   - File path to file to partition.
  */
 struct uprov_cmdline
 {
 	struct udo_log_error_struct err;
 	uint8_t                     free;
 	uint8_t                     empty_flags;
-	char                        part_file[UDO_FILE_PATH_MAX];
 	char                        config_file[UDO_FILE_PATH_MAX];
+	char                        part_file[UDO_FILE_PATH_MAX];
 };
 
 /****************************************
@@ -154,28 +154,6 @@ uprov_cmdline_create (struct uprov_cmdline *p_cmdline,
  **************************************/
 
 
-/*****************************************
- * Start uprov_cmdline_destroy functions *
- *****************************************/
-
-void
-uprov_cmdline_destroy (struct uprov_cmdline *cmdline)
-{
-	if (!cmdline)
-		return;
-
-	if (cmdline->free) {
-		free(cmdline);
-	} else {
-		memset(cmdline, 0, sizeof(struct uprov_cmdline));
-	}
-}
-
-/***************************************
- * End uprov_cmdline_destroy functions *
- ***************************************/
-
-
 /*************************************
  * Start uprov_cmdline_get functions *
  *************************************/
@@ -202,6 +180,28 @@ uprov_cmdline_get_part_file (struct uprov_cmdline *cmdline)
 /***********************************
  * End uprov_cmdline_get functions *
  ***********************************/
+
+
+/*****************************************
+ * Start uprov_cmdline_destroy functions *
+ *****************************************/
+
+void
+uprov_cmdline_destroy (struct uprov_cmdline *cmdline)
+{
+	if (!cmdline)
+		return;
+
+	if (cmdline->free) {
+		free(cmdline);
+	} else {
+		memset(cmdline, 0, sizeof(struct uprov_cmdline));
+	}
+}
+
+/***************************************
+ * End uprov_cmdline_destroy functions *
+ ***************************************/
 
 
 /*****************************************************
