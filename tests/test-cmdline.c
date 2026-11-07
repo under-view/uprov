@@ -100,8 +100,6 @@ test_cmdline_flags_config (void UDO_UNUSED **state)
 
 	config_file_eq = (const char *) &(test_flags_eq[1][9]);
 
-	udo_log_set_level(UDO_LOG_ALL);
-
 	/*************** test_flags ***************/
 
 	cmdline = uprov_cmdline_create(NULL, test_flags, UDO_ARRAY_SIZE(test_flags));
@@ -139,6 +137,58 @@ test_cmdline_flags_config (void UDO_UNUSED **state)
 
 
 /**********************************************
+ * Start of test_cmdline_flags_file functions *
+ **********************************************/
+
+static void UDO_UNUSED
+test_cmdline_flags_file (void UDO_UNUSED **state)
+{
+	struct uprov_cmdline *cmdline = NULL;
+
+	const char *part_file = NULL, *part_file_eq = NULL;
+
+	const char *test_flags[] = { "./uprov", "--file", "some-file.txt" };
+	const char *test_flags_eq[] = { "./uprov", "--file=some-file.txt" };
+
+	part_file_eq = (const char *) &(test_flags_eq[1][7]);
+
+	/*************** test_flags ***************/
+
+	cmdline = uprov_cmdline_create(NULL, test_flags, UDO_ARRAY_SIZE(test_flags));
+	assert_non_null(cmdline);
+	part_file = uprov_cmdline_get_part_file(cmdline);
+	assert_string_equal(part_file, test_flags[2]);
+	uprov_cmdline_destroy(cmdline); cmdline = NULL;
+
+	test_flags[1] = "-f";
+	cmdline = uprov_cmdline_create(NULL, test_flags, UDO_ARRAY_SIZE(test_flags));
+	assert_non_null(cmdline);
+	part_file = uprov_cmdline_get_part_file(cmdline);
+	assert_string_equal(part_file, test_flags[2]);
+	uprov_cmdline_destroy(cmdline); cmdline = NULL;
+
+	/*************** test_flags_eq ***************/
+
+	cmdline = uprov_cmdline_create(NULL, test_flags_eq, UDO_ARRAY_SIZE(test_flags_eq));
+	assert_non_null(cmdline);
+	part_file = uprov_cmdline_get_part_file(cmdline);
+	assert_string_equal(part_file, part_file_eq);
+	uprov_cmdline_destroy(cmdline); cmdline = NULL;
+
+	test_flags[1] = "-f=some-file.txt";
+	cmdline = uprov_cmdline_create(NULL, test_flags_eq, UDO_ARRAY_SIZE(test_flags_eq));
+	assert_non_null(cmdline);
+	part_file = uprov_cmdline_get_part_file(cmdline);
+	assert_string_equal(part_file, part_file_eq);
+	uprov_cmdline_destroy(cmdline); cmdline = NULL;
+}
+
+/********************************************
+ * End of test_cmdline_flags_file functions *
+ ********************************************/
+
+
+/**********************************************
  * Start of test_cmdline_get_sizeof functions *
  **********************************************/
 
@@ -161,6 +211,7 @@ main (void)
 		cmocka_unit_test(test_cmdline_flags_zero),
 		cmocka_unit_test(test_cmdline_flags_help),
 		cmocka_unit_test(test_cmdline_flags_config),
+		cmocka_unit_test(test_cmdline_flags_file),
 		cmocka_unit_test(test_cmdline_get_sizeof),
 	};
 

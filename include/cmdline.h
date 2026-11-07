@@ -73,6 +73,20 @@ uprov_cmdline_get_config_file (struct uprov_cmdline *cmdline);
 
 
 /*
+ * @brief Returns string path to file to repartition.
+ *
+ * @param cmdline - Pointer to a valid struct uprov_cmdline.
+ *
+ * @returns
+ * 	on success: Path to file to repartition
+ * 	on failure: NULL
+ */
+UDO_API
+const char *
+uprov_cmdline_get_part_file (struct uprov_cmdline *cmdline);
+
+
+/*
  * @brief Frees any allocated memory and closes FD's (if open) create after
  *        uprov_cmdline_create() call.
  *

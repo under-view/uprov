@@ -46,7 +46,7 @@
  *                       destroying the context.
  * @member empty_flags - Stores integer holding command line
  *                       flags that contain no arguments.
- * @member repart_file - File to repartition.
+ * @member part_file   - File path to file to partition.
  * @member config_file - File path to configuration file.
  */
 struct uprov_cmdline
@@ -54,7 +54,7 @@ struct uprov_cmdline
 	struct udo_log_error_struct err;
 	uint8_t                     free;
 	uint8_t                     empty_flags;
-	char                        repart_file[UDO_FILE_PATH_MAX];
+	char                        part_file[UDO_FILE_PATH_MAX];
 	char                        config_file[UDO_FILE_PATH_MAX];
 };
 
@@ -124,6 +124,13 @@ uprov_cmdline_create (struct uprov_cmdline *p_cmdline,
 
 			case 147: /* -f */
 			case 506: /* --file */
+			{
+				arg = (argv[a][ret] == '=') ? \
+					((char *)&(argv[a][ret+1])) : \
+					((char *)argv[++a]);
+
+				strncpy(cmdline->part_file, arg, UDO_FILE_PATH_MAX-1);
+			}
 				break;
 
 			case 159: /* -r */
@@ -180,6 +187,16 @@ uprov_cmdline_get_config_file (struct uprov_cmdline *cmdline)
 		return NULL;
 
 	return cmdline->config_file;
+}
+
+
+const char *
+uprov_cmdline_get_part_file (struct uprov_cmdline *cmdline)
+{
+	if (!cmdline || !(*cmdline->part_file))
+		return NULL;
+
+	return cmdline->part_file;
 }
 
 /***********************************
