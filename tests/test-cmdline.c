@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include <stdio.h>
+#include <stdlib.h>
 
 /*
  * Required by cmocka
@@ -44,9 +44,9 @@
 static void UDO_UNUSED
 test_cmdline_flags_zero (void UDO_UNUSED **state)
 {
-	char *test_flags[] = { "uprov" };
-
 	struct uprov_cmdline *cmdline = NULL;
+
+	const char *test_flags[] = { "uprov" };
 
 	cmdline = uprov_cmdline_create(NULL, \
 		test_flags, UDO_ARRAY_SIZE(test_flags));
@@ -65,9 +65,9 @@ test_cmdline_flags_zero (void UDO_UNUSED **state)
 static void UDO_UNUSED
 test_cmdline_flags_help (void UDO_UNUSED **state)
 {
-	char *test_flags[] = { "./uprov", "--help" };
-
 	struct uprov_cmdline *cmdline = NULL;
+
+	const char *test_flags[] = { "./uprov", "--help" };
 
 	cmdline = uprov_cmdline_create(NULL, \
 		test_flags, UDO_ARRAY_SIZE(test_flags));
@@ -79,9 +79,63 @@ test_cmdline_flags_help (void UDO_UNUSED **state)
 	assert_null(cmdline);
 }
 
-/***************************************
- * End of test_cmdline_flags functions *
- ***************************************/
+/********************************************
+ * End of test_cmdline_flags_help functions *
+ ********************************************/
+
+
+/************************************************
+ * Start of test_cmdline_flags_config functions *
+ ************************************************/
+
+static void UDO_UNUSED
+test_cmdline_flags_config (void UDO_UNUSED **state)
+{
+	struct uprov_cmdline *cmdline = NULL;
+
+	const char *config_file = NULL, *config_file_eq = NULL;
+
+	const char *test_flags[] = { "./uprov", "--config", "some-file.txt" };
+	const char *test_flags_eq[] = { "./uprov", "--config=some-file.txt" };
+
+	config_file_eq = (const char *) &(test_flags_eq[1][9]);
+
+	udo_log_set_level(UDO_LOG_ALL);
+
+	/*************** test_flags ***************/
+
+	cmdline = uprov_cmdline_create(NULL, test_flags, UDO_ARRAY_SIZE(test_flags));
+	assert_non_null(cmdline);
+	config_file = uprov_cmdline_get_config_file(cmdline);
+	assert_string_equal(config_file, test_flags[2]);
+	uprov_cmdline_destroy(cmdline); cmdline = NULL;
+
+	test_flags[1] = "-c";
+	cmdline = uprov_cmdline_create(NULL, test_flags, UDO_ARRAY_SIZE(test_flags));
+	assert_non_null(cmdline);
+	config_file = uprov_cmdline_get_config_file(cmdline);
+	assert_string_equal(config_file, test_flags[2]);
+	uprov_cmdline_destroy(cmdline); cmdline = NULL;
+
+	/*************** test_flags_eq ***************/
+
+	cmdline = uprov_cmdline_create(NULL, test_flags_eq, UDO_ARRAY_SIZE(test_flags_eq));
+	assert_non_null(cmdline);
+	config_file = uprov_cmdline_get_config_file(cmdline);
+	assert_string_equal(config_file, config_file_eq);
+	uprov_cmdline_destroy(cmdline); cmdline = NULL;
+
+	test_flags[1] = "-c=some-file.txt";
+	cmdline = uprov_cmdline_create(NULL, test_flags_eq, UDO_ARRAY_SIZE(test_flags_eq));
+	assert_non_null(cmdline);
+	config_file = uprov_cmdline_get_config_file(cmdline);
+	assert_string_equal(config_file, config_file_eq);
+	uprov_cmdline_destroy(cmdline); cmdline = NULL;
+}
+
+/**********************************************
+ * End of test_cmdline_flags_config functions *
+ **********************************************/
 
 
 /**********************************************
@@ -106,6 +160,7 @@ main (void)
 	const struct CMUnitTest tests[] = {
 		cmocka_unit_test(test_cmdline_flags_zero),
 		cmocka_unit_test(test_cmdline_flags_help),
+		cmocka_unit_test(test_cmdline_flags_config),
 		cmocka_unit_test(test_cmdline_get_sizeof),
 	};
 

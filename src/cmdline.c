@@ -24,6 +24,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stddef.h> /* For ptrdiff_t */
 #include <errno.h>
 
 #include <udo/log.h>
@@ -80,12 +81,14 @@ p_cmdline_help_msg (const char *bin_name)
 
 struct uprov_cmdline *
 uprov_cmdline_create (struct uprov_cmdline *p_cmdline,
-                      char *argv[],
-                      int argc)
+                      const char *argv[],
+                      const int argc)
 {
 	int a;
 
-	char *ret = NULL;
+	char *arg = NULL;
+
+	ptrdiff_t ret = 0;
 
 	struct uprov_cmdline *cmdline = p_cmdline;
 
@@ -110,6 +113,13 @@ uprov_cmdline_create (struct uprov_cmdline *p_cmdline,
 		switch (UDO_STRTOU_UTOC(argv[a], '=', &ret)) {
 			case 144: /* -c */
 			case 720: /* --config */
+			{
+				arg = (argv[a][ret] == '=') ? \
+					((char *)&(argv[a][ret+1])) : \
+					((char *)argv[++a]);
+
+				strncpy(cmdline->config_file, arg, UDO_FILE_PATH_MAX-1);
+			}
 				break;
 
 			case 147: /* -f */
@@ -157,6 +167,24 @@ uprov_cmdline_destroy (struct uprov_cmdline *cmdline)
 /***************************************
  * End uprov_cmdline_destroy functions *
  ***************************************/
+
+
+/*************************************
+ * Start uprov_cmdline_get functions *
+ *************************************/
+
+const char *
+uprov_cmdline_get_config_file (struct uprov_cmdline *cmdline)
+{
+	if (!cmdline || !(*cmdline->config_file))
+		return NULL;
+
+	return cmdline->config_file;
+}
+
+/***********************************
+ * End uprov_cmdline_get functions *
+ ***********************************/
 
 
 /*****************************************************

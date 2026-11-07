@@ -54,15 +54,29 @@ struct uprov_cmdline;
 UDO_API
 struct uprov_cmdline *
 uprov_cmdline_create (struct uprov_cmdline *cmdline,
-                      char *argv[],
-                      int argc);
+                      const char *argv[],
+                      const int argc);
+
+
+/*
+ * @brief Returns string to partiton configuration file.
+ *
+ * @param cmdline - Pointer to a valid struct uprov_cmdline.
+ *
+ * @returns
+ * 	on success: Path to partiton configuration file
+ * 	on failure: NULL
+ */
+UDO_API
+const char *
+uprov_cmdline_get_config_file (struct uprov_cmdline *cmdline);
 
 
 /*
  * @brief Frees any allocated memory and closes FD's (if open) create after
  *        uprov_cmdline_create() call.
  *
- * @param device - Pointer to a valid struct uprov_cmdline.
+ * @param cmdline - Pointer to a valid struct uprov_cmdline.
  */
 UDO_API
 void
