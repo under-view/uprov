@@ -37,9 +37,9 @@
 
 #include "cmdline.h"
 
-/*****************************************
- * Start of test_cmdline_flags functions *
- *****************************************/
+/**********************************************
+ * Start of test_cmdline_flags_zero functions *
+ **********************************************/
 
 static void UDO_UNUSED
 test_cmdline_flags_zero (void UDO_UNUSED **state)
@@ -53,6 +53,14 @@ test_cmdline_flags_zero (void UDO_UNUSED **state)
 	assert_null(cmdline);
 }
 
+/********************************************
+ * End of test_cmdline_flags_zero functions *
+ ********************************************/
+
+
+/**********************************************
+ * Start of test_cmdline_flags_help functions *
+ **********************************************/
 
 static void UDO_UNUSED
 test_cmdline_flags_help (void UDO_UNUSED **state)
