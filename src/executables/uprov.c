@@ -33,7 +33,8 @@
 #include "uprov.h"
 
 int
-main (int argc, char *argv[])
+main (const int argc,
+      const char *argv[])
 {
 	struct uprov_cmdline *cmdline = NULL;
 
