@@ -46,6 +46,7 @@
  *                       destroying the context.
  * @member empty_flags - Stores integer holding command line
  *                       flags that contain no arguments.
+ * @member size        - Size of a newly created file.
  * @member config_file - File path to configuration file.
  * @member part_file   - File path to file to partition.
  */
@@ -54,6 +55,7 @@ struct uprov_cmdline
 	struct udo_log_error_struct err;
 	uint8_t                     free;
 	uint8_t                     empty_flags;
+	char                        size[32];
 	char                        config_file[UDO_FILE_PATH_MAX];
 	char                        part_file[UDO_FILE_PATH_MAX];
 };
@@ -75,6 +77,12 @@ p_cmdline_help_msg (const char *bin_name)
 	udo_log_print(UDO_LOG_SUCCESS, "\t-f,--file <required>  "); udo_log_print(UDO_LOG_INFO, "\tFile to repartition.\n");
 	udo_log_print(UDO_LOG_SUCCESS, "\t-r,--resize-last      "); udo_log_print(UDO_LOG_INFO, "\tResize a drive partition to extend\n");
 	udo_log_print(UDO_LOG_SUCCESS, "\t                      "); udo_log_print(UDO_LOG_INFO, "\tit out to the end of drive.\n");
+	udo_log_print(UDO_LOG_SUCCESS, "\t-s,--size <required>  "); udo_log_print(UDO_LOG_INFO, "\tSize of new file being created.\n");
+	udo_log_print(UDO_LOG_SUCCESS, "\t                      "); udo_log_print(UDO_LOG_INFO, "\tFlag only used if new file being created.\n");
+	udo_log_print(UDO_LOG_SUCCESS, "\t                      "); udo_log_print(UDO_LOG_INFO, "\t<number>G - for gigabytes\n");
+	udo_log_print(UDO_LOG_SUCCESS, "\t                      "); udo_log_print(UDO_LOG_INFO, "\t<number>M - for megabytes\n");
+	udo_log_print(UDO_LOG_SUCCESS, "\t                      "); udo_log_print(UDO_LOG_INFO, "\t<number>K - for kilobytes\n");
+	udo_log_print(UDO_LOG_SUCCESS, "\t                      "); udo_log_print(UDO_LOG_INFO, "\t<number>  - for bytes\n");
 	udo_log_print(UDO_LOG_SUCCESS, "\t-h,--help             "); udo_log_print(UDO_LOG_INFO, "\tSee this message.\n");
 }
 
@@ -138,6 +146,17 @@ uprov_cmdline_create (struct uprov_cmdline *p_cmdline,
 				cmdline->empty_flags |= UPROV_CMDLINE_FLAG_RESIZE_LAST;
 				break;
 
+			case 160: /* -s */
+			case 533: /* --size */
+			{
+				arg = (argv[a][ret] == '=') ? \
+					((char *)&(argv[a][ret+1])) : \
+					((char *)argv[++a]);
+
+				strncpy(cmdline->size, arg, sizeof(cmdline->size)-1);
+			}
+				break;
+
 			case 149: /* -h */
 			case 515: /* --help */
 			default:
@@ -186,6 +205,16 @@ uprov_cmdline_get_resize_last (struct uprov_cmdline *cmdline)
 		return 0;
 
 	return cmdline->empty_flags & UPROV_CMDLINE_FLAG_RESIZE_LAST;
+}
+
+
+const char *
+uprov_cmdline_get_size (struct uprov_cmdline *cmdline)
+{
+	if (!cmdline || !(*cmdline->size))
+		return NULL;
+
+	return cmdline->size;
 }
 
 /***********************************

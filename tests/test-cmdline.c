@@ -223,6 +223,60 @@ test_cmdline_flags_resize_last (void UDO_UNUSED **state)
 
 
 /**********************************************
+ * Start of test_cmdline_flags_size functions *
+ **********************************************/
+
+static void UDO_UNUSED
+test_cmdline_flags_size (void UDO_UNUSED **state)
+{
+	struct uprov_cmdline *cmdline = NULL;
+
+	const char *size = NULL, *size_eq = NULL;
+
+	const char *test_flags[] = { "./uprov", "--size", "1M" };
+	const char *test_flags_eq[] = { "./uprov", "--size=4G" };
+
+	size_eq = &(test_flags_eq[1][7]);
+
+	udo_log_set_level(UDO_LOG_ALL);
+
+	/*************** test_flags ***************/
+
+	cmdline = uprov_cmdline_create(NULL, test_flags, UDO_ARRAY_SIZE(test_flags));
+	assert_non_null(cmdline);
+	size = uprov_cmdline_get_size(cmdline);
+	assert_string_equal(size, test_flags[2]);
+	uprov_cmdline_destroy(cmdline); cmdline = NULL;
+
+	test_flags[1] = "-s";
+	cmdline = uprov_cmdline_create(NULL, test_flags, UDO_ARRAY_SIZE(test_flags));
+	assert_non_null(cmdline);
+	size = uprov_cmdline_get_size(cmdline);
+	assert_string_equal(size, test_flags[2]);
+	uprov_cmdline_destroy(cmdline); cmdline = NULL;
+
+	/*************** test_flags_eq ***************/
+
+	cmdline = uprov_cmdline_create(NULL, test_flags_eq, UDO_ARRAY_SIZE(test_flags_eq));
+	assert_non_null(cmdline);
+	size = uprov_cmdline_get_size(cmdline);
+	assert_string_equal(size, size_eq);
+	uprov_cmdline_destroy(cmdline); cmdline = NULL;
+
+	test_flags[1] = "-f=4G";
+	cmdline = uprov_cmdline_create(NULL, test_flags_eq, UDO_ARRAY_SIZE(test_flags_eq));
+	assert_non_null(cmdline);
+	size = uprov_cmdline_get_size(cmdline);
+	assert_string_equal(size, size_eq);
+	uprov_cmdline_destroy(cmdline); cmdline = NULL;
+}
+
+/********************************************
+ * End of test_cmdline_flags_size functions *
+ ********************************************/
+
+
+/**********************************************
  * Start of test_cmdline_get_sizeof functions *
  **********************************************/
 
@@ -247,6 +301,7 @@ main (void)
 		cmocka_unit_test(test_cmdline_flags_config),
 		cmocka_unit_test(test_cmdline_flags_file),
 		cmocka_unit_test(test_cmdline_flags_resize_last),
+		cmocka_unit_test(test_cmdline_flags_size),
 		cmocka_unit_test(test_cmdline_get_sizeof),
 	};
 

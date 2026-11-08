@@ -113,6 +113,20 @@ uprov_cmdline_get_resize_last (struct uprov_cmdline *cmdline);
 
 
 /*
+ * @brief Returns string passed to --size flag.
+ *
+ * @param cmdline - Pointer to a valid struct uprov_cmdline.
+ *
+ * @returns
+ * 	on success: String given to size flag
+ * 	on failure: NULL
+ */
+UDO_API
+const char *
+uprov_cmdline_get_size (struct uprov_cmdline *cmdline);
+
+
+/*
  * @brief Frees any allocated memory and closes FD's (if open) create after
  *        uprov_cmdline_create() call.
  *
