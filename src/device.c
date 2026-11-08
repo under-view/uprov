@@ -418,14 +418,19 @@ uprov_device_create (struct uprov_device *p_device,
 #define MBR_SECTOR_GAP (1<<11)
 
 static int
-p_device_create_part (struct uprov_device_part *part,
-                      const char *part_string,
+p_device_create_part (struct uprov_device *device,
                       const uint8_t mbr,
+                      const char *part_string,
+                      size_t *part_index,
                       uint16_t *len)
 {
+	size_t part_num = 0;
+
 	int ti = 0, iter = 0;
 
 	char temp[FSTYPE_MAX];
+
+	struct uprov_device_part *part = NULL;
 
 	*len = 0;
 
@@ -438,13 +443,25 @@ p_device_create_part (struct uprov_device_part *part,
 				continue;
 			case ':':
 				switch (iter) {
-					case 0: /* Partition start sector */
+					case 0: /* Partition number */
+						part_num = (atoi(temp)-1) % PARTITIONS_MAX;
+						part = &(device->parts[part_num]);
+
+						if (part_index) {
+							*part_index = part_num;
+						} else {
+							device->part_count++;
+							part->number = part_num + 1;
+						}
+
+						break;
+					case 1: /* Partition start sector */
 						part->start_sector = atoll(temp);
 						break;
-					case 1: /* Partition sector size */
+					case 2: /* Partition sector size */
 						part->sector_size = atoll(temp);
 						break;
-					case 2: /* Partition type code */
+					case 3: /* Partition type code */
 						if (mbr) {
 							part->type.code = strtoul(temp, NULL, 16);
 						} else {
@@ -452,10 +469,10 @@ p_device_create_part (struct uprov_device_part *part,
 								temp, TYPE_CODE_STR_MAX);
 						}
 						break;
-					case 3: /* Partition file system type */
+					case 4: /* Partition file system type */
 						memcpy(&(part->fstype[0]), temp, FSTYPE_MAX);
 						break;
-					case 4: /* Partition file system label */
+					case 5: /* Partition file system label */
 						memcpy(&(part->fslabel[0]), temp, FSLABEL_MAX);
 						break;
 					default:
@@ -482,12 +499,11 @@ p_device_create_part (struct uprov_device_part *part,
 static int
 p_device_parse_part_string (struct uprov_device *device,
                             const char *part_string,
-                            const size_t part_index)
+                            size_t *part_index)
 {
 	uint8_t mbr = 0;
-	uint16_t word = 0, len = 0;
 
-	struct uprov_device_part *part = NULL;
+	uint16_t word = 0, len = 0;
 
 	while (*part_string) {
 		switch (*part_string) {
@@ -511,19 +527,14 @@ p_device_parse_part_string (struct uprov_device *device,
 				memcpy(&(device->ptable_type[0]),"gpt",sizeof("gpt"));
 				break;
 			case 369: /* PART: */
-				part_string++;
-				if (part_index == (size_t)-1) {
-					part = &(device->parts[device->part_count++]);
-					p_device_create_part(part, part_string, mbr, &len);
-					part_string = ((char*)part_string + len);
-					word = 0;
-				} else {
-					part = &(device->parts[part_index]);
-					mbr = (UDO_STRTOU(device->ptable_type) == 321) ? 1 : 0;
-					p_device_create_part(part, part_string, mbr, &len);
-					return 0;
-				}
+				part_string++; /* Remove ':' character */
+				p_device_create_part(device, mbr, part_string, part_index, &len);
 
+				if (part_index) /* Only want to iterate 1 partition */
+					return 0;
+
+				part_string = ((char*)part_string + len);
+				word = 0;
 				break;
 			case 498: /* PTABLE: */
 				word = 0;
@@ -652,7 +663,7 @@ uprov_device_repart_wholedisk (struct uprov_device *device,
 		return -1;
 	}
 
-	err = p_device_parse_part_string(device, part_string, (size_t)-1);
+	err = p_device_parse_part_string(device, part_string, NULL);
 	if (err == -1)
 		return -1;
 
@@ -754,13 +765,13 @@ uprov_device_repart_wholedisk (struct uprov_device *device,
 
 int
 uprov_device_repart_part (struct uprov_device *device,
-                          const size_t part_index,
                           const char *part_string,
                           const uint32_t ask_type)
 {
 	size_t p;
 	int err = -1;
 	uint8_t gpt = 0;
+	size_t part_index = 0;
 	uint64_t total_sectors = 0;
 	struct p_device_fdisk fdisk;
 
@@ -769,7 +780,7 @@ uprov_device_repart_part (struct uprov_device *device,
 		return -1;
 	}
 
-	err = p_device_parse_part_string(device, part_string, part_index);
+	err = p_device_parse_part_string(device, part_string, &part_index);
 	if (err == -1)
 		return -1;
 

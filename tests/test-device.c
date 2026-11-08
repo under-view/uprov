@@ -42,17 +42,17 @@ static const char \
 UDO_UNUSED \
 p_device_create_gpt_disk[] = \
 	"PTABLE: gpt\n" \
-	"PART: 2048:2048:21686148-6449-6E6F-744E-656564454649:none:BIOS_BOOT:\n" \
-	"PART: 4096:98304:C12A7328-F81F-11D2-BA4B-00A0C93EC93B:vfat:EFI_SYSTEM:\n" \
-	"PART: 102400:159744:0FC63DAF-8483-4772-8E79-3D69D8477DE4:ext4:GRUB_DATA:\n" \
-	"PART: 262144:159744:0FC63DAF-8483-4772-8E79-3D69D8477DE4:ext4:ROOTFS:\n" \
+	"PART: 1:2048:2048:21686148-6449-6E6F-744E-656564454649:none:BIOS_BOOT:\n" \
+	"PART: 2:4096:98304:C12A7328-F81F-11D2-BA4B-00A0C93EC93B:vfat:EFI_SYSTEM:\n" \
+	"PART: 3:102400:159744:0FC63DAF-8483-4772-8E79-3D69D8477DE4:ext4:GRUB_DATA:\n" \
+	"PART: 4:262144:159744:0FC63DAF-8483-4772-8E79-3D69D8477DE4:ext4:ROOTFS:\n" \
 	;
 
 
 static const char \
 UDO_UNUSED \
 p_device_repart_gpt_disk[] = \
-	"PART: 102400:159744:C12A7328-F81F-11D2-BA4B-00A0C93EC93B:vfat:GRUB_DATA:" \
+	"PART: 3:102400:159744:C12A7328-F81F-11D2-BA4B-00A0C93EC93B:vfat:GRUB_DATA:" \
 	;
 
 
@@ -60,14 +60,14 @@ static const char \
 UDO_UNUSED \
 p_device_create_mbr_disk[] = \
 	"PTABLE: mbr\n" \
-	"PART: 2048:98304:83:ext4:LABEL_ONE:\n" \
+	"PART: 1:2048:98304:83:ext4:LABEL_ONE:\n" \
 	;
 
 
 static const char \
 UDO_UNUSED \
 p_device_repart_mbr_disk[] = \
-	"PART: 2048:98304:83:vfat:LABEL_TWO:" \
+	"PART: 1:2048:98304:83:vfat:LABEL_TWO:" \
 	;
 
 
@@ -131,10 +131,14 @@ test_device_repart_wholedisk (void UDO_UNUSED **state)
 
 	const size_t file_size = (size_t) (1<<29);
 
+	const uint32_t ask_type = FDISK_ASKTYPE_NONE;
+
+	/*
 	const uint32_t ask_type = \
 		FDISK_ASKTYPE_WARN | \
 		FDISK_ASKTYPE_WARNX | \
 		FDISK_ASKTYPE_INFO;
+	*/
 
 	flops = p_device_create_empty_file(fname, file_size);
 	assert_non_null(flops);
@@ -200,7 +204,7 @@ test_device_repart_part (void UDO_UNUSED **state)
 	err = uprov_device_repart_wholedisk(device, p_device_create_mbr_disk, ask_type);
 	assert_int_equal(err, 0);
 
-	err = uprov_device_repart_part(device, 0, p_device_repart_mbr_disk, ask_type);
+	err = uprov_device_repart_part(device, p_device_repart_mbr_disk, ask_type);
 	assert_int_equal(err, 0);
 
 	/* End of MBR test */
@@ -212,7 +216,7 @@ test_device_repart_part (void UDO_UNUSED **state)
 	err = uprov_device_repart_wholedisk(device, p_device_create_gpt_disk, ask_type);
 	assert_int_equal(err, 0);
 
-	err = uprov_device_repart_part(device, 2, p_device_repart_gpt_disk, ask_type);
+	err = uprov_device_repart_part(device, p_device_repart_gpt_disk, ask_type);
 	assert_int_equal(err, 0);
 
 	/* End of GPT test */
