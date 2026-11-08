@@ -188,6 +188,40 @@ test_cmdline_flags_file (void UDO_UNUSED **state)
  ********************************************/
 
 
+/*****************************************************
+ * Start of test_cmdline_flags_resize_last functions *
+ *****************************************************/
+
+static void UDO_UNUSED
+test_cmdline_flags_resize_last (void UDO_UNUSED **state)
+{
+	uint16_t resize_last = 0;
+
+	struct uprov_cmdline *cmdline = NULL;
+
+	const char *test_flags[] = { "./uprov", "--resize-last" };
+
+	/*************** test_flags ***************/
+
+	cmdline = uprov_cmdline_create(NULL, test_flags, UDO_ARRAY_SIZE(test_flags));
+	assert_non_null(cmdline);
+	resize_last = uprov_cmdline_get_resize_last(cmdline);
+	assert_int_equal(resize_last, (1<<1)); resize_last = 0;
+	uprov_cmdline_destroy(cmdline); cmdline = NULL;
+
+	test_flags[1] = "-r";
+	cmdline = uprov_cmdline_create(NULL, test_flags, UDO_ARRAY_SIZE(test_flags));
+	assert_non_null(cmdline);
+	resize_last = uprov_cmdline_get_resize_last(cmdline);
+	assert_int_equal(resize_last, UPROV_CMDLINE_FLAG_RESIZE_LAST);
+	uprov_cmdline_destroy(cmdline); cmdline = NULL;
+}
+
+/***************************************************
+ * End of test_cmdline_flags_resize_last functions *
+ ***************************************************/
+
+
 /**********************************************
  * Start of test_cmdline_get_sizeof functions *
  **********************************************/
@@ -212,6 +246,7 @@ main (void)
 		cmocka_unit_test(test_cmdline_flags_help),
 		cmocka_unit_test(test_cmdline_flags_config),
 		cmocka_unit_test(test_cmdline_flags_file),
+		cmocka_unit_test(test_cmdline_flags_resize_last),
 		cmocka_unit_test(test_cmdline_get_sizeof),
 	};
 

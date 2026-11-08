@@ -34,6 +34,16 @@ struct uprov_cmdline;
 
 
 /*
+ * @brief Enum with enumerators used to
+ *        determine what flag was set.
+ */
+enum uprov_cmdline_flag_type
+{
+	UPROV_CMDLINE_FLAG_RESIZE_LAST = (1<<1),
+};
+
+
+/*
  * @brief Given flags or arguments from executable. Parse
  *        and create a struct uprov_cmdline context storing
  *        flags passed to executable.
@@ -60,6 +70,7 @@ uprov_cmdline_create (struct uprov_cmdline *cmdline,
 
 /*
  * @brief Returns string to partiton configuration file.
+ *        If --config flag is set.
  *
  * @param cmdline - Pointer to a valid struct uprov_cmdline.
  *
@@ -74,6 +85,7 @@ uprov_cmdline_get_config_file (struct uprov_cmdline *cmdline);
 
 /*
  * @brief Returns string path to file to repartition.
+ *        If --file flag is set.
  *
  * @param cmdline - Pointer to a valid struct uprov_cmdline.
  *
@@ -84,6 +96,20 @@ uprov_cmdline_get_config_file (struct uprov_cmdline *cmdline);
 UDO_API
 const char *
 uprov_cmdline_get_part_file (struct uprov_cmdline *cmdline);
+
+
+/*
+ * @brief Returns true if --resize-last flag is set.
+ *
+ * @param cmdline - Pointer to a valid struct uprov_cmdline.
+ *
+ * @returns
+ * 	on success: Unsigned 16-bit integer
+ * 	on failure: 0
+ */
+UDO_API
+uint16_t
+uprov_cmdline_get_resize_last (struct uprov_cmdline *cmdline);
 
 
 /*

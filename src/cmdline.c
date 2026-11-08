@@ -135,6 +135,7 @@ uprov_cmdline_create (struct uprov_cmdline *p_cmdline,
 
 			case 159: /* -r */
 			case 1229: /* --resize-last */
+				cmdline->empty_flags |= UPROV_CMDLINE_FLAG_RESIZE_LAST;
 				break;
 
 			case 149: /* -h */
@@ -175,6 +176,16 @@ uprov_cmdline_get_part_file (struct uprov_cmdline *cmdline)
 		return NULL;
 
 	return cmdline->part_file;
+}
+
+
+uint16_t
+uprov_cmdline_get_resize_last (struct uprov_cmdline *cmdline)
+{
+	if (!cmdline)
+		return 0;
+
+	return cmdline->empty_flags & UPROV_CMDLINE_FLAG_RESIZE_LAST;
 }
 
 /***********************************
