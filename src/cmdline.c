@@ -44,20 +44,20 @@
  * @member free        - If structure allocated with calloc(3) member will be
  *                       set to true so that, we know to call free(3) when
  *                       destroying the context.
- * @member empty_flags - Stores integer holding command line
+ * @member flag_type   - Stores integer holding command line
  *                       flags that contain no arguments.
- * @member size        - Size of a newly created file.
  * @member config_file - File path to configuration file.
  * @member part_file   - File path to file to partition.
+ * @member size        - Size of a newly created file.
  */
 struct uprov_cmdline
 {
 	struct udo_log_error_struct err;
 	uint8_t                     free;
-	uint8_t                     empty_flags;
-	char                        size[32];
+	uint32_t                    flag_type;
 	char                        config_file[UDO_FILE_PATH_MAX];
 	char                        part_file[UDO_FILE_PATH_MAX];
+	char                        size[32];
 };
 
 /****************************************
@@ -127,6 +127,7 @@ uprov_cmdline_create (struct uprov_cmdline *p_cmdline,
 					((char *)argv[++a]);
 
 				strncpy(cmdline->config_file, arg, UDO_FILE_PATH_MAX-1);
+				cmdline->flag_type |= UPROV_CMDLINE_FLAG_CONFIG;
 			}
 				break;
 
@@ -138,12 +139,13 @@ uprov_cmdline_create (struct uprov_cmdline *p_cmdline,
 					((char *)argv[++a]);
 
 				strncpy(cmdline->part_file, arg, UDO_FILE_PATH_MAX-1);
+				cmdline->flag_type |= UPROV_CMDLINE_FLAG_FILE;
 			}
 				break;
 
 			case 159: /* -r */
 			case 1229: /* --resize-last */
-				cmdline->empty_flags |= UPROV_CMDLINE_FLAG_RESIZE_LAST;
+				cmdline->flag_type |= UPROV_CMDLINE_FLAG_RESIZE_LAST;
 				break;
 
 			case 160: /* -s */
@@ -154,6 +156,7 @@ uprov_cmdline_create (struct uprov_cmdline *p_cmdline,
 					((char *)argv[++a]);
 
 				strncpy(cmdline->size, arg, sizeof(cmdline->size)-1);
+				cmdline->flag_type |= UPROV_CMDLINE_FLAG_SIZE;
 			}
 				break;
 
@@ -178,6 +181,16 @@ uprov_cmdline_create (struct uprov_cmdline *p_cmdline,
  * Start uprov_cmdline_get functions *
  *************************************/
 
+uint32_t
+uprov_cmdline_get_flag_type (struct uprov_cmdline *cmdline)
+{
+	if (!cmdline)
+		return 0;
+
+	return cmdline->flag_type;
+}
+
+
 const char *
 uprov_cmdline_get_config_file (struct uprov_cmdline *cmdline)
 {
@@ -195,16 +208,6 @@ uprov_cmdline_get_part_file (struct uprov_cmdline *cmdline)
 		return NULL;
 
 	return cmdline->part_file;
-}
-
-
-uint16_t
-uprov_cmdline_get_resize_last (struct uprov_cmdline *cmdline)
-{
-	if (!cmdline)
-		return 0;
-
-	return cmdline->empty_flags & UPROV_CMDLINE_FLAG_RESIZE_LAST;
 }
 
 

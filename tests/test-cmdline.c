@@ -91,6 +91,8 @@ test_cmdline_flags_help (void UDO_UNUSED **state)
 static void UDO_UNUSED
 test_cmdline_flags_config (void UDO_UNUSED **state)
 {
+	uint32_t config_flag = 0;
+
 	struct uprov_cmdline *cmdline = NULL;
 
 	const char *config_file = NULL, *config_file_eq = NULL;
@@ -106,14 +108,18 @@ test_cmdline_flags_config (void UDO_UNUSED **state)
 	assert_non_null(cmdline);
 	config_file = uprov_cmdline_get_config_file(cmdline);
 	assert_string_equal(config_file, test_flags[2]);
-	uprov_cmdline_destroy(cmdline); cmdline = NULL;
+	config_flag = uprov_cmdline_get_flag_type(cmdline) & UPROV_CMDLINE_FLAG_CONFIG;
+	assert_int_equal(config_flag, UPROV_CMDLINE_FLAG_CONFIG);
+	uprov_cmdline_destroy(cmdline); cmdline = NULL; config_flag = 0;
 
 	test_flags[1] = "-c";
 	cmdline = uprov_cmdline_create(NULL, test_flags, UDO_ARRAY_SIZE(test_flags));
 	assert_non_null(cmdline);
 	config_file = uprov_cmdline_get_config_file(cmdline);
 	assert_string_equal(config_file, test_flags[2]);
-	uprov_cmdline_destroy(cmdline); cmdline = NULL;
+	config_flag = uprov_cmdline_get_flag_type(cmdline) & UPROV_CMDLINE_FLAG_CONFIG;
+	assert_int_equal(config_flag, UPROV_CMDLINE_FLAG_CONFIG);
+	uprov_cmdline_destroy(cmdline); cmdline = NULL; config_flag = 0;
 
 	/*************** test_flags_eq ***************/
 
@@ -121,14 +127,18 @@ test_cmdline_flags_config (void UDO_UNUSED **state)
 	assert_non_null(cmdline);
 	config_file = uprov_cmdline_get_config_file(cmdline);
 	assert_string_equal(config_file, config_file_eq);
-	uprov_cmdline_destroy(cmdline); cmdline = NULL;
+	config_flag = uprov_cmdline_get_flag_type(cmdline) & UPROV_CMDLINE_FLAG_CONFIG;
+	assert_int_equal(config_flag, UPROV_CMDLINE_FLAG_CONFIG);
+	uprov_cmdline_destroy(cmdline); cmdline = NULL; config_flag = 0;
 
 	test_flags[1] = "-c=some-file.txt";
 	cmdline = uprov_cmdline_create(NULL, test_flags_eq, UDO_ARRAY_SIZE(test_flags_eq));
 	assert_non_null(cmdline);
 	config_file = uprov_cmdline_get_config_file(cmdline);
 	assert_string_equal(config_file, config_file_eq);
-	uprov_cmdline_destroy(cmdline); cmdline = NULL;
+	config_flag = uprov_cmdline_get_flag_type(cmdline) & UPROV_CMDLINE_FLAG_CONFIG;
+	assert_int_equal(config_flag, UPROV_CMDLINE_FLAG_CONFIG);
+	uprov_cmdline_destroy(cmdline);
 }
 
 /**********************************************
@@ -143,6 +153,8 @@ test_cmdline_flags_config (void UDO_UNUSED **state)
 static void UDO_UNUSED
 test_cmdline_flags_file (void UDO_UNUSED **state)
 {
+	uint32_t file_flag = 0;
+
 	struct uprov_cmdline *cmdline = NULL;
 
 	const char *part_file = NULL, *part_file_eq = NULL;
@@ -158,14 +170,18 @@ test_cmdline_flags_file (void UDO_UNUSED **state)
 	assert_non_null(cmdline);
 	part_file = uprov_cmdline_get_part_file(cmdline);
 	assert_string_equal(part_file, test_flags[2]);
-	uprov_cmdline_destroy(cmdline); cmdline = NULL;
+	file_flag = uprov_cmdline_get_flag_type(cmdline) & UPROV_CMDLINE_FLAG_FILE;
+	assert_int_equal(file_flag, UPROV_CMDLINE_FLAG_FILE);
+	uprov_cmdline_destroy(cmdline); cmdline = NULL; file_flag = 0;
 
 	test_flags[1] = "-f";
 	cmdline = uprov_cmdline_create(NULL, test_flags, UDO_ARRAY_SIZE(test_flags));
 	assert_non_null(cmdline);
 	part_file = uprov_cmdline_get_part_file(cmdline);
 	assert_string_equal(part_file, test_flags[2]);
-	uprov_cmdline_destroy(cmdline); cmdline = NULL;
+	file_flag = uprov_cmdline_get_flag_type(cmdline) & UPROV_CMDLINE_FLAG_FILE;
+	assert_int_equal(file_flag, UPROV_CMDLINE_FLAG_FILE);
+	uprov_cmdline_destroy(cmdline); cmdline = NULL; file_flag = 0;
 
 	/*************** test_flags_eq ***************/
 
@@ -173,14 +189,18 @@ test_cmdline_flags_file (void UDO_UNUSED **state)
 	assert_non_null(cmdline);
 	part_file = uprov_cmdline_get_part_file(cmdline);
 	assert_string_equal(part_file, part_file_eq);
-	uprov_cmdline_destroy(cmdline); cmdline = NULL;
+	file_flag = uprov_cmdline_get_flag_type(cmdline) & UPROV_CMDLINE_FLAG_FILE;
+	assert_int_equal(file_flag, UPROV_CMDLINE_FLAG_FILE);
+	uprov_cmdline_destroy(cmdline); cmdline = NULL; file_flag = 0;
 
 	test_flags[1] = "-f=some-file.txt";
 	cmdline = uprov_cmdline_create(NULL, test_flags_eq, UDO_ARRAY_SIZE(test_flags_eq));
 	assert_non_null(cmdline);
 	part_file = uprov_cmdline_get_part_file(cmdline);
 	assert_string_equal(part_file, part_file_eq);
-	uprov_cmdline_destroy(cmdline); cmdline = NULL;
+	file_flag = uprov_cmdline_get_flag_type(cmdline) & UPROV_CMDLINE_FLAG_FILE;
+	assert_int_equal(file_flag, UPROV_CMDLINE_FLAG_FILE);
+	uprov_cmdline_destroy(cmdline);
 }
 
 /********************************************
@@ -195,7 +215,7 @@ test_cmdline_flags_file (void UDO_UNUSED **state)
 static void UDO_UNUSED
 test_cmdline_flags_resize_last (void UDO_UNUSED **state)
 {
-	uint16_t resize_last = 0;
+	uint32_t resize_last = 0;
 
 	struct uprov_cmdline *cmdline = NULL;
 
@@ -205,16 +225,16 @@ test_cmdline_flags_resize_last (void UDO_UNUSED **state)
 
 	cmdline = uprov_cmdline_create(NULL, test_flags, UDO_ARRAY_SIZE(test_flags));
 	assert_non_null(cmdline);
-	resize_last = uprov_cmdline_get_resize_last(cmdline);
-	assert_int_equal(resize_last, (1<<1)); resize_last = 0;
-	uprov_cmdline_destroy(cmdline); cmdline = NULL;
+	resize_last = uprov_cmdline_get_flag_type(cmdline);
+	assert_int_equal(resize_last, UPROV_CMDLINE_FLAG_RESIZE_LAST);
+	uprov_cmdline_destroy(cmdline); cmdline = NULL; resize_last = 0;
 
 	test_flags[1] = "-r";
 	cmdline = uprov_cmdline_create(NULL, test_flags, UDO_ARRAY_SIZE(test_flags));
 	assert_non_null(cmdline);
-	resize_last = uprov_cmdline_get_resize_last(cmdline);
+	resize_last = uprov_cmdline_get_flag_type(cmdline) & UPROV_CMDLINE_FLAG_RESIZE_LAST;
 	assert_int_equal(resize_last, UPROV_CMDLINE_FLAG_RESIZE_LAST);
-	uprov_cmdline_destroy(cmdline); cmdline = NULL;
+	uprov_cmdline_destroy(cmdline);
 }
 
 /***************************************************
@@ -229,6 +249,8 @@ test_cmdline_flags_resize_last (void UDO_UNUSED **state)
 static void UDO_UNUSED
 test_cmdline_flags_size (void UDO_UNUSED **state)
 {
+	uint32_t size_flag = 0;
+
 	struct uprov_cmdline *cmdline = NULL;
 
 	const char *size = NULL, *size_eq = NULL;
@@ -238,22 +260,24 @@ test_cmdline_flags_size (void UDO_UNUSED **state)
 
 	size_eq = &(test_flags_eq[1][7]);
 
-	udo_log_set_level(UDO_LOG_ALL);
-
 	/*************** test_flags ***************/
 
 	cmdline = uprov_cmdline_create(NULL, test_flags, UDO_ARRAY_SIZE(test_flags));
 	assert_non_null(cmdline);
 	size = uprov_cmdline_get_size(cmdline);
 	assert_string_equal(size, test_flags[2]);
-	uprov_cmdline_destroy(cmdline); cmdline = NULL;
+	size_flag = uprov_cmdline_get_flag_type(cmdline) & UPROV_CMDLINE_FLAG_SIZE;
+	assert_int_equal(size_flag, UPROV_CMDLINE_FLAG_SIZE);
+	uprov_cmdline_destroy(cmdline); cmdline = NULL; size_flag = 0;
 
 	test_flags[1] = "-s";
 	cmdline = uprov_cmdline_create(NULL, test_flags, UDO_ARRAY_SIZE(test_flags));
 	assert_non_null(cmdline);
 	size = uprov_cmdline_get_size(cmdline);
 	assert_string_equal(size, test_flags[2]);
-	uprov_cmdline_destroy(cmdline); cmdline = NULL;
+	size_flag = uprov_cmdline_get_flag_type(cmdline) & UPROV_CMDLINE_FLAG_SIZE;
+	assert_int_equal(size_flag, UPROV_CMDLINE_FLAG_SIZE);
+	uprov_cmdline_destroy(cmdline); cmdline = NULL; size_flag = 0;
 
 	/*************** test_flags_eq ***************/
 
@@ -261,14 +285,18 @@ test_cmdline_flags_size (void UDO_UNUSED **state)
 	assert_non_null(cmdline);
 	size = uprov_cmdline_get_size(cmdline);
 	assert_string_equal(size, size_eq);
-	uprov_cmdline_destroy(cmdline); cmdline = NULL;
+	size_flag = uprov_cmdline_get_flag_type(cmdline) & UPROV_CMDLINE_FLAG_SIZE;
+	assert_int_equal(size_flag, UPROV_CMDLINE_FLAG_SIZE);
+	uprov_cmdline_destroy(cmdline); cmdline = NULL; size_flag = 0;
 
-	test_flags[1] = "-f=4G";
+	test_flags[1] = "-s=4G";
 	cmdline = uprov_cmdline_create(NULL, test_flags_eq, UDO_ARRAY_SIZE(test_flags_eq));
 	assert_non_null(cmdline);
 	size = uprov_cmdline_get_size(cmdline);
 	assert_string_equal(size, size_eq);
-	uprov_cmdline_destroy(cmdline); cmdline = NULL;
+	size_flag = uprov_cmdline_get_flag_type(cmdline) & UPROV_CMDLINE_FLAG_SIZE;
+	assert_int_equal(size_flag, UPROV_CMDLINE_FLAG_SIZE);
+	uprov_cmdline_destroy(cmdline);
 }
 
 /********************************************

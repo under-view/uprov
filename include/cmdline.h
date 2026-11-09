@@ -39,7 +39,10 @@ struct uprov_cmdline;
  */
 enum uprov_cmdline_flag_type
 {
-	UPROV_CMDLINE_FLAG_RESIZE_LAST = (1<<1),
+	UPROV_CMDLINE_FLAG_CONFIG      = (1<<1),
+	UPROV_CMDLINE_FLAG_FILE        = (1<<2),
+	UPROV_CMDLINE_FLAG_RESIZE_LAST = (1<<3),
+	UPROV_CMDLINE_FLAG_SIZE        = (1<<4),
 };
 
 
@@ -66,6 +69,21 @@ struct uprov_cmdline *
 uprov_cmdline_create (struct uprov_cmdline *cmdline,
                       const char *argv[],
                       const int argc);
+
+
+/*
+ * @brief Returns bit-wise or of different command
+ *        line flags passed to the executable.
+ *
+ * @param cmdline - Pointer to a valid struct uprov_cmdline.
+ *
+ * @returns
+ * 	on success: Unsigned 32-bit integer
+ * 	on failure: 0
+ */
+UDO_API
+uint32_t
+uprov_cmdline_get_flag_type (struct uprov_cmdline *cmdline);
 
 
 /*
@@ -96,20 +114,6 @@ uprov_cmdline_get_config_file (struct uprov_cmdline *cmdline);
 UDO_API
 const char *
 uprov_cmdline_get_part_file (struct uprov_cmdline *cmdline);
-
-
-/*
- * @brief Returns true if --resize-last flag is set.
- *
- * @param cmdline - Pointer to a valid struct uprov_cmdline.
- *
- * @returns
- * 	on success: Unsigned 16-bit integer
- * 	on failure: 0
- */
-UDO_API
-uint16_t
-uprov_cmdline_get_resize_last (struct uprov_cmdline *cmdline);
 
 
 /*
