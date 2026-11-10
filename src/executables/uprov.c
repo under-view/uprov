@@ -22,20 +22,33 @@
  * SOFTWARE.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <getopt.h>
-
 #include <udo/udo.h>
 
 #include "cmdline.h"
 #include "uprov.h"
 
+/* Flags --file and --config */
+#define UPROV_CMDLINE_FLAG_FILE_CONFIG \
+	UPROV_CMDLINE_FLAG_FILE | \
+	UPROV_CMDLINE_FLAG_CONFIG
+
+/* Flags --file and --resize-last */
+#define UPROV_CMDLINE_FLAG_FILE_RESIZE_LAST \
+	UPROV_CMDLINE_FLAG_FILE | \
+	UPROV_CMDLINE_FLAG_RESIZE_LAST
+
+/* Flags --file, --config, and --size */
+#define UPROV_CMDLINE_FLAG_FILE_CONFIG_SIZE \
+	UPROV_CMDLINE_FLAG_FILE | \
+	UPROV_CMDLINE_FLAG_CONFIG | \
+	UPROV_CMDLINE_FLAG_SIZE
+
 int
 main (const int argc,
       const char *argv[])
 {
+	uint32_t flag_type;
+
 	struct uprov_cmdline *cmdline = NULL;
 
 	udo_log_set_level(UDO_LOG_ALL);
@@ -43,6 +56,26 @@ main (const int argc,
 	cmdline = uprov_cmdline_create(NULL, argv, argc);
 	if (!cmdline)
 		return 1;
+
+	flag_type = uprov_cmdline_get_flag_type(cmdline);
+	switch (flag_type) {
+		case UPROV_CMDLINE_FLAG_FILE_CONFIG:
+			udo_log_print(UDO_LOG_INFO, "Passed --file and --config flags\n");
+			break;
+
+		case UPROV_CMDLINE_FLAG_FILE_RESIZE_LAST:
+			udo_log_print(UDO_LOG_INFO, "Passed --file and --resize-last flags\n");
+			break;
+
+		case UPROV_CMDLINE_FLAG_FILE_CONFIG_SIZE:
+			udo_log_print(UDO_LOG_INFO, "Passed --file, --config, and --size flags\n");
+			break;
+
+		default:
+			udo_log_print(UDO_LOG_ERROR, "No flag combination found.\n");
+			uprov_cmdline_destroy(cmdline);
+			return 1;
+	}
 
 	uprov_cmdline_destroy(cmdline);
 
