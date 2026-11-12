@@ -1209,6 +1209,41 @@ uprov_device_get_sizeof (void)
 	return sizeof(struct uprov_device);
 }
 
+
+size_t
+uprov_device_convert_to_bytes (char *size)
+{
+	int end = 0;
+	size_t bytes = 0;
+
+	if (!size) {
+		udo_log_error("Incorrect data passed\n");
+		return (size_t)-1;
+	}
+
+	end = strnlen(size, 64) - 1;
+
+	switch (*(size+end)) {
+		case 'G':
+			*(size+end) = '\0';
+			bytes = strtol(size, NULL, 10) * 1024 * 1024 * 1024;
+			break;
+		case 'M':
+			*(size+end) = '\0';
+			bytes = strtol(size, NULL, 10) * 1024 * 1024;
+			break;
+		case 'K':
+			*(size+end) = '\0';
+			bytes = strtol(size, NULL, 10) * 1024;
+			break;
+		default:
+			bytes = strtol(size, NULL, 10);
+			break;
+	}
+
+	return bytes;
+}
+
 /**************************************************
  * End of non struct uprov_device param functions *
  **************************************************/

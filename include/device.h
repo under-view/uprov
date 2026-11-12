@@ -466,4 +466,24 @@ uprov_device_destroy_parts (struct uprov_device *device);
 int
 uprov_device_get_sizeof (void);
 
+
+/*
+ * @brief Returns size in bytes after
+ *        converting caller passed string.
+ *
+ * @param size - Must pass string to convert to bytes
+ *
+ *               Accepted Formats:
+ *               	<number>G - for gigabytes
+ *               	<number>M - for megabytes
+ *               	<number>K - for kilobytes
+ *               	<number>  - for bytes
+ *
+ * @returns
+ *	on success: string to byte conversion
+ *	on failure: (size_t)-1
+ */
+size_t
+uprov_device_convert_to_bytes (char *size);
+
 #endif /* UPROV_DEVICE_H */
