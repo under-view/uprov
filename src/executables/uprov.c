@@ -50,6 +50,9 @@
  *************************************/
 
 static int
+handle_file_config (struct uprov_cmdline *cmdline);
+
+static int
 handle_file_config_size (struct uprov_cmdline *cmdline);
 
 /***********************************
@@ -76,7 +79,7 @@ main (const int argc,
 
 	switch (flag_type) {
 		case UPROV_CMDLINE_FLAG_FILE_CONFIG:
-			udo_log_print(UDO_LOG_INFO, "Passed --file and --config flags\n");
+			ret = handle_file_config(cmdline);
 			break;
 
 		case UPROV_CMDLINE_FLAG_FILE_RESIZE_LAST:
@@ -102,6 +105,46 @@ main (const int argc,
 /*******************************
  * Start of handle_* functions *
  *******************************/
+
+static int
+handle_file_config (struct uprov_cmdline *cmdline)
+{
+	int err = -1;
+	const void *data = NULL;
+	const char *part_file = NULL;
+	struct udo_file_ops *flops = NULL;
+	struct uprov_device *device = NULL;
+	uint32_t ask_type = FDISK_ASKTYPE_NONE;
+
+	struct udo_file_ops_create_info file_info;
+	memset(&file_info, 0, sizeof(file_info));
+
+	part_file = uprov_cmdline_get_part_file(cmdline);
+	device = uprov_device_create(NULL, part_file, ask_type);
+	if (!device)
+		return 1;
+
+	file_info.fname = uprov_cmdline_get_config_file(cmdline);
+	flops = udo_file_ops_create(NULL, &file_info);
+	if (!flops) {
+		uprov_device_destroy(device);
+		return 1;
+	}
+
+	data = udo_file_ops_get_data(flops, 0);
+	err = uprov_device_repart_wholedisk(device, data, ask_type);
+	if (err == -1) {
+		udo_file_ops_destroy(flops, 0);
+		uprov_device_destroy(device);
+		return 1;
+	}
+
+	udo_file_ops_destroy(flops, 0);
+	uprov_device_destroy(device);
+
+	return 0;
+}
+
 
 static int
 handle_file_config_size (struct uprov_cmdline *cmdline)
