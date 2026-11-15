@@ -51,5 +51,12 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
+# Vim files
 *.swp
+
+# GDB files
 *.gdb*
+
+# Potential uprov generated file
+*.img
+*.IMG
