@@ -22,6 +22,8 @@
  * SOFTWARE.
  */
 
+#include <libfdisk/libfdisk.h>
+
 #include <udo/udo.h>
 
 #include "cmdline.h"
@@ -43,10 +45,23 @@
 	UPROV_CMDLINE_FLAG_CONFIG | \
 	UPROV_CMDLINE_FLAG_SIZE
 
+/*************************************
+ * Start of main function prototypes *
+ *************************************/
+
+static int
+handle_file_config_size (struct uprov_cmdline *cmdline);
+
+/***********************************
+ * End of main function prototypes *
+ ***********************************/
+
 int
 main (const int argc,
       const char *argv[])
 {
+	int ret = 1;
+
 	uint32_t flag_type;
 
 	struct uprov_cmdline *cmdline = NULL;
@@ -58,6 +73,7 @@ main (const int argc,
 		return 1;
 
 	flag_type = uprov_cmdline_get_flag_type(cmdline);
+
 	switch (flag_type) {
 		case UPROV_CMDLINE_FLAG_FILE_CONFIG:
 			udo_log_print(UDO_LOG_INFO, "Passed --file and --config flags\n");
@@ -68,16 +84,73 @@ main (const int argc,
 			break;
 
 		case UPROV_CMDLINE_FLAG_FILE_CONFIG_SIZE:
-			udo_log_print(UDO_LOG_INFO, "Passed --file, --config, and --size flags\n");
+			ret = handle_file_config_size(cmdline);
 			break;
 
 		default:
 			udo_log_print(UDO_LOG_ERROR, "No flag combination found.\n");
 			uprov_cmdline_destroy(cmdline);
-			return 1;
+			break;
 	}
 
 	uprov_cmdline_destroy(cmdline);
 
+	return ret;
+}
+
+
+/*******************************
+ * Start of handle_* functions *
+ *******************************/
+
+static int
+handle_file_config_size (struct uprov_cmdline *cmdline)
+{
+	int err = -1;
+	char *size = NULL;
+	const void *data = NULL;
+	struct udo_file_ops *flops = NULL;
+	struct uprov_device *device = NULL;
+	uint32_t ask_type = FDISK_ASKTYPE_NONE;
+
+	struct udo_file_ops_create_info file_info;
+	memset(&file_info, 0, sizeof(file_info));
+
+	size = (char*) uprov_cmdline_get_size(cmdline);
+	file_info.size = uprov_device_convert_to_bytes(size);
+	file_info.fname = uprov_cmdline_get_part_file(cmdline);
+	flops = udo_file_ops_create(NULL, &file_info);
+	if (!flops)
+		return 1;
+
+	udo_file_ops_destroy(flops, file_info.size); flops = NULL;
+
+	device = uprov_device_create(NULL, file_info.fname, ask_type);
+	if (!device)
+		return 1;
+
+	memset(&file_info, 0, sizeof(file_info));
+	file_info.fname = uprov_cmdline_get_config_file(cmdline);
+	flops = udo_file_ops_create(NULL, &file_info);
+	if (!flops) {
+		uprov_device_destroy(device);
+		return 1;
+	}
+
+	data = udo_file_ops_get_data(flops, 0);
+	err = uprov_device_repart_wholedisk(device, data, ask_type);
+	if (err == -1) {
+		udo_file_ops_destroy(flops, 0);
+		uprov_device_destroy(device);
+		return 1;
+	}
+
+	udo_file_ops_destroy(flops, 0);
+	uprov_device_destroy(device);
+
 	return 0;
 }
+
+/*****************************
+ * End of handle_* functions *
+ *****************************/
