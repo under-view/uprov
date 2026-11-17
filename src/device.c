@@ -825,7 +825,7 @@ uprov_device_repart_part (struct uprov_device *device,
 
 	gpt = UDO_STRTOU(device->ptable_type);
 
-	/* Protects MRB & GPT sectors from being wiped */
+	/* Protects MBR & GPT sectors from being wiped */
 	fdisk_enable_bootbits_protection(fdisk.ctx, 1);
 
 	p = part_index;
