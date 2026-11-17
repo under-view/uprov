@@ -16,6 +16,7 @@ cc = meson.get_compiler('c')
 project_name = meson.project_name()
 so_version = meson.project_version()
 src_root_dir = meson.current_source_dir()
+build_root_dir = meson.current_build_dir()
 
 file_offset_bits = get_option('file-offset-bits')
 
