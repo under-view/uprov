@@ -1,3 +1,7 @@
+option('docs',
+	type: 'boolean', value: false,
+	description: 'Build documentation')
+
 option('file-offset-bits',
 	type: 'integer', value: 64,
 	description: 'Sets the _FILE_OFFSET_BITS macro')

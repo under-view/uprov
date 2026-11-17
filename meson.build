@@ -80,3 +80,17 @@ pkg.generate(libraries: pkglibs_shared,
 if get_option('tests')
   subdir('tests')
 endif
+
+if get_option('docs')
+  docs_dir = src_root_dir + '/docs'
+  docs_build_dir = build_root_dir + '/docs'
+  sphinx = find_program('sphinx-build-5', 'sphinx-build', required: true)
+
+  if sphinx.found()
+    subdir('docs')
+    custom_target('docs',
+                  command: [sphinx, '-W', '-b', 'html', docs_dir, '@OUTPUT@'],
+                  input: docs_src, output: 'docs', install: false, install_dir: '',
+                  build_by_default: false, build_always_stale: true)
+  endif
+endif
