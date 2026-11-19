@@ -5,3 +5,4 @@
 	:maxdepth: 1
 	:caption: API documentations
 
+	version
