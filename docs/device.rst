@@ -24,7 +24,8 @@ Unions
 Structs
 =======
 
-1. :c:struct:`uprov_device`
+1. :c:struct:`uprov_device_part`
+#. :c:struct:`uprov_device`
 
 =========
 Functions
@@ -33,9 +34,12 @@ Functions
 API Documentation
 ~~~~~~~~~~~~~~~~~
 
-======================
-uprov_device (private)
-======================
+===========================
+uprov_device_part (private)
+===========================
+
+| Structure defining a single partition entry.
+| For a caller given partitioned file.
 
 .. c:struct:: uprov_device_part
 
@@ -56,6 +60,58 @@ uprov_device (private)
 			uint32_t code;
 			char code_str[TYPE_CODE_STR_MAX];
 
+	:c:member:`number`
+		| Partition number.
+
+	:c:member:`start_sector`
+		| The starting sector of a partition.
+
+	:c:member:`end_sector`
+		| The final sector of a partition.
+
+	:c:member:`sector_size`
+		| Amount of sectors a partition has.
+
+	:c:member:`logical`
+		| Boolean indicating if a partition
+		| is logical or not. Used for MBR.
+		| Always false in the GPT case.
+
+	:c:member:`extended`
+		| Boolean indicating if a partition
+		| is extended or not. Used for MBR.
+		| Always false in the GPT case.
+
+	:c:member:`fstype`
+		| File system type of a partition.
+
+	:c:member:`partlabel`
+		| GPT partition label of a partition.
+
+	:c:member:`fslabel`
+		| File system label of a partition.
+
+	:c:member:`type`
+		| Stores the partition type.
+
+		:c:member:`code`
+			| Stores partition type
+			| (Linux, Linux extended, etc..)
+			| in integer representation.
+			| Used MBR based partition table types.
+
+		:c:member:`code_str`
+			| Store partition type in string format.
+			| GUID partition table type in string format.
+			| Used GPT based partition table types.
+			| `GPT_fdisk#Partition_type`_
+
+======================
+uprov_device (private)
+======================
+
+| Structure storing everything required to partition a file.
+
 .. c:struct:: uprov_device
 
 	.. c:member::
@@ -69,6 +125,44 @@ uprov_device (private)
 		size_t part_count;
 		char part_name[PART_NAME_MAX];
 
+	:c:member:`err`
+		| Stores information about the error that occured
+		| for the given context and may later be retrieved
+		| by caller.
+
+	:c:member:`free`
+		| If structure allocated with `calloc(3)`_ member will be
+		| set to true so that, we know to call `free(3)`_ when
+		| destroying the context.
+
+	:c:member:`parts`
+		| Array of partitions for the given ``fname``.
+
+	:c:member:`fname`
+		| File name of file to repartition in string format.
+
+	:c:member:`fname_fd`
+		| ``fname`` open file descriptor.
+
+	:c:member:`ptable_type`
+		| Partition table type contained in ``fname``.
+
+	:c:member:`sector_sz`
+		| Byte size of each sector in ``fname``.
+		| Typically ``512`` bytes per sector.
+
+	:c:member:`part_count`
+		| Size of ``parts`` array. Amount of partitions
+		| associated with the context.
+
+	:c:member:`part_name`
+		| Used to temporarily acquire and store name
+		| of a partition. Or the absolute path to
+		| the block device partition.
+
 =========================================================================================================================================
 
+.. _calloc(3): https://www.man7.org/linux/man-pages/man3/malloc.3.html
+.. _free(3): https://www.man7.org/linux/man-pages/man3/free.3.html
+.. _GPT_fdisk#Partition_type: https://wiki.archlinux.org/title/GPT_fdisk#Partition_type
 .. _UDO_FILE_PATH_MAX: https://libudo.readthedocs.io/en/latest/macros.html#c.UDO_FILE_PATH_MAX

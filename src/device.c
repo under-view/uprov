@@ -55,11 +55,11 @@
  * @member start_sector  - The starting sector of a partition.
  * @member end_sector    - The final sector of a partition.
  * @member sector_size   - Amount of sectors a partition has.
- * @member logical       - Boolean indicating if partition
- *                         logical or not. Used for MBR.
+ * @member logical       - Boolean indicating if a partition
+ *                         is logical or not. Used for MBR.
  *                         Always false in the GPT case.
- * @member extended      - Boolean indicating if partition
- *                         extended or not. Used for MBR.
+ * @member extended      - Boolean indicating if a partition
+ *                         is extended or not. Used for MBR.
  *                         Always false in the GPT case.
  * @member fstype        - File system type of a partition.
  * @member partlabel     - GPT partition label of a partition.
@@ -102,7 +102,7 @@ struct uprov_device_part
  *                       set to true so that, we know to call free(3) when
  *                       destroying the context.
  * @member parts       - Array of partitions for the given @fname.
- * @member fname       - Block device name in string format.
+ * @member fname       - File name of file to repartition in string format.
  * @member fname_fd    - @fname open file descriptor.
  * @member ptable_type - Partition table type contained in @fname.
  * @member sector_sz   - Byte size of each sector in @fname.
