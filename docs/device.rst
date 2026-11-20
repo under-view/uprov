@@ -31,6 +31,8 @@ Structs
 Functions
 =========
 
+1. :c:func:`uprov_device_create`
+
 API Documentation
 ~~~~~~~~~~~~~~~~~
 
@@ -132,7 +134,7 @@ uprov_device (private)
 
 	:c:member:`free`
 		| If structure allocated with `calloc(3)`_ member will be
-		| set to true so that, we know to call `free(3)`_ when
+		| set to true. So that the api knows to call `free(3)`_ when
 		| destroying the context.
 
 	:c:member:`parts`
@@ -162,7 +164,46 @@ uprov_device (private)
 
 =========================================================================================================================================
 
+===================
+uprov_device_create
+===================
+
+.. c:function:: struct uprov_device *uprov_device_create(struct uprov_device *device, const char *fname, const uint32_t ask_type);
+
+| Given a file parse with libfdisk and populate
+| it's partitions in a ``struct`` :c:struct:`uprov_device` context.
+|
+| If empty file given function returns pointer to an
+| unpopulate ``struct`` :c:struct:`uprov_device`. Caller will later
+| need to make a call to :c:func:`uprov_device_repart_wholedisk`
+| to populate the ``struct`` :c:struct:`uprov_device` and create the disk.
+
+	.. list-table::
+		:header-rows: 1
+
+		* - Param
+		  - Decription
+		* - device
+		  - | May be ``NULL`` or a pointer to a ``struct`` :c:struct:`uprov_device`.
+		    | If ``NULL`` memory will be allocated and return to
+		    | caller. If not ``NULL`` address passed will be used
+		    | to store the newly created ``struct`` :c:struct:`uprov_device`
+		    | context.
+		* - fname
+		  - | Pointer to string storing absolute path to file
+		    | to associate with a ``struct`` :c:struct:`uprov_device` context.
+		* - ask_type
+		  - | Must pass an `enum fdisk_ask_type`_ enumerator.
+		    | Used for libfdisk debug output.
+
+	Returns:
+		| **on success:** Pointer to a ``struct`` :c:struct:`uprov_device`
+		| **on failure:** ``NULL``
+
+=========================================================================================================================================
+
 .. _calloc(3): https://www.man7.org/linux/man-pages/man3/malloc.3.html
 .. _free(3): https://www.man7.org/linux/man-pages/man3/free.3.html
 .. _GPT_fdisk#Partition_type: https://wiki.archlinux.org/title/GPT_fdisk#Partition_type
 .. _UDO_FILE_PATH_MAX: https://libudo.readthedocs.io/en/latest/macros.html#c.UDO_FILE_PATH_MAX
+.. _enum fdisk_ask_type: https://github.com/util-linux/util-linux/blob/master/libfdisk/src/libfdisk.h.in
