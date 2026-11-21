@@ -393,19 +393,19 @@ test_device_get_part_end_sector (void UDO_UNUSED **state)
 
 
 static void UDO_UNUSED
-test_device_get_part_sector_size (void UDO_UNUSED **state)
+test_device_get_part_size_sector (void UDO_UNUSED **state)
 {
-	uint64_t sector_size = 0;
+	uint64_t size_sector = 0;
 	struct uprov_device *device = NULL;
 
 	device = uprov_device_create(NULL, BLOCK_DEVICE, FDISK_ASKTYPE_NONE);
 	assert_non_null(device);
 
-	sector_size = uprov_device_get_part_size_sector(NULL, 0);
-	assert_true(sector_size == UINT64_MAX);
+	size_sector = uprov_device_get_part_size_sector(NULL, 0);
+	assert_true(size_sector == UINT64_MAX);
 
-	sector_size = uprov_device_get_part_size_sector(device, 0);
-	assert_false(sector_size == UINT64_MAX);
+	size_sector = uprov_device_get_part_size_sector(device, 0);
+	assert_false(size_sector == UINT64_MAX);
 
 	uprov_device_destroy(device);
 }
@@ -636,7 +636,7 @@ main (void)
 		cmocka_unit_test(test_device_get_part_name),
 		cmocka_unit_test(test_device_get_part_start_sector),
 		cmocka_unit_test(test_device_get_part_end_sector),
-		cmocka_unit_test(test_device_get_part_sector_size),
+		cmocka_unit_test(test_device_get_part_size_sector),
 		cmocka_unit_test(test_device_get_part_logical),
 		cmocka_unit_test(test_device_get_part_extended),
 		cmocka_unit_test(test_device_get_part_fstype),

@@ -54,7 +54,7 @@
  * @member number        - Partition number.
  * @member start_sector  - The starting sector of a partition.
  * @member end_sector    - The final sector of a partition.
- * @member sector_size   - Amount of sectors a partition has.
+ * @member size_sector   - Amount of sectors a partition has.
  * @member logical       - Boolean indicating if a partition
  *                         is logical or not. Used for MBR.
  *                         Always false in the GPT case.
@@ -79,7 +79,7 @@ struct uprov_device_part
 	size_t   number;
 	uint64_t start_sector;
 	uint64_t end_sector;
-	uint64_t sector_size;
+	uint64_t size_sector;
 	uint8_t  logical;
 	uint8_t  extended;
 	char     fstype[FSTYPE_MAX];
@@ -310,7 +310,7 @@ p_device_create_with_fdisk (struct uprov_device *device,
 		device->parts[p].number = fdisk_partition_get_partno(fdisk.part) + 1;
 		device->parts[p].start_sector = fdisk_partition_get_start(fdisk.part);
 		device->parts[p].end_sector = fdisk_partition_get_end(fdisk.part);
-		device->parts[p].sector_size = fdisk_partition_get_size(fdisk.part);
+		device->parts[p].size_sector = fdisk_partition_get_size(fdisk.part);
 
 		/* Acquire fslabel of a partiton */
 		fdisk_partition_to_string(fdisk.part, fdisk.ctx, \
@@ -459,7 +459,7 @@ p_device_create_part (struct uprov_device *device,
 						part->start_sector = atoll(temp);
 						break;
 					case 2: /* Partition sector size */
-						part->sector_size = atoll(temp);
+						part->size_sector = atoll(temp);
 						break;
 					case 3: /* Partition type code */
 						if (mbr) {
@@ -567,15 +567,15 @@ p_device_parts_resize_mbr (struct uprov_device *device,
 
 		device->parts[p].end_sector = \
 			device->parts[p].start_sector + \
-			device->parts[p].sector_size - 1;
+			device->parts[p].size_sector - 1;
 
 		device->parts[p2].end_sector = \
 			device->parts[p2].start_sector + \
-			device->parts[p2].sector_size - 1;
+			device->parts[p2].size_sector - 1;
 
 		device->parts[p2].start_sector = (extended_found) ? \
 			device->parts[p].start_sector + \
-			device->parts[p].sector_size + \
+			device->parts[p].size_sector + \
 			MBR_SECTOR_GAP : device->parts[p].end_sector + 1;
 
 		/* If extended partition type code found. */
@@ -593,15 +593,15 @@ p_device_parts_resize_mbr (struct uprov_device *device,
 	 */
 	p--;
 
-	device->parts[p].sector_size = \
+	device->parts[p].size_sector = \
 		total_sectors - device->parts[p].start_sector;
 
 	device->parts[p].end_sector = \
 		device->parts[p].start_sector + \
-		device->parts[p].sector_size - 1;
+		device->parts[p].size_sector - 1;
 
 	if (extended_found) {
-		device->parts[epdx].sector_size = \
+		device->parts[epdx].size_sector = \
 			total_sectors - device->parts[epdx].start_sector;
 		device->parts[epdx].end_sector = total_sectors;
 	}
@@ -623,14 +623,14 @@ p_device_parts_resize_gpt (struct uprov_device *device,
 
 		device->parts[p].end_sector = \
 			device->parts[p].start_sector + \
-			device->parts[p].sector_size - 1;
+			device->parts[p].size_sector - 1;
 
 		device->parts[p2].start_sector = \
 			device->parts[p].end_sector + 1;
 
 		device->parts[p2].end_sector = \
 			device->parts[p2].start_sector + \
-			device->parts[p2].sector_size - 1;
+			device->parts[p2].size_sector - 1;
 	}
 
 	/*
@@ -638,13 +638,13 @@ p_device_parts_resize_gpt (struct uprov_device *device,
 	 */
 	p--;
 
-	device->parts[p].sector_size = \
+	device->parts[p].size_sector = \
 		(total_sectors - BACKUP_GPT_SECTORS) - \
 		device->parts[p].start_sector;
 
 	device->parts[p].end_sector = \
 		device->parts[p].start_sector + \
-		device->parts[p].sector_size;
+		device->parts[p].size_sector;
 }
 
 
@@ -729,7 +729,7 @@ uprov_device_repart_wholedisk (struct uprov_device *device,
 
 		fdisk_partition_set_type(fdisk.part, fdisk.parttype);
 		fdisk_partition_set_start(fdisk.part, device->parts[p].start_sector);
-		fdisk_partition_set_size(fdisk.part, device->parts[p].sector_size);
+		fdisk_partition_set_size(fdisk.part, device->parts[p].size_sector);
 
 		if (gpt == IS_GPT) {
 			fdisk_parttype_set_typestr(fdisk.parttype, \
@@ -849,7 +849,7 @@ uprov_device_repart_part (struct uprov_device *device,
 
 		fdisk_partition_set_type(fdisk.part, fdisk.parttype);
 		fdisk_partition_set_start(fdisk.part, device->parts[p].start_sector);
-		fdisk_partition_set_size(fdisk.part, device->parts[p].sector_size);
+		fdisk_partition_set_size(fdisk.part, device->parts[p].size_sector);
 
 		if (gpt == IS_GPT) {
 			fdisk_parttype_set_typestr(fdisk.parttype, \
@@ -1035,7 +1035,7 @@ uprov_device_get_part_size_sector (struct uprov_device *device,
 	if (!device)
 		return UINT64_MAX;
 
-	return device->parts[part_index].sector_size;
+	return device->parts[part_index].size_sector;
 }
 
 
