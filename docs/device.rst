@@ -38,6 +38,7 @@ Functions
 #. :c:func:`uprov_device_get_fname_fd`
 #. :c:func:`uprov_device_get_ptable_type`
 #. :c:func:`uprov_device_get_sector_sz`
+#. :c:func:`uprov_device_get_part_count`
 
 API Documentation
 ~~~~~~~~~~~~~~~~~
@@ -386,6 +387,28 @@ uprov_device_get_sector_sz
 	Returns:
 		| **on success:** Byte size of each sector
 		| **on failure:** ``(uint16_t)-1`` or ``UINT16_MAX``
+
+=========================================================================================================================================
+
+===========================
+uprov_device_get_part_count
+===========================
+
+.. c:function:: size_t uprov_device_get_part_count(struct uprov_device *device);
+
+| Returns number of partitions associated with context.
+
+	.. list-table::
+		:header-rows: 1
+
+		* - Param
+		  - Decription
+		* - device
+		  - | Pointer to a valid struct uprov_device.
+
+	Returns:
+		| **on success:** Amount of partitions in context
+		| **on failure:** ``(size_t)-1``
 
 =========================================================================================================================================
 
