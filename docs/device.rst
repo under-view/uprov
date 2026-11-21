@@ -41,6 +41,7 @@ Functions
 #. :c:func:`uprov_device_get_part_count`
 #. :c:func:`uprov_device_get_part_num`
 #. :c:func:`uprov_device_get_part_name`
+#. :c:func:`uprov_device_get_part_start_sector`
 
 API Documentation
 ~~~~~~~~~~~~~~~~~
@@ -462,6 +463,30 @@ uprov_device_get_part_name
 	Returns:
 		| **on success:** Logical partition name
 		| **on failure:** ``NULL``
+
+=========================================================================================================================================
+
+==================================
+uprov_device_get_part_start_sector
+==================================
+
+.. c:function:: uint64_t uprov_device_get_part_start_sector(struct uprov_device *device, const size_t part_index);
+
+| Returns a given partitions start sector.
+
+	.. list-table::
+		:header-rows: 1
+
+		* - Param
+		  - Decription
+		* - device
+		  - | Pointer to a valid ``struct`` :c:struct:`uprov_device`.
+		* - part_index
+		  - | Must pass valid partition index value.
+
+	Returns:
+		| **on success:** Partition start sector
+		| **on failure:** ``(uint64_t)-1`` or ``UINT64_MAX``
 
 =========================================================================================================================================
 
