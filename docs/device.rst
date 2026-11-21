@@ -37,6 +37,7 @@ Functions
 #. :c:func:`uprov_device_get_fname`
 #. :c:func:`uprov_device_get_fname_fd`
 #. :c:func:`uprov_device_get_ptable_type`
+#. :c:func:`uprov_device_get_sector_sz`
 
 API Documentation
 ~~~~~~~~~~~~~~~~~
@@ -360,6 +361,31 @@ uprov_device_get_ptable_type
 	Returns:
 		| **on success:** Partition table type
 		| **on failure:** ``NULL``
+
+=========================================================================================================================================
+
+==========================
+uprov_device_get_sector_sz
+==========================
+
+.. c:function:: uint16_t uprov_device_get_sector_sz(struct uprov_device *device);
+
+| Returns byte size of each sector
+| in caller defined file.
+|
+| Typically ``512`` bytes per sector.
+
+	.. list-table::
+		:header-rows: 1
+
+		* - Param
+		  - Decription
+		* - device
+		  - | Pointer to a valid struct uprov_device.
+
+	Returns:
+		| **on success:** Byte size of each sector
+		| **on failure:** ``(uint16_t)-1`` or ``UINT16_MAX``
 
 =========================================================================================================================================
 
