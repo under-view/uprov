@@ -291,7 +291,7 @@ uprov_device_get_part_end_sector (struct uprov_device *device,
  */
 UDO_API
 uint64_t
-uprov_device_get_part_sector_size (struct uprov_device *device,
+uprov_device_get_part_size_sector (struct uprov_device *device,
                                    const size_t part_index);
 
 

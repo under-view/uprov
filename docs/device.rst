@@ -43,7 +43,7 @@ Functions
 #. :c:func:`uprov_device_get_part_name`
 #. :c:func:`uprov_device_get_part_start_sector`
 #. :c:func:`uprov_device_get_part_end_sector`
-#. :c:func:`uprov_device_get_part_sector_size`
+#. :c:func:`uprov_device_get_part_size_sector`
 
 API Documentation
 ~~~~~~~~~~~~~~~~~
@@ -517,10 +517,10 @@ uprov_device_get_part_end_sector
 =========================================================================================================================================
 
 =================================
-uprov_device_get_part_sector_size
+uprov_device_get_part_size_sector
 =================================
 
-.. c:function:: uint64_t uprov_device_get_part_sector_size(struct uprov_device *device, const size_t part_index);
+.. c:function:: uint64_t uprov_device_get_part_size_sector(struct uprov_device *device, const size_t part_index);
 
 | Returns amount of sectors a partition has available.
 

@@ -401,10 +401,10 @@ test_device_get_part_sector_size (void UDO_UNUSED **state)
 	device = uprov_device_create(NULL, BLOCK_DEVICE, FDISK_ASKTYPE_NONE);
 	assert_non_null(device);
 
-	sector_size = uprov_device_get_part_sector_size(NULL, 0);
+	sector_size = uprov_device_get_part_size_sector(NULL, 0);
 	assert_true(sector_size == UINT64_MAX);
 
-	sector_size = uprov_device_get_part_sector_size(device, 0);
+	sector_size = uprov_device_get_part_size_sector(device, 0);
 	assert_false(sector_size == UINT64_MAX);
 
 	uprov_device_destroy(device);
