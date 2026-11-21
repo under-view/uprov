@@ -40,6 +40,7 @@ Functions
 #. :c:func:`uprov_device_get_sector_sz`
 #. :c:func:`uprov_device_get_part_count`
 #. :c:func:`uprov_device_get_part_num`
+#. :c:func:`uprov_device_get_part_name`
 
 API Documentation
 ~~~~~~~~~~~~~~~~~
@@ -435,6 +436,32 @@ uprov_device_get_part_num
 	Returns:
 		| **on success:** Partition number
 		| **on failure:** ``(size_t)-1``
+
+=========================================================================================================================================
+
+==========================
+uprov_device_get_part_name
+==========================
+
+.. c:function:: const char *uprov_device_get_part_name(struct uprov_device *device, const size_t part_index);
+
+| Returns a block devices logical partition name.
+| If file not a block device ``NULL`` is return with
+| error properly set.
+
+	.. list-table::
+		:header-rows: 1
+
+		* - Param
+		  - Decription
+		* - device
+		  - | Pointer to a valid ``struct`` :c:struct:`uprov_device`.
+		* - part_index
+		  - | Must pass valid partition index value.
+
+	Returns:
+		| **on success:** Logical partition name
+		| **on failure:** ``NULL``
 
 =========================================================================================================================================
 
