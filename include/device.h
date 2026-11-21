@@ -67,8 +67,8 @@ uprov_device_create (struct uprov_device *device,
  * @brief Repartition file with caller defined partition information.
  *
  *        1 - PARTITION_NUMBER
- *        2 - START(SECTOR)
- *        3 - SIZE(SECTORS)
+ *        2 - START_SECTOR
+ *        3 - SIZE_SECTORS
  *        4 - PARTITION_TYPE_CODE
  *        5 - FILE_SYSTEM_TYPE
  *        6 - FILE_SYSTEM_LABEL (Space character unsupported)
@@ -115,8 +115,8 @@ uprov_device_repart_wholedisk (struct uprov_device *device,
  *        partitioned. See uprov_device_repart_wholedisk(3).
  *
  *        1 - PARTITION_NUMBER
- *        2 - START(SECTOR)
- *        3 - SIZE(SECTORS)
+ *        2 - START_SECTOR
+ *        3 - SIZE_SECTORS
  *        4 - PARTITION_TYPE_CODE
  *        5 - FILE_SYSTEM_TYPE
  *        6 - FILE_SYSTEM_LABEL (Space character unsupported)

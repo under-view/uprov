@@ -32,6 +32,8 @@ Functions
 =========
 
 1. :c:func:`uprov_device_create`
+#. :c:func:`uprov_device_repart_wholedisk`
+#. :c:func:`uprov_device_repart_part`
 
 API Documentation
 ~~~~~~~~~~~~~~~~~
@@ -199,6 +201,102 @@ uprov_device_create
 	Returns:
 		| **on success:** Pointer to a ``struct`` :c:struct:`uprov_device`
 		| **on failure:** ``NULL``
+
+=========================================================================================================================================
+
+=============================
+uprov_device_repart_wholedisk
+=============================
+
+.. c:function:: int uprov_device_repart_wholedisk(struct uprov_device *device, const char *part_string, const uint32_t ask_type);
+
+| Repartition file with caller defined partition information.
+
+	1. PARTITION_NUMBER
+	#. START_SECTOR
+	#. SIZE_SECTORS
+	#. PARTITION_TYPE_CODE
+	#. FILE_SYSTEM_TYPE
+	#. FILE_SYSTEM_LABEL (Space character unsupported)
+
+	| Acceptable format:
+
+	.. code-block::
+
+		PTABLE: mbr
+		PART: 1:2:3:4:5:6:
+		PART: 1:2:3:4:5:6:
+		PART: 1:2:3:4:5:6:
+
+		PTABLE: gpt
+		PART: 1:2:3:4:5:6:
+		PART: 1:2:3:4:5:6:
+		PART: 1:2:3:4:5:6:
+
+	.. list-table::
+		:header-rows: 1
+
+		* - Param
+		  - Decription
+		* - device
+		  - | May be ``NULL`` or a pointer to a ``struct`` :c:struct:`uprov_device`.
+		    | If ``NULL`` memory will be allocated and return to
+		    | caller. If not ``NULL`` address passed will be used
+		    | to store the newly created ``struct`` :c:struct:`uprov_device`
+		    | context.
+		* - part_string
+		  - | String used to determine how to repartition disk.
+		* - ask_type
+		  - | Must pass an `enum fdisk_ask_type`_ enumerator.
+		    | Used for libfdisk debug output.
+
+	Returns:
+		| **on success:** 0
+		| **on failure:** -1
+
+=========================================================================================================================================
+
+========================
+uprov_device_repart_part
+========================
+
+.. c:function:: int uprov_device_repart_part(struct uprov_device *device, const char *part_string, const uint32_t ask_type);
+
+| Repartition file with caller defined partition information.
+
+	1. PARTITION_NUMBER
+	#. START_SECTOR
+	#. SIZE_SECTORS
+	#. PARTITION_TYPE_CODE
+	#. FILE_SYSTEM_TYPE
+	#. FILE_SYSTEM_LABEL (Space character unsupported)
+
+	| Acceptable format:
+
+	.. code-block::
+
+		PART: 1:2:3:4:5:6:
+
+	.. list-table::
+		:header-rows: 1
+
+		* - Param
+		  - Decription
+		* - device
+		  - | May be ``NULL`` or a pointer to a ``struct`` :c:struct:`uprov_device`.
+		    | If ``NULL`` memory will be allocated and return to
+		    | caller. If not ``NULL`` address passed will be used
+		    | to store the newly created ``struct`` :c:struct:`uprov_device`
+		    | context.
+		* - part_string
+		  - | String used to determine how to repartition disk.
+		* - ask_type
+		  - | Must pass an `enum fdisk_ask_type`_ enumerator.
+		    | Used for libfdisk debug output.
+
+	Returns:
+		| **on success:** 0
+		| **on failure:** -1
 
 =========================================================================================================================================
 
