@@ -312,7 +312,7 @@ uprov_device_get_fname
 		* - Param
 		  - Decription
 		* - device
-		  - | Pointer to a valid struct uprov_device.
+		  - | Pointer to a valid ``struct`` :c:struct:`uprov_device`.
 
 	Returns:
 		| **on success:** Absolute path to partitioned file
@@ -336,7 +336,7 @@ uprov_device_get_fname_fd
 		* - Param
 		  - Decription
 		* - device
-		  - | Pointer to a valid struct uprov_device.
+		  - | Pointer to a valid ``struct`` :c:struct:`uprov_device`.
 
 	Returns:
 		| **on success:** Open file descriptor
@@ -358,7 +358,7 @@ uprov_device_get_ptable_type
 		* - Param
 		  - Decription
 		* - device
-		  - | Pointer to a valid struct uprov_device.
+		  - | Pointer to a valid ``struct`` :c:struct:`uprov_device`.
 
 	Returns:
 		| **on success:** Partition table type
@@ -383,7 +383,7 @@ uprov_device_get_sector_sz
 		* - Param
 		  - Decription
 		* - device
-		  - | Pointer to a valid struct uprov_device.
+		  - | Pointer to a valid ``struct`` :c:struct:`uprov_device`.
 
 	Returns:
 		| **on success:** Byte size of each sector
@@ -405,7 +405,7 @@ uprov_device_get_part_count
 		* - Param
 		  - Decription
 		* - device
-		  - | Pointer to a valid struct uprov_device.
+		  - | Pointer to a valid ``struct`` :c:struct:`uprov_device`.
 
 	Returns:
 		| **on success:** Amount of partitions in context
