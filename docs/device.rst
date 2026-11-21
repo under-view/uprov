@@ -34,6 +34,7 @@ Functions
 1. :c:func:`uprov_device_create`
 #. :c:func:`uprov_device_repart_wholedisk`
 #. :c:func:`uprov_device_repart_part`
+#. :c:func:`uprov_device_get_fname`
 
 API Documentation
 ~~~~~~~~~~~~~~~~~
@@ -297,6 +298,28 @@ uprov_device_repart_part
 	Returns:
 		| **on success:** 0
 		| **on failure:** -1
+
+=========================================================================================================================================
+
+======================
+uprov_device_get_fname
+======================
+
+.. c:function:: const char *uprov_device_get_fname(struct uprov_device *device);
+
+| Returns absolute path to file in string format.
+
+	.. list-table::
+		:header-rows: 1
+
+		* - Param
+		  - Decription
+		* - device
+		  - | Pointer to a valid struct uprov_device.
+
+	Returns:
+		| **on success:** Absolute path to partitioned file
+		| **on failure:** ``NULL``
 
 =========================================================================================================================================
 

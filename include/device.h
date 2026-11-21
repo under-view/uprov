@@ -151,7 +151,7 @@ uprov_device_repart_part (struct uprov_device *device,
  * @param device - Pointer to a valid struct uprov_device.
  *
  * @returns
- *	on success: Absolute path to file
+ *	on success: Absolute path to partitioned file
  *	on failure: NULL
  */
 UDO_API
