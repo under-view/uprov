@@ -153,7 +153,7 @@ uprov_device_get_fname (struct uprov_device *device);
 
 /*
  * @brief Returns file descriptor associated
- *        with open file passed to create
+ *        with open file passed to uprov_device_create(3)
  *        function.
  *
  * @param device - Pointer to a valid struct uprov_device.
