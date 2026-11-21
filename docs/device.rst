@@ -36,6 +36,7 @@ Functions
 #. :c:func:`uprov_device_repart_part`
 #. :c:func:`uprov_device_get_fname`
 #. :c:func:`uprov_device_get_fname_fd`
+#. :c:func:`uprov_device_get_ptable_type`
 
 API Documentation
 ~~~~~~~~~~~~~~~~~
@@ -337,6 +338,28 @@ uprov_device_get_fname_fd
 	Returns:
 		| **on success:** Open file descriptor
 		| **on failure:** -1
+
+=========================================================================================================================================
+
+============================
+uprov_device_get_ptable_type
+============================
+
+.. c:function:: const char *uprov_device_get_ptable_type(struct uprov_device *device);
+
+| Returns partition table type in string format.
+
+	.. list-table::
+		:header-rows: 1
+
+		* - Param
+		  - Decription
+		* - device
+		  - | Pointer to a valid struct uprov_device.
+
+	Returns:
+		| **on success:** Partition table type
+		| **on failure:** ``NULL``
 
 =========================================================================================================================================
 
