@@ -39,6 +39,7 @@ Functions
 #. :c:func:`uprov_device_get_ptable_type`
 #. :c:func:`uprov_device_get_sector_sz`
 #. :c:func:`uprov_device_get_part_count`
+#. :c:func:`uprov_device_get_part_num`
 
 API Documentation
 ~~~~~~~~~~~~~~~~~
@@ -408,6 +409,31 @@ uprov_device_get_part_count
 
 	Returns:
 		| **on success:** Amount of partitions in context
+		| **on failure:** ``(size_t)-1``
+
+=========================================================================================================================================
+
+=========================
+uprov_device_get_part_num
+=========================
+
+.. c:function:: size_t uprov_device_get_part_num(struct uprov_device *device, const size_t part_index);
+
+| Returns partition number.
+| It's generally ``part_index`` **+ 1**.
+
+	.. list-table::
+		:header-rows: 1
+
+		* - Param
+		  - Decription
+		* - device
+		  - | Pointer to a valid ``struct`` :c:struct:`uprov_device`.
+		* - part_index
+		  - | Must pass valid partition index value.
+
+	Returns:
+		| **on success:** Partition number
 		| **on failure:** ``(size_t)-1``
 
 =========================================================================================================================================
