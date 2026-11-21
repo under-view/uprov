@@ -240,11 +240,7 @@ uprov_device_repart_wholedisk
 		* - Param
 		  - Decription
 		* - device
-		  - | May be ``NULL`` or a pointer to a ``struct`` :c:struct:`uprov_device`.
-		    | If ``NULL`` memory will be allocated and return to
-		    | caller. If not ``NULL`` address passed will be used
-		    | to store the newly created ``struct`` :c:struct:`uprov_device`
-		    | context.
+		  - | Pointer to a valid ``struct`` :c:struct:`uprov_device`.
 		* - part_string
 		  - | String used to determine how to repartition disk.
 		* - ask_type
@@ -284,11 +280,7 @@ uprov_device_repart_part
 		* - Param
 		  - Decription
 		* - device
-		  - | May be ``NULL`` or a pointer to a ``struct`` :c:struct:`uprov_device`.
-		    | If ``NULL`` memory will be allocated and return to
-		    | caller. If not ``NULL`` address passed will be used
-		    | to store the newly created ``struct`` :c:struct:`uprov_device`
-		    | context.
+		  - | Pointer to a valid ``struct`` :c:struct:`uprov_device`.
 		* - part_string
 		  - | String used to determine how to repartition disk.
 		* - ask_type

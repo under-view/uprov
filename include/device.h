@@ -85,11 +85,7 @@ uprov_device_create (struct uprov_device *device,
  *            PART: 1:2:3:4:5:6:
  *            PART: 1:2:3:4:5:6:
  *
- * @param device      - May be NULL or a pointer to a struct uprov_device.
- *                      If NULL memory will be allocated and return to
- *                      caller. If not NULL address passed will be used
- *                      to store the newly created struct uprov_device
- *                      context.
+ * @param device      - Pointer to a valid struct uprov_device.
  * @param part_string - String used to determine how to repartition disk.
  * @param ask_type    - Must pass an enum fdisk_ask_type enumerator.
  *                      Used for libfdisk debug output.
@@ -125,11 +121,7 @@ uprov_device_repart_wholedisk (struct uprov_device *device,
  *
  *            PART: 1:2:3:4:5:6:
  *
- * @param device      - May be NULL or a pointer to a struct uprov_device.
- *                      If NULL memory will be allocated and return to
- *                      caller. If not NULL address passed will be used
- *                      to store the newly created struct uprov_device
- *                      context.
+ * @param device      - Pointer to a valid struct uprov_device.
  * @param part_string - String used to determine how to repartition disk.
  * @param ask_type    - Must pass an enum fdisk_ask_type enumerator.
  *                      Used for libfdisk debug output.
