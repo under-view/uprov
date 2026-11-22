@@ -40,12 +40,11 @@
 
 #define IS_GPT            0x4B
 #define PARTLABEL_MAX     72
-#define BLK_NAME_MAX      (1<<5)
 #define TABLE_TYPE_MAX    (1<<3)
 #define PARTITIONS_MAX    (1<<7)
 #define FSTYPE_MAX        (1<<8)
 #define TYPE_CODE_STR_MAX (1<<6)
-#define PART_NAME_MAX     (BLK_NAME_MAX+3)
+#define PART_NAME_MAX     (UDO_FILE_PATH_MAX+(1<<5))
 
 /*
  * @brief Structure defining a single partition entry.
@@ -104,26 +103,26 @@ struct uprov_device_part
  * @member parts       - Array of partitions for the given @fname.
  * @member fname       - File name of file to repartition in string format.
  * @member fname_fd    - @fname open file descriptor.
+ * @member fname_end   - Keeps track of end of fname string. Used to
+ *                       acquire current partition name and reset
+ *                       to acquire file name.
  * @member ptable_type - Partition table type contained in @fname.
  * @member sector_sz   - Byte size of each sector in @fname.
  *                       Typically 512 bytes per sector.
  * @member part_count  - Size of @parts array. Amount of partitions
  *                       associated with the context.
- * @member part_name   - Used to temporarily acquire and store name
- *                       of a partition. Or the absolute path to
- *                       the block device partition.
  */
 struct uprov_device
 {
 	struct udo_log_error_struct err;
 	uint8_t                     free;
 	struct uprov_device_part    parts[PARTITIONS_MAX];
-	char                        fname[UDO_FILE_PATH_MAX];
+	char                        fname[PART_NAME_MAX];
 	int                         fname_fd;
+	int                         fname_end;
 	char                        ptable_type[TABLE_TYPE_MAX];
 	uint16_t                    sector_sz;
 	size_t                      part_count;
-	char                        part_name[PART_NAME_MAX];
 };
 
 /*****************************************
@@ -389,8 +388,8 @@ uprov_device_create (struct uprov_device *p_device,
 		}
 	}
 
-	strncpy(&(device->fname[0]), fname, \
-		UDO_FILE_PATH_MAX - 1);
+	strncpy(&(device->fname[0]), fname, UDO_FILE_PATH_MAX - 1);
+	device->fname_end = strnlen(device->fname, UDO_FILE_PATH_MAX);
 
 	ret = p_device_create_with_fdisk(device, ask_type);
 	if (ret == -1) {
@@ -905,6 +904,8 @@ uprov_device_get_fname (struct uprov_device *device)
 		return NULL;
 	}
 
+	*(((char*)device->fname)+device->fname_end) = '\0';
+
 	return device->fname;
 }
 
@@ -995,11 +996,11 @@ p_device_get_part_name_format (const char *fname)
 			case 617: /* /dev/hd */
 			case 628: /* /dev/sd */
 			case 631: /* /dev/vd */
-				return "%s%d";
+				return "%d";
 			case 851: /* /dev/nvme */
 			case 855: /* /dev/loop  */
 			case 1043: /* /dev/mmcblk  */
-				return "%sp%d";
+				return "p%d";
 			default:
 				break;
 		}
@@ -1007,7 +1008,7 @@ p_device_get_part_name_format (const char *fname)
 		fname++;
 	}
 
-	return "%s%d";
+	return "%d";
 }
 
 
@@ -1015,14 +1016,22 @@ const char *
 uprov_device_get_part_name (struct uprov_device *device,
                             const size_t part_index)
 {
-	if (!device)
+	void *place_data = NULL;
+
+	if (!device || \
+	    p_uprov_device_check_part_index(device, part_index))
+	{
 		return NULL;
+	}
 
-	snprintf(device->part_name, PART_NAME_MAX, \
+	place_data = ((char *) device->fname) + device->fname_end;
+	memset(place_data, 0, (1<<5));
+
+	snprintf(place_data, (1<<5), \
 		p_device_get_part_name_format(device->fname), \
-		device->fname, device->parts[part_index].number);
+		device->parts[part_index].number);
 
-	return device->part_name;
+	return device->fname;
 }
 
 

@@ -230,9 +230,7 @@ uprov_device_get_part_num (struct uprov_device *device,
 
 
 /*
- * @brief Returns a block devices logical partition name.
- *        If file not a block device NULL is return with
- *        error properly set.
+ * @brief Returns a logical partition name of partitioned file.
  *
  * @param device     - Pointer to a valid struct uprov_device.
  * @param part_index - Must pass valid partition index value.

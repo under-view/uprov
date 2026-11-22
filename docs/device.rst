@@ -133,12 +133,12 @@ uprov_device (private)
 		struct udo_log_error_struct err;
 		uint8_t free;
 		struct uprov_device_part parts[PARTITIONS_MAX];
-		char fname[UDO_FILE_PATH_MAX];
+		char fname[PART_NAME_MAX];
 		int fname_fd;
+		int fname_end;
 		char ptable_type[TABLE_TYPE_MAX];
 		uint16_t sector_sz;
 		size_t part_count;
-		char part_name[PART_NAME_MAX];
 
 	:c:member:`err`
 		| Stores information about the error that occured
@@ -159,6 +159,11 @@ uprov_device (private)
 	:c:member:`fname_fd`
 		| ``fname`` open file descriptor.
 
+	:c:member:`fname_end`
+		| Keeps track of end of fname string. Used to
+		| acquire current partition name and reset
+		| to acquire file name.
+
 	:c:member:`ptable_type`
 		| Partition table type contained in ``fname``.
 
@@ -169,11 +174,6 @@ uprov_device (private)
 	:c:member:`part_count`
 		| Size of ``parts`` array. Amount of partitions
 		| associated with the context.
-
-	:c:member:`part_name`
-		| Used to temporarily acquire and store name
-		| of a partition. Or the absolute path to
-		| the block device partition.
 
 =========================================================================================================================================
 
@@ -449,9 +449,7 @@ uprov_device_get_part_name
 
 .. c:function:: const char *uprov_device_get_part_name(struct uprov_device *device, const size_t part_index);
 
-| Returns a block devices logical partition name.
-| If file not a block device ``NULL`` is return with
-| error properly set.
+| Returns a logical partition name of partitioned file.
 
 	.. list-table::
 		:header-rows: 1

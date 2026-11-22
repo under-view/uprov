@@ -406,20 +406,38 @@ test_device_get_part_num (void UDO_UNUSED **state)
 static void UDO_UNUSED
 test_device_get_part_name (void UDO_UNUSED **state)
 {
-	const char *part_name = NULL;
 	struct uprov_device *device = NULL;
-
-	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
-	assert_non_null(device);
+	const char *part_name = NULL, *fname = NULL;
 
 	part_name = uprov_device_get_part_name(NULL, 0);
 	assert_null(part_name);
 
-	part_name = uprov_device_get_part_name(device, 2);
+	device = p_device_create_mbr_disk();
+	assert_non_null(device);
+
+	part_name = uprov_device_get_part_name(device, 1);
+	assert_null(part_name);
+
+	part_name = uprov_device_get_part_name(device, 0);
 	assert_non_null(strstr(part_name, DISK_FILE));
-	assert_non_null(strstr(part_name, "3"));
+	assert_non_null(strstr(part_name, "1"));
+
+	fname = uprov_device_get_fname(device);
+	assert_string_equal(fname, DISK_FILE);
+
+	device = p_device_create_gpt_disk(device);
+	assert_non_null(device);
+
+	part_name = uprov_device_get_part_name(device, 6);
+	assert_null(part_name);
+
+	part_name = uprov_device_get_part_name(device, 3);
+	assert_non_null(strstr(part_name, DISK_FILE));
+	assert_non_null(strstr(part_name, "4"));
 
 	uprov_device_destroy(device);
+
+	remove(DISK_FILE);
 }
 
 
