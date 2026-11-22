@@ -1,5 +1,4 @@
 libcmocka = dependency('cmocka', required: true)
-block_device = get_option('block-device')
 
 progs = [
   'test-device.c',
@@ -12,12 +11,6 @@ foreach p : progs
   exec_name = p.substring(0,-2) # remove .c extension from name
 
   test_exec_fs = files(p)
-
-  if p == 'test-device.c'
-    pargs += [
-      '-DBLOCK_DEVICE="' + block_device + '"',
-    ]
-  endif
 
   if p == 'test-cmdline.c'
     test_exec_fs += cmdline_src
