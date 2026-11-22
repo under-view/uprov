@@ -900,7 +900,7 @@ uprov_device_get_fname (struct uprov_device *device)
 
 	if (!(*device->fname)) {
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
-		                  "Block device name not found.\n");
+		                  "File name not found.\n");
 		return NULL;
 	}
 
