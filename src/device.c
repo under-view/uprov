@@ -717,6 +717,8 @@ uprov_device_repart_wholedisk (struct uprov_device *device,
 		return -1;
 	}
 
+	device->sector_sz = fdisk_get_sector_size(fdisk.ctx);
+
 	for (p = 0; p < device->part_count; p++) {
 		fdisk_reset_partition(fdisk.part);
 
