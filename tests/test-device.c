@@ -38,6 +38,8 @@
  * Start of global test-device functions *
  *****************************************/
 
+#define DISK_FILE "/tmp/disk-file.img"
+
 static const char \
 UDO_UNUSED \
 p_device_create_gpt_disk[] = \
@@ -104,7 +106,7 @@ test_device_create (void UDO_UNUSED **state)
 {
 	struct uprov_device *device = NULL;
 
-	device = uprov_device_create(NULL, BLOCK_DEVICE, FDISK_ASKTYPE_NONE);
+	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
 	assert_non_null(device);
 
 	uprov_device_destroy(device);
@@ -127,8 +129,6 @@ test_device_repart_wholedisk (void UDO_UNUSED **state)
 	struct udo_file_ops *flops = NULL;
 	struct uprov_device *device = NULL;
 
-	const char *fname = "/tmp/disk-file.wic";
-
 	const size_t file_size = (size_t) (1<<29);
 
 	const uint32_t ask_type = FDISK_ASKTYPE_NONE;
@@ -140,12 +140,12 @@ test_device_repart_wholedisk (void UDO_UNUSED **state)
 		FDISK_ASKTYPE_INFO;
 	*/
 
-	flops = p_device_create_empty_file(fname, file_size);
+	flops = p_device_create_empty_file(DISK_FILE, file_size);
 	assert_non_null(flops);
 
 	udo_file_ops_destroy(flops, file_size);
 
-	device = uprov_device_create(NULL, fname, FDISK_ASKTYPE_NONE);
+	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
 	assert_non_null(device);
 
 	/* Start of MBR test */
@@ -166,7 +166,7 @@ test_device_repart_wholedisk (void UDO_UNUSED **state)
 
 	uprov_device_destroy(device);
 
-	remove(fname);
+	remove(DISK_FILE);
 }
 
 
@@ -177,8 +177,6 @@ test_device_repart_part (void UDO_UNUSED **state)
 
 	struct udo_file_ops *flops = NULL;
 	struct uprov_device *device = NULL;
-
-	const char *fname = "/tmp/disk-file.wic";
 
 	const size_t file_size = (size_t) (1<<29);
 
@@ -191,12 +189,12 @@ test_device_repart_part (void UDO_UNUSED **state)
 		FDISK_ASKTYPE_INFO;
 	*/
 
-	flops = p_device_create_empty_file(fname, file_size);
+	flops = p_device_create_empty_file(DISK_FILE, file_size);
 	assert_non_null(flops);
 
 	udo_file_ops_destroy(flops, file_size);
 
-	device = uprov_device_create(NULL, fname, FDISK_ASKTYPE_NONE);
+	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
 	assert_non_null(device);
 
 	/* Start of MBR test */
@@ -223,7 +221,7 @@ test_device_repart_part (void UDO_UNUSED **state)
 
 	uprov_device_destroy(device);
 
-	remove(fname);
+	remove(DISK_FILE);
 }
 
 /***************************************
@@ -241,11 +239,11 @@ test_device_get_fname (void UDO_UNUSED **state)
 	const char *fname = NULL;
 	struct uprov_device *device = NULL;
 
-	device = uprov_device_create(NULL, BLOCK_DEVICE, FDISK_ASKTYPE_NONE);
+	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
 	assert_non_null(device);
 
 	fname = uprov_device_get_fname(device);
-	assert_string_equal(fname, BLOCK_DEVICE);
+	assert_string_equal(fname, DISK_FILE);
 
 	uprov_device_destroy(device);
 }
@@ -257,7 +255,7 @@ test_device_get_fname_fd (void UDO_UNUSED **state)
 	int fd = -1;
 	struct uprov_device *device = NULL;
 
-	device = uprov_device_create(NULL, BLOCK_DEVICE, FDISK_ASKTYPE_NONE);
+	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
 	assert_non_null(device);
 
 	fd = uprov_device_get_fname_fd(device);
@@ -273,10 +271,10 @@ test_device_get_ptable_type (void UDO_UNUSED **state)
 	const char *ptable_type = NULL;
 	struct uprov_device *device = NULL;
 
-	device = uprov_device_create(NULL, BLOCK_DEVICE, FDISK_ASKTYPE_NONE);
+	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
 	assert_non_null(device);
 
-	ptable_type = uprov_device_get_fname(device);
+	ptable_type = uprov_device_get_ptable_type(device);
 	assert_non_null(ptable_type);
 
 	uprov_device_destroy(device);
@@ -289,7 +287,7 @@ test_device_get_sector_sz (void UDO_UNUSED **state)
 	uint16_t sector_sz = 0;
 	struct uprov_device *device = NULL;
 
-	device = uprov_device_create(NULL, BLOCK_DEVICE, FDISK_ASKTYPE_NONE);
+	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
 	assert_non_null(device);
 
 	sector_sz = uprov_device_get_sector_sz(device);
@@ -305,7 +303,7 @@ test_device_get_part_count (void UDO_UNUSED **state)
 	size_t part_count = 0;
 	struct uprov_device *device = NULL;
 
-	device = uprov_device_create(NULL, BLOCK_DEVICE, FDISK_ASKTYPE_NONE);
+	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
 	assert_non_null(device);
 
 	part_count = uprov_device_get_part_count(device);
@@ -321,7 +319,7 @@ test_device_get_part_num (void UDO_UNUSED **state)
 	size_t part_num = 0;
 	struct uprov_device *device = NULL;
 
-	device = uprov_device_create(NULL, BLOCK_DEVICE, FDISK_ASKTYPE_NONE);
+	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
 	assert_non_null(device);
 
 	part_num = uprov_device_get_part_num(NULL, 0);
@@ -340,14 +338,14 @@ test_device_get_part_name (void UDO_UNUSED **state)
 	const char *part_name = NULL;
 	struct uprov_device *device = NULL;
 
-	device = uprov_device_create(NULL, BLOCK_DEVICE, FDISK_ASKTYPE_NONE);
+	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
 	assert_non_null(device);
 
 	part_name = uprov_device_get_part_name(NULL, 0);
 	assert_null(part_name);
 
 	part_name = uprov_device_get_part_name(device, 2);
-	assert_non_null(strstr(part_name, BLOCK_DEVICE));
+	assert_non_null(strstr(part_name, DISK_FILE));
 	assert_non_null(strstr(part_name, "3"));
 
 	uprov_device_destroy(device);
@@ -360,7 +358,7 @@ test_device_get_part_start_sector (void UDO_UNUSED **state)
 	uint64_t start_sector = 0;
 	struct uprov_device *device = NULL;
 
-	device = uprov_device_create(NULL, BLOCK_DEVICE, FDISK_ASKTYPE_NONE);
+	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
 	assert_non_null(device);
 
 	start_sector = uprov_device_get_part_start_sector(NULL, 0);
@@ -379,7 +377,7 @@ test_device_get_part_end_sector (void UDO_UNUSED **state)
 	uint64_t end_sector = 0;
 	struct uprov_device *device = NULL;
 
-	device = uprov_device_create(NULL, BLOCK_DEVICE, FDISK_ASKTYPE_NONE);
+	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
 	assert_non_null(device);
 
 	end_sector = uprov_device_get_part_end_sector(NULL, 0);
@@ -398,7 +396,7 @@ test_device_get_part_size_sector (void UDO_UNUSED **state)
 	uint64_t size_sector = 0;
 	struct uprov_device *device = NULL;
 
-	device = uprov_device_create(NULL, BLOCK_DEVICE, FDISK_ASKTYPE_NONE);
+	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
 	assert_non_null(device);
 
 	size_sector = uprov_device_get_part_size_sector(NULL, 0);
@@ -417,7 +415,7 @@ test_device_get_part_size_bytes (void UDO_UNUSED **state)
 	uint64_t size_bytes = 0;
 	struct uprov_device *device = NULL;
 
-	device = uprov_device_create(NULL, BLOCK_DEVICE, FDISK_ASKTYPE_NONE);
+	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
 	assert_non_null(device);
 
 	size_bytes = uprov_device_get_part_size_bytes(NULL, 0);
@@ -436,7 +434,7 @@ test_device_get_part_logical (void UDO_UNUSED **state)
 	uint8_t logical = 0;
 	struct uprov_device *device = NULL;
 
-	device = uprov_device_create(NULL, BLOCK_DEVICE, FDISK_ASKTYPE_NONE);
+	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
 	assert_non_null(device);
 
 	logical = uprov_device_get_part_logical(NULL, 0);
@@ -455,7 +453,7 @@ test_device_get_part_extended (void UDO_UNUSED **state)
 	uint8_t extended = 0;
 	struct uprov_device *device = NULL;
 
-	device = uprov_device_create(NULL, BLOCK_DEVICE, FDISK_ASKTYPE_NONE);
+	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
 	assert_non_null(device);
 
 	extended = uprov_device_get_part_extended(NULL, 0);
@@ -474,7 +472,7 @@ test_device_get_part_fstype (void UDO_UNUSED **state)
 	const char *fstype = NULL;
 	struct uprov_device *device = NULL;
 
-	device = uprov_device_create(NULL, BLOCK_DEVICE, FDISK_ASKTYPE_NONE);
+	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
 	assert_non_null(device);
 
 	fstype = uprov_device_get_part_fstype(NULL, 0);
@@ -493,7 +491,7 @@ test_device_get_part_fslabel (void UDO_UNUSED **state)
 	const char *fslabel = NULL;
 	struct uprov_device *device = NULL;
 
-	device = uprov_device_create(NULL, BLOCK_DEVICE, FDISK_ASKTYPE_NONE);
+	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
 	assert_non_null(device);
 
 	fslabel = uprov_device_get_part_fslabel(NULL, 0);
@@ -517,7 +515,7 @@ test_device_get_part_partlabel (void UDO_UNUSED **state)
 	const char *partlabel = NULL;
 	struct uprov_device *device = NULL;
 
-	device = uprov_device_create(NULL, BLOCK_DEVICE, FDISK_ASKTYPE_NONE);
+	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
 	assert_non_null(device);
 
 	partlabel = uprov_device_get_part_partlabel(NULL, 0);
@@ -541,7 +539,7 @@ test_device_get_part_type_code (void UDO_UNUSED **state)
 	uint32_t type_code = UINT32_MAX;
 	struct uprov_device *device = NULL;
 
-	device = uprov_device_create(NULL, BLOCK_DEVICE, FDISK_ASKTYPE_NONE);
+	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
 	assert_non_null(device);
 
 	type_code = uprov_device_get_part_type_code(NULL, 0);
@@ -565,7 +563,7 @@ test_device_get_part_type_code_string (void UDO_UNUSED **state)
 	const char *type_code_str = NULL;
 	struct uprov_device *device = NULL;
 
-	device = uprov_device_create(NULL, BLOCK_DEVICE, FDISK_ASKTYPE_NONE);
+	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
 	assert_non_null(device);
 
 	type_code_str = uprov_device_get_part_type_code_string(NULL, 0);
