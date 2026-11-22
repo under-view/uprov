@@ -376,16 +376,30 @@ test_device_get_part_num (void UDO_UNUSED **state)
 	size_t part_num = 0;
 	struct uprov_device *device = NULL;
 
-	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
+	part_num = uprov_device_get_part_num(NULL, 0);
+	assert_int_equal(part_num, (size_t)-1);
+
+	device = p_device_create_mbr_disk();
 	assert_non_null(device);
 
-	part_num = uprov_device_get_part_num(NULL, 0);
+	part_num = uprov_device_get_part_num(device, 3);
 	assert_int_equal(part_num, (size_t)-1);
 
 	part_num = uprov_device_get_part_num(device, 0);
 	assert_int_equal(part_num, 1);
 
+	device = p_device_create_gpt_disk(device);
+	assert_non_null(device);
+
+	part_num = uprov_device_get_part_num(device, 6);
+	assert_int_equal(part_num, (size_t)-1);
+
+	part_num = uprov_device_get_part_num(device, 2);
+	assert_int_equal(part_num, 3);
+
 	uprov_device_destroy(device);
+
+	remove(DISK_FILE);
 }
 
 

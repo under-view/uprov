@@ -962,6 +962,13 @@ uprov_device_get_part_num (struct uprov_device *device,
 	if (!device)
 		return (size_t)-1;
 
+	if (part_index >= device->part_count) {
+		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
+		                  "part_index(%lu) larger than part_count(%lu).\n", \
+		                  part_index, device->part_count);
+		return (size_t)-1;
+	}
+
 	return device->parts[part_index].number;
 }
 
