@@ -888,9 +888,9 @@ uprov_device_repart_part (struct uprov_device *device,
  *************************************/
 
 
-/************************************
- * Start uprov_device_get functions *
- ************************************/
+/***************************************
+ * Start of uprov_device_get functions *
+ ***************************************/
 
 const char *
 uprov_device_get_fname (struct uprov_device *device)
@@ -955,8 +955,16 @@ uprov_device_get_part_count (struct uprov_device *device)
 	return device->part_count;
 }
 
+/*************************************
+ * End of uprov_device_get functions *
+ *************************************/
 
-static int
+
+/*****************************************
+ * Start uprov_device_get_part functions *
+ *****************************************/
+
+static uint8_t
 p_uprov_device_check_part_index (struct uprov_device *device,
                                  const size_t part_index)
 {
@@ -968,20 +976,6 @@ p_uprov_device_check_part_index (struct uprov_device *device,
 	}
 
 	return 0;
-}
-
-
-size_t
-uprov_device_get_part_num (struct uprov_device *device,
-                           const size_t part_index)
-{
-	if (!device || \
-	    p_uprov_device_check_part_index(device, part_index))
-	{
-		return (size_t)-1;
-	}
-
-	return device->parts[part_index].number;
 }
 
 
@@ -1009,6 +1003,20 @@ p_device_get_part_name_format (const char *fname)
 	}
 
 	return "%d";
+}
+
+
+size_t
+uprov_device_get_part_num (struct uprov_device *device,
+                           const size_t part_index)
+{
+	if (!device || \
+	    p_uprov_device_check_part_index(device, part_index))
+	{
+		return (size_t)-1;
+	}
+
+	return device->parts[part_index].number;
 }
 
 
@@ -1197,9 +1205,9 @@ uprov_device_get_part_type_code_string (struct uprov_device *device,
 	return device->parts[part_index].type.code_str;
 }
 
-/**********************************
- * End uprov_device_get functions *
- **********************************/
+/******************************************
+ * End of uprov_device_get_part functions *
+ ******************************************/
 
 
 /****************************************
