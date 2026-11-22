@@ -750,6 +750,8 @@ uprov_device_repart_wholedisk (struct uprov_device *device,
 			p_device_fdisk_destroy(&fdisk);
 			return -1;
 		}
+
+		device->parts[p].end_sector = fdisk_partition_get_end(fdisk.part);
 	}
 
 	err = fdisk_write_disklabel(fdisk.ctx);
@@ -1061,8 +1063,11 @@ uint64_t
 uprov_device_get_part_end_sector (struct uprov_device *device,
                                   const size_t part_index)
 {
-	if (!device)
+	if (!device || \
+	    p_uprov_device_check_part_index(device, part_index))
+	{
 		return UINT64_MAX;
+	}
 
 	return device->parts[part_index].end_sector;
 }
