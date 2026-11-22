@@ -231,9 +231,9 @@ p_device_ask_callback (struct fdisk_context UDO_UNUSED *cxt,
  ***************************************/
 
 
-/***************************************
- * Start uprov_device_create functions *
- ***************************************/
+/******************************************
+ * Start of uprov_device_create functions *
+ ******************************************/
 
 static int
 p_device_create_with_fdisk (struct uprov_device *device,
@@ -400,14 +400,14 @@ uprov_device_create (struct uprov_device *p_device,
 	return device;
 }
 
-/*************************************
- * End uprov_device_create functions *
- *************************************/
+/****************************************
+ * End of uprov_device_create functions *
+ ****************************************/
 
 
-/***************************************
- * Start uprov_device_repart functions *
- ***************************************/
+/******************************************
+ * Start of uprov_device_repart functions *
+ ******************************************/
 
 /*
  * Defined in section 5.3.1
@@ -883,9 +883,9 @@ uprov_device_repart_part (struct uprov_device *device,
 	return 0;
 }
 
-/*************************************
- * End uprov_device_repart functions *
- *************************************/
+/****************************************
+ * End of uprov_device_repart functions *
+ ****************************************/
 
 
 /***************************************
@@ -960,9 +960,9 @@ uprov_device_get_part_count (struct uprov_device *device)
  *************************************/
 
 
-/*****************************************
- * Start uprov_device_get_part functions *
- *****************************************/
+/********************************************
+ * Start of uprov_device_get_part functions *
+ ********************************************/
 
 static uint8_t
 p_uprov_device_check_part_index (struct uprov_device *device,
@@ -1210,9 +1210,9 @@ uprov_device_get_part_type_code_string (struct uprov_device *device,
  ******************************************/
 
 
-/****************************************
- * Start uprov_device_destroy functions *
- ****************************************/
+/*******************************************
+ * Start of uprov_device_destroy functions *
+ *******************************************/
 
 void
 uprov_device_destroy (struct uprov_device *device)
@@ -1241,9 +1241,9 @@ uprov_device_destroy_parts (struct uprov_device *device)
 	memset(&(device->ptable_type[0]), 0, sizeof(device->ptable_type));
 }
 
-/**************************************
- * End uprov_device_destroy functions *
- **************************************/
+/*****************************************
+ * End of uprov_device_destroy functions *
+ *****************************************/
 
 
 /****************************************************
