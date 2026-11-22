@@ -733,40 +733,40 @@ test_device_get_sizeof (void UDO_UNUSED **state)
  *******************************************/
 
 
-/***************************************************
- * Start of test_device_convert_to_bytes functions *
- ***************************************************/
+/***********************************************
+ * Start of test_device_str_to_bytes functions *
+ ***********************************************/
 
 static void UDO_UNUSED
-test_device_convert_to_bytes (void UDO_UNUSED **state)
+test_device_str_to_bytes (void UDO_UNUSED **state)
 {
 	char string[64];
 
 	size_t size = 0;
 
 	strncpy(string, "4G", sizeof("4G")+1);
-	size = uprov_device_convert_to_bytes(string);
+	size = uprov_device_str_to_bytes(string);
 	assert_int_equal(size, 4294967296);
 	memset(string, 0, sizeof(string));
 
 	strncpy(string, "512M", sizeof("512M")+1);
-	size = uprov_device_convert_to_bytes(string);
+	size = uprov_device_str_to_bytes(string);
 	assert_int_equal(size, 536870912);
 	memset(string, 0, sizeof(string));
 
 	strncpy(string, "64K", sizeof("64K")+1);
-	size = uprov_device_convert_to_bytes(string);
+	size = uprov_device_str_to_bytes(string);
 	assert_int_equal(size, 65536);
 	memset(string, 0, sizeof(string));
 
 	strncpy(string, "862688232", sizeof("862688232")+1);
-	size = uprov_device_convert_to_bytes(string);
+	size = uprov_device_str_to_bytes(string);
 	assert_int_equal(size, 862688232);
 }
 
-/*************************************************
- * End of test_device_convert_to_bytes functions *
- *************************************************/
+/*********************************************
+ * End of test_device_str_to_bytes functions *
+ *********************************************/
 
 int
 main (void)
@@ -794,7 +794,7 @@ main (void)
 		cmocka_unit_test(test_device_get_part_type_code),
 		cmocka_unit_test(test_device_get_part_type_code_string),
 		cmocka_unit_test(test_device_get_sizeof),
-		cmocka_unit_test(test_device_convert_to_bytes),
+		cmocka_unit_test(test_device_str_to_bytes),
 	};
 
 	return cmocka_run_group_tests(tests, NULL, NULL);

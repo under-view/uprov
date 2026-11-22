@@ -490,6 +490,6 @@ uprov_device_get_sizeof (void);
  *	on failure: (size_t)-1
  */
 size_t
-uprov_device_convert_to_bytes (char *size);
+uprov_device_str_to_bytes (char *size);
 
 #endif /* UPROV_DEVICE_H */

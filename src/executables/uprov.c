@@ -160,7 +160,7 @@ handle_file_config_size (struct uprov_cmdline *cmdline)
 	memset(&file_info, 0, sizeof(file_info));
 
 	size = (char*) uprov_cmdline_get_size(cmdline);
-	file_info.size = uprov_device_convert_to_bytes(size);
+	file_info.size = uprov_device_str_to_bytes(size);
 	file_info.fname = uprov_cmdline_get_part_file(cmdline);
 	flops = udo_file_ops_create(NULL, &file_info);
 	if (!flops)

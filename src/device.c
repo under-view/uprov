@@ -1269,7 +1269,7 @@ uprov_device_get_sizeof (void)
 
 
 size_t
-uprov_device_convert_to_bytes (char *size)
+uprov_device_str_to_bytes (char *size)
 {
 	int end = 0;
 	size_t bytes = 0;
