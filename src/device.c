@@ -1039,6 +1039,16 @@ uprov_device_get_part_size_sector (struct uprov_device *device,
 }
 
 
+uint64_t
+uprov_device_get_part_size_bytes (struct uprov_device *device,
+                                  const size_t part_index)
+{
+	if (!device)
+		return UINT64_MAX;
+
+	return device->parts[part_index].size_sector * device->sector_sz;
+}
+
 uint8_t
 uprov_device_get_part_logical (struct uprov_device *device,
                                const size_t part_index)

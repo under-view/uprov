@@ -44,6 +44,7 @@ Functions
 #. :c:func:`uprov_device_get_part_start_sector`
 #. :c:func:`uprov_device_get_part_end_sector`
 #. :c:func:`uprov_device_get_part_size_sector`
+#. :c:func:`uprov_device_get_part_size_bytes`
 
 API Documentation
 ~~~~~~~~~~~~~~~~~
@@ -536,6 +537,30 @@ uprov_device_get_part_size_sector
 
 	Returns:
 		| **on success:** Partition sector count
+		| **on failure:** ``(uint64_t)-1`` or ``UINT64_MAX``
+
+=========================================================================================================================================
+
+================================
+uprov_device_get_part_size_bytes
+================================
+
+.. c:function:: uint64_t uprov_device_get_part_size_bytes(struct uprov_device *device, const size_t part_index);
+
+| Returns amount of bytes a partition has available.
+
+	.. list-table::
+		:header-rows: 1
+
+		* - Param
+		  - Decription
+		* - device
+		  - | Pointer to a valid ``struct`` :c:struct:`uprov_device`.
+		* - part_index
+		  - | Must pass valid partition index value.
+
+	Returns:
+		| **on success:** Partition size in bytes
 		| **on failure:** ``(uint64_t)-1`` or ``UINT64_MAX``
 
 =========================================================================================================================================
