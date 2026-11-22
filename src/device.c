@@ -1047,8 +1047,11 @@ uint64_t
 uprov_device_get_part_start_sector (struct uprov_device *device,
                                     const size_t part_index)
 {
-	if (!device)
+	if (!device || \
+	    p_uprov_device_check_part_index(device, part_index))
+	{
 		return UINT64_MAX;
+	}
 
 	return device->parts[part_index].start_sector;
 }

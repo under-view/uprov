@@ -447,16 +447,30 @@ test_device_get_part_start_sector (void UDO_UNUSED **state)
 	uint64_t start_sector = 0;
 	struct uprov_device *device = NULL;
 
-	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
-	assert_non_null(device);
-
 	start_sector = uprov_device_get_part_start_sector(NULL, 0);
 	assert_true(start_sector == UINT64_MAX);
 
+	device = p_device_create_mbr_disk();
+	assert_non_null(device);
+
+	start_sector = uprov_device_get_part_start_sector(device, 2);
+	assert_true(start_sector == UINT64_MAX);
+
 	start_sector = uprov_device_get_part_start_sector(device, 0);
-	assert_false(start_sector == UINT64_MAX);
+	assert_int_equal(start_sector, 2048);
+
+	device = p_device_create_gpt_disk(device);
+	assert_non_null(device);
+
+	start_sector = uprov_device_get_part_start_sector(device, 8);
+	assert_true(start_sector == UINT64_MAX);
+
+	start_sector = uprov_device_get_part_start_sector(device, 2);
+	assert_int_equal(start_sector, 102400);
 
 	uprov_device_destroy(device);
+
+	remove(DISK_FILE);
 }
 
 
