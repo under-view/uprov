@@ -543,19 +543,33 @@ test_device_get_part_size_sector (void UDO_UNUSED **state)
 static void UDO_UNUSED
 test_device_get_part_size_bytes (void UDO_UNUSED **state)
 {
-	uint64_t size_bytes = 0;
+	uint64_t bytes = 0;
 	struct uprov_device *device = NULL;
 
-	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
+	bytes = uprov_device_get_part_size_bytes(NULL, 0);
+	assert_true(bytes == UINT64_MAX);
+
+	device = p_device_create_mbr_disk();
 	assert_non_null(device);
 
-	size_bytes = uprov_device_get_part_size_bytes(NULL, 0);
-	assert_true(size_bytes == UINT64_MAX);
+	bytes = uprov_device_get_part_size_bytes(device, 2);
+	assert_true(bytes == UINT64_MAX);
 
-	size_bytes = uprov_device_get_part_size_bytes(device, 0);
-	assert_false(size_bytes == UINT64_MAX);
+	bytes = uprov_device_get_part_size_bytes(device, 0);
+	assert_int_equal(bytes, 50331648);
+
+	device = p_device_create_gpt_disk(device);
+	assert_non_null(device);
+
+	bytes = uprov_device_get_part_size_bytes(device, 8);
+	assert_true(bytes == UINT64_MAX);
+
+	bytes = uprov_device_get_part_size_bytes(device, 2);
+	assert_int_equal(bytes, 81788928);
 
 	uprov_device_destroy(device);
+
+	remove(DISK_FILE);
 }
 
 
