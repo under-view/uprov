@@ -574,6 +574,39 @@ test_device_get_part_size_bytes (void UDO_UNUSED **state)
 
 
 static void UDO_UNUSED
+test_device_get_part_size_megabytes (void UDO_UNUSED **state)
+{
+	uint64_t megabytes = 0;
+	struct uprov_device *device = NULL;
+
+	megabytes = uprov_device_get_part_size_megabytes(NULL, 0);
+	assert_true(megabytes == UINT64_MAX);
+
+	device = p_device_create_mbr_disk();
+	assert_non_null(device);
+
+	megabytes = uprov_device_get_part_size_megabytes(device, 2);
+	assert_true(megabytes == UINT64_MAX);
+
+	megabytes = uprov_device_get_part_size_megabytes(device, 0);
+	assert_int_equal(megabytes, 48);
+
+	device = p_device_create_gpt_disk(device);
+	assert_non_null(device);
+
+	megabytes = uprov_device_get_part_size_megabytes(device, 8);
+	assert_true(megabytes == UINT64_MAX);
+
+	megabytes = uprov_device_get_part_size_megabytes(device, 2);
+	assert_int_equal(megabytes, 78);
+
+	uprov_device_destroy(device);
+
+	remove(DISK_FILE);
+}
+
+
+static void UDO_UNUSED
 test_device_get_part_logical (void UDO_UNUSED **state)
 {
 	uint8_t logical = 0;
@@ -800,6 +833,7 @@ main (void)
 		cmocka_unit_test(test_device_get_part_end_sector),
 		cmocka_unit_test(test_device_get_part_size_sector),
 		cmocka_unit_test(test_device_get_part_size_bytes),
+		cmocka_unit_test(test_device_get_part_size_megabytes),
 		cmocka_unit_test(test_device_get_part_logical),
 		cmocka_unit_test(test_device_get_part_extended),
 		cmocka_unit_test(test_device_get_part_fstype),
