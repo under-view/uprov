@@ -310,6 +310,22 @@ uprov_device_get_part_size_bytes (struct uprov_device *device,
 
 
 /*
+ * @brief Returns amount of kilobytes a partition has available.
+ *
+ * @param device     - Pointer to a valid struct uprov_device.
+ * @param part_index - Must pass valid partition index value.
+ *
+ * @returns
+ * 	on success: Partition size in kilobytes
+ * 	on failure: (uint64_t)-1 or UINT64_MAX
+ */
+UDO_API
+uint64_t
+uprov_device_get_part_size_kilobytes (struct uprov_device *device,
+                                      const size_t part_index);
+
+
+/*
  * @brief Returns amount of megabytes a partition has available.
  *
  * @param device     - Pointer to a valid struct uprov_device.
