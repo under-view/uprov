@@ -1131,6 +1131,21 @@ uprov_device_get_part_size_megabytes (struct uprov_device *device,
 }
 
 
+uint64_t
+uprov_device_get_part_size_gigabytes (struct uprov_device *device,
+                                      const size_t part_index)
+{
+	if (!device || \
+	    p_uprov_device_check_part_index(device, part_index))
+	{
+		return UINT64_MAX;
+	}
+
+	return (device->parts[part_index].size_sector * \
+		device->sector_sz) / 1024 / 1024 / 1024;
+}
+
+
 uint8_t
 uprov_device_get_part_logical (struct uprov_device *device,
                                const size_t part_index)

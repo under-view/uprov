@@ -613,6 +613,30 @@ uprov_device_get_part_size_megabytes
 
 =========================================================================================================================================
 
+====================================
+uprov_device_get_part_size_gigabytes
+====================================
+
+.. c:function:: uint64_t uprov_device_get_part_size_gigabytes(struct uprov_device *device, const size_t part_index);
+
+| Returns amount of gigabytes a partition has available.
+
+	.. list-table::
+		:header-rows: 1
+
+		* - Param
+		  - Decription
+		* - device
+		  - | Pointer to a valid ``struct`` :c:struct:`uprov_device`.
+		* - part_index
+		  - | Must pass valid partition index value.
+
+	Returns:
+		| **on success:** Partition size in gigabytes
+		| **on failure:** ``(uint64_t)-1`` or ``UINT64_MAX``
+
+=========================================================================================================================================
+
 .. _calloc(3): https://www.man7.org/linux/man-pages/man3/malloc.3.html
 .. _free(3): https://www.man7.org/linux/man-pages/man3/free.3.html
 .. _GPT_fdisk#Partition_type: https://wiki.archlinux.org/title/GPT_fdisk#Partition_type
