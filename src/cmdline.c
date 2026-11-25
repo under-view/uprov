@@ -67,23 +67,23 @@ struct uprov_cmdline
 static void
 p_cmdline_help_msg (const char *bin_name)
 {
-	udo_log_print(UDO_LOG_WARNING, "Usage:\n");
-	udo_log_print(UDO_LOG_INFO,    "\t%s <options>\n\n", bin_name);
-	udo_log_print(UDO_LOG_WARNING, "Example:\n");
-	udo_log_print(UDO_LOG_INFO,    "\t%s --file /dev/sda -c part-config.txt\n", bin_name);
-	udo_log_print(UDO_LOG_INFO,    "\t%s --file some-part.img -c part-config.txt\n\n", bin_name);
-	udo_log_print(UDO_LOG_WARNING, "Options:\n");
-	udo_log_print(UDO_LOG_SUCCESS, "\t-c,--config <required>"); udo_log_print(UDO_LOG_INFO, "\tPartition configuration file.\n");
-	udo_log_print(UDO_LOG_SUCCESS, "\t-f,--file <required>  "); udo_log_print(UDO_LOG_INFO, "\tFile to repartition.\n");
-	udo_log_print(UDO_LOG_SUCCESS, "\t-r,--resize-last      "); udo_log_print(UDO_LOG_INFO, "\tResize a drive partition to extend\n");
-	udo_log_print(UDO_LOG_SUCCESS, "\t                      "); udo_log_print(UDO_LOG_INFO, "\tit out to the end of drive.\n");
-	udo_log_print(UDO_LOG_SUCCESS, "\t-s,--size <required>  "); udo_log_print(UDO_LOG_INFO, "\tSize of new file being created.\n");
-	udo_log_print(UDO_LOG_SUCCESS, "\t                      "); udo_log_print(UDO_LOG_INFO, "\tFlag only used if new file being created.\n");
-	udo_log_print(UDO_LOG_SUCCESS, "\t                      "); udo_log_print(UDO_LOG_INFO, "\t<number>G - for gigabytes\n");
-	udo_log_print(UDO_LOG_SUCCESS, "\t                      "); udo_log_print(UDO_LOG_INFO, "\t<number>M - for megabytes\n");
-	udo_log_print(UDO_LOG_SUCCESS, "\t                      "); udo_log_print(UDO_LOG_INFO, "\t<number>K - for kilobytes\n");
-	udo_log_print(UDO_LOG_SUCCESS, "\t                      "); udo_log_print(UDO_LOG_INFO, "\t<number>  - for bytes\n");
-	udo_log_print(UDO_LOG_SUCCESS, "\t-h,--help             "); udo_log_print(UDO_LOG_INFO, "\tSee this message.\n");
+	udo_log_print_warning("Usage:\n");
+	udo_log_print_info("\t%s <options>\n\n", bin_name);
+	udo_log_print_warning("Example:\n");
+	udo_log_print_info("\t%s --file /dev/sda -c part-config.txt\n", bin_name);
+	udo_log_print_info("\t%s --file some-part.img -c part-config.txt\n\n", bin_name);
+	udo_log_print_warning("Options:\n");
+	udo_log_print_success("\t-c,--config <required>"); udo_log_print_info("\tPartition configuration file.\n");
+	udo_log_print_success("\t-f,--file <required>  "); udo_log_print_info("\tFile to repartition.\n");
+	udo_log_print_success("\t-r,--resize-last      "); udo_log_print_info("\tResize a drive partition to extend\n");
+	udo_log_print_success("\t                      "); udo_log_print_info("\tit out to the end of drive.\n");
+	udo_log_print_success("\t-s,--size <required>  "); udo_log_print_info("\tSize of new file being created.\n");
+	udo_log_print_success("\t                      "); udo_log_print_info("\tFlag only used if new file being created.\n");
+	udo_log_print_success("\t                      "); udo_log_print_info("\t<number>G - for gigabytes\n");
+	udo_log_print_success("\t                      "); udo_log_print_info("\t<number>M - for megabytes\n");
+	udo_log_print_success("\t                      "); udo_log_print_info("\t<number>K - for kilobytes\n");
+	udo_log_print_success("\t                      "); udo_log_print_info("\t<number>  - for bytes\n");
+	udo_log_print_success("\t-h,--help             "); udo_log_print_info("\tSee this message.\n");
 }
 
 
