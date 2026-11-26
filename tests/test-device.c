@@ -79,11 +79,10 @@ p_device_repart_mbr_disk_str[] = \
 
 
 static int
-p_device_create_empty_file (const char *fname)
+p_device_create_empty_file (const char *fname,
+                            const size_t file_size)
 {
 	struct udo_file_ops *flops = NULL;
-
-	const size_t file_size = (size_t) (1<<29);
 
 	struct udo_file_ops_create_info file_info;
 
@@ -117,7 +116,7 @@ p_device_create_mbr_disk (void)
 		FDISK_ASKTYPE_INFO;
 	*/
 
-	err = p_device_create_empty_file(DISK_FILE);
+	err = p_device_create_empty_file(DISK_FILE, (1ULL<<34));
 	if (err == -1)
 		return NULL;
 
@@ -154,7 +153,7 @@ p_device_create_gpt_disk (struct uprov_device *p_device)
 	if (device) {
 		uprov_device_destroy_parts(device);
 	} else {
-		err = p_device_create_empty_file(DISK_FILE);
+		err = p_device_create_empty_file(DISK_FILE, (1<<29));
 		if (err == -1)
 			return NULL;
 
@@ -188,7 +187,7 @@ test_device_create (void UDO_UNUSED **state)
 
 	struct uprov_device *device = NULL;
 
-	err = p_device_create_empty_file(DISK_FILE);
+	err = p_device_create_empty_file(DISK_FILE, (1<<29));
 	assert_int_equal(err, 0);
 
 	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
