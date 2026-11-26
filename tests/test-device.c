@@ -63,6 +63,11 @@ UDO_UNUSED \
 p_device_create_mbr_disk_str[] = \
 	"PTABLE: mbr\n" \
 	"PART: 1:2048:98304:83:ext4:LABEL_ONE:\n" \
+	"PART: 2:100352:10485760:ef:vfat:LABEL_TWO:\n" \
+	"PART: 3:10586112:10485760:83:vfat:LABEL_THREE:\n" \
+	"PART: 4:21071872:12482560:85:EXTENDED:NULL:\n" \
+	"PART: 5:21073920:4194304:83:extra:LABEL_FOUR:\n" \
+	"PART: 6:25268224:6291456:83:extra:LABEL_FIVE:\n" \
 	;
 
 
