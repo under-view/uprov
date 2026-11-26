@@ -360,7 +360,7 @@ test_device_get_part_count (void UDO_UNUSED **state)
 	assert_non_null(device);
 
 	part_count = uprov_device_get_part_count(device);
-	assert_int_equal(part_count, 1);
+	assert_int_equal(part_count, 6);
 
 	device = p_device_create_gpt_disk(device);
 	assert_non_null(device);
@@ -386,7 +386,7 @@ test_device_get_part_num (void UDO_UNUSED **state)
 	device = p_device_create_mbr_disk();
 	assert_non_null(device);
 
-	part_num = uprov_device_get_part_num(device, 3);
+	part_num = uprov_device_get_part_num(device, 8);
 	assert_int_equal(part_num, (size_t)-1);
 
 	part_num = uprov_device_get_part_num(device, 0);
@@ -419,12 +419,12 @@ test_device_get_part_name (void UDO_UNUSED **state)
 	device = p_device_create_mbr_disk();
 	assert_non_null(device);
 
-	part_name = uprov_device_get_part_name(device, 1);
+	part_name = uprov_device_get_part_name(device, 8);
 	assert_null(part_name);
 
-	part_name = uprov_device_get_part_name(device, 0);
+	part_name = uprov_device_get_part_name(device, 1);
 	assert_non_null(strstr(part_name, DISK_FILE));
-	assert_non_null(strstr(part_name, "1"));
+	assert_non_null(strstr(part_name, "2"));
 
 	fname = uprov_device_get_fname(device);
 	assert_string_equal(fname, DISK_FILE);
@@ -457,7 +457,7 @@ test_device_get_part_start_sector (void UDO_UNUSED **state)
 	device = p_device_create_mbr_disk();
 	assert_non_null(device);
 
-	start_sector = uprov_device_get_part_start_sector(device, 2);
+	start_sector = uprov_device_get_part_start_sector(device, 8);
 	assert_true(start_sector == UINT64_MAX);
 
 	start_sector = uprov_device_get_part_start_sector(device, 0);
@@ -490,7 +490,7 @@ test_device_get_part_end_sector (void UDO_UNUSED **state)
 	device = p_device_create_mbr_disk();
 	assert_non_null(device);
 
-	end_sector = uprov_device_get_part_end_sector(device, 2);
+	end_sector = uprov_device_get_part_end_sector(device, 8);
 	assert_true(end_sector == UINT64_MAX);
 
 	end_sector = uprov_device_get_part_end_sector(device, 0);
@@ -523,7 +523,7 @@ test_device_get_part_size_sector (void UDO_UNUSED **state)
 	device = p_device_create_mbr_disk();
 	assert_non_null(device);
 
-	size_sector = uprov_device_get_part_size_sector(device, 2);
+	size_sector = uprov_device_get_part_size_sector(device, 8);
 	assert_true(size_sector == UINT64_MAX);
 
 	size_sector = uprov_device_get_part_size_sector(device, 0);
@@ -556,7 +556,7 @@ test_device_get_part_size_bytes (void UDO_UNUSED **state)
 	device = p_device_create_mbr_disk();
 	assert_non_null(device);
 
-	bytes = uprov_device_get_part_size_bytes(device, 2);
+	bytes = uprov_device_get_part_size_bytes(device, 8);
 	assert_true(bytes == UINT64_MAX);
 
 	bytes = uprov_device_get_part_size_bytes(device, 0);
@@ -589,7 +589,7 @@ test_device_get_part_size_kilobytes (void UDO_UNUSED **state)
 	device = p_device_create_mbr_disk();
 	assert_non_null(device);
 
-	kilobytes = uprov_device_get_part_size_kilobytes(device, 2);
+	kilobytes = uprov_device_get_part_size_kilobytes(device, 8);
 	assert_true(kilobytes == UINT64_MAX);
 
 	kilobytes = uprov_device_get_part_size_kilobytes(device, 0);
@@ -622,7 +622,7 @@ test_device_get_part_size_megabytes (void UDO_UNUSED **state)
 	device = p_device_create_mbr_disk();
 	assert_non_null(device);
 
-	megabytes = uprov_device_get_part_size_megabytes(device, 2);
+	megabytes = uprov_device_get_part_size_megabytes(device, 8);
 	assert_true(megabytes == UINT64_MAX);
 
 	megabytes = uprov_device_get_part_size_megabytes(device, 0);
@@ -655,11 +655,11 @@ test_device_get_part_size_gigabytes (void UDO_UNUSED **state)
 	device = p_device_create_mbr_disk();
 	assert_non_null(device);
 
-	gigabytes = uprov_device_get_part_size_gigabytes(device, 3);
+	gigabytes = uprov_device_get_part_size_gigabytes(device, 8);
 	assert_true(gigabytes == UINT64_MAX);
 
-	gigabytes = uprov_device_get_part_size_gigabytes(device, 0);
-	assert_int_equal(gigabytes, 0);
+	gigabytes = uprov_device_get_part_size_gigabytes(device, 5);
+	assert_int_equal(gigabytes, 3);
 
 	device = p_device_create_gpt_disk(device);
 	assert_non_null(device);
