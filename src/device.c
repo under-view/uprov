@@ -689,7 +689,7 @@ uprov_device_repart_wholedisk (struct uprov_device *device,
 	fdisk.ctx = fdisk_new_context();
 	if (!(fdisk.ctx)) {
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
-				"fdisk_new_context failed\n");
+				"fdisk_new_context failed");
 		return -1;
 	}
 
@@ -700,7 +700,7 @@ uprov_device_repart_wholedisk (struct uprov_device *device,
 	fdisk.part = fdisk_new_partition();
 	if (!(fdisk.part)) {
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
-			"Failed to get new partition context.\n");
+			"Failed to get new partition context.");
 		p_device_fdisk_destroy(&fdisk);
 		return -1;
 	}
@@ -708,7 +708,7 @@ uprov_device_repart_wholedisk (struct uprov_device *device,
 	fdisk.parttype = fdisk_new_parttype();
 	if (!(fdisk.parttype)) {
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
-			"Failed to get new partition type context.\n");
+			"Failed to get new partition type context.");
 		p_device_fdisk_destroy(&fdisk);
 		return -1;
 	}
@@ -717,7 +717,7 @@ uprov_device_repart_wholedisk (struct uprov_device *device,
 		device->fname_fd, device->fname, 0);
 	if (err < 0) {
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
-			"fdisk_assign_device_by_fd('%d','%s') failed\n", \
+			"fdisk_assign_device_by_fd('%d','%s') failed.", \
 			device->fname_fd, device->fname);
 		p_device_fdisk_destroy(&fdisk);
 		return -1;
@@ -728,7 +728,7 @@ uprov_device_repart_wholedisk (struct uprov_device *device,
 	err = fdisk_create_disklabel(fdisk.ctx, device->ptable_type);
 	if (err < 0) {
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
-				"Failed to create disk label '%s'.\n", \
+				"Failed to create disk label '%s'.", \
 				device->ptable_type);
 		p_device_fdisk_destroy(&fdisk);
 		return -1;
@@ -764,7 +764,7 @@ uprov_device_repart_wholedisk (struct uprov_device *device,
 		if (err) {
 			udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
 					"fdisk_add_partition: failed " \
-					"to add partition '%d'\n", p+1);
+					"to add partition '%d'", p+1);
 			p_device_fdisk_destroy(&fdisk);
 			return -1;
 		}
@@ -810,14 +810,14 @@ uprov_device_repart_part (struct uprov_device *device,
 	fdisk.ctx = fdisk_new_context();
 	if (!(fdisk.ctx)) {
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
-				"fdisk_new_context failed\n");
+				"fdisk_new_context failed");
 		return -1;
 	}
 
 	fdisk.part = fdisk_new_partition();
 	if (!(fdisk.part)) {
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
-			"Failed to get new partition context.\n");
+			"Failed to get new partition context.");
 		p_device_fdisk_destroy(&fdisk);
 		return -1;
 	}
@@ -825,7 +825,7 @@ uprov_device_repart_part (struct uprov_device *device,
 	fdisk.parttype = fdisk_new_parttype();
 	if (!(fdisk.parttype)) {
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
-			"Failed to get new partition type context.\n");
+			"Failed to get new partition type context.");
 		p_device_fdisk_destroy(&fdisk);
 		return -1;
 	}
@@ -838,7 +838,7 @@ uprov_device_repart_part (struct uprov_device *device,
 		device->fname_fd, device->fname, 0);
 	if (err < 0) {
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
-			"fdisk_assign_device_by_fd('%d','%s') failed\n", \
+			"fdisk_assign_device_by_fd('%d','%s') failed", \
 			device->fname_fd, device->fname);
 		p_device_fdisk_destroy(&fdisk);
 		return -1;
@@ -886,7 +886,7 @@ uprov_device_repart_part (struct uprov_device *device,
 		if (err) {
 			udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
 			                  "fdisk_add_partition: failed " \
-			                  "to add partition '%d'\n", p+1);
+			                  "to add partition '%d'", p+1);
 			p_device_fdisk_destroy(&fdisk);
 			return -1;
 		}
@@ -920,7 +920,7 @@ uprov_device_get_fname (struct uprov_device *device)
 
 	if (!(*device->fname)) {
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
-		                  "File name not found.\n");
+		                  "File name not found.");
 		return NULL;
 	}
 
@@ -948,7 +948,7 @@ uprov_device_get_ptable_type (struct uprov_device *device)
 
 	if (!(*device->ptable_type)) {
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
-		                  "Partition table type name not found.\n");
+		                  "Partition table type name not found.");
 		return NULL;
 	}
 
@@ -990,7 +990,7 @@ p_uprov_device_check_part_index (struct uprov_device *device,
 {
 	if (part_index >= device->part_count) {
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
-		                  "part_index(%lu) larger than part_count(%lu).\n", \
+		                  "part_index(%lu) larger than part_count(%lu).", \
 		                  part_index, device->part_count);
 		return 1;
 	}
@@ -1004,7 +1004,7 @@ p_uprov_device_check_is_gpt (struct uprov_device *device)
 {
 	if ((uint8_t)UDO_STRTOU(device->ptable_type) != IS_GPT) {
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
-		                  "Not a GPT disk\n");
+		                  "Not a GPT disk.");
 		return 1;
 	}
 
@@ -1017,7 +1017,7 @@ p_uprov_device_check_mbr (struct uprov_device *device)
 {
 	if ((uint8_t)UDO_STRTOU(device->ptable_type) == IS_GPT) {
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
-		                  "Not an MBR disk\n");
+		                  "Not an MBR disk.");
 		return 1;
 	}
 
@@ -1221,7 +1221,7 @@ uprov_device_get_part_fstype (struct uprov_device *device,
 
 	if (!(*device->parts[part_index].fstype)) {
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
-		                  "File system type not set.\n");
+		                  "File system type not set.");
 		return NULL;
 	}
 
@@ -1238,7 +1238,7 @@ uprov_device_get_part_fslabel (struct uprov_device *device,
 
 	if (!(*device->parts[part_index].fslabel)) {
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
-		                  "File system label not set.\n");
+		                  "File system label not set.");
 		return NULL;
 	}
 
@@ -1259,7 +1259,7 @@ uprov_device_get_part_partlabel (struct uprov_device *device,
 
 	if (!(*device->parts[part_index].partlabel)) {
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
-		                  "GPT PARTLABEL not set.\n");
+		                  "GPT PARTLABEL not set.");
 		return NULL;
 	}
 
@@ -1295,7 +1295,7 @@ uprov_device_get_part_type_code_string (struct uprov_device *device,
 
 	if (!(*device->parts[part_index].type.code_str)) {
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
-		                  "GPT partition type code not set.\n");
+		                  "GPT partition type code not set.");
 		return NULL;
 	}
 
