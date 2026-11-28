@@ -999,6 +999,19 @@ p_uprov_device_check_part_index (struct uprov_device *device,
 }
 
 
+static uint8_t
+p_uprov_device_check_is_gpt (struct uprov_device *device)
+{
+	if ((uint8_t)UDO_STRTOU(device->ptable_type) != IS_GPT) {
+		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
+		                  "Not a GPT disk\n");
+		return 1;
+	}
+
+	return 0;
+}
+
+
 static const char *
 p_device_get_part_name_format (const char *fname)
 {
@@ -1224,12 +1237,10 @@ const char *
 uprov_device_get_part_partlabel (struct uprov_device *device,
                                  const size_t part_index)
 {
-	if (!device)
-		return NULL;
-
-	if ((uint8_t)UDO_STRTOU(device->ptable_type) != IS_GPT) {
-		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
-		                  "Not a GPT disk\n");
+	if (!device || \
+	    p_uprov_device_check_part_index(device, part_index) || \
+	    p_uprov_device_check_is_gpt(device))
+	{
 		return NULL;
 	}
 
@@ -1265,14 +1276,9 @@ uprov_device_get_part_type_code_string (struct uprov_device *device,
                                         const size_t part_index)
 {
 	if (!device || \
-	    p_uprov_device_check_part_index(device, part_index))
+	    p_uprov_device_check_part_index(device, part_index) || \
+	    p_uprov_device_check_is_gpt(device))
 	{
-		return NULL;
-	}
-
-	if ((uint8_t)UDO_STRTOU(device->ptable_type) != IS_GPT) {
-		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
-		                  "Not a GPT disk\n");
 		return NULL;
 	}
 
