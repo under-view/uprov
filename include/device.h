@@ -364,6 +364,8 @@ uprov_device_get_part_size_gigabytes (struct uprov_device *device,
  *        1 if logical
  *        0 if not logical
  *
+ *        Only set if disk is MBR.
+ *
  * @param device     - Pointer to a valid struct uprov_device.
  * @param part_index - Must pass valid partition index value.
  *
@@ -383,6 +385,8 @@ uprov_device_get_part_logical (struct uprov_device *device,
  *
  *        1 if extended
  *        0 if not extended
+ *
+ *        Only set if disk is MBR.
  *
  * @param device     - Pointer to a valid struct uprov_device.
  * @param part_index - Must pass valid partition index value.

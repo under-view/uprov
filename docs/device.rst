@@ -649,6 +649,66 @@ uprov_device_get_part_size_gigabytes
 
 =========================================================================================================================================
 
+=============================
+uprov_device_get_part_logical
+=============================
+
+.. c:function:: uint8_t uprov_device_get_part_logical(struct uprov_device *device, const size_t part_index);
+
+| Returns a boolean value determining
+| if the partition is logical or not.
+|
+| ``1`` if logical
+| ``0`` if not logical
+|
+| Only set if disk is MBR.
+
+	.. list-table::
+		:header-rows: 1
+
+		* - Param
+		  - Decription
+		* - device
+		  - | Pointer to a valid ``struct`` :c:struct:`uprov_device`.
+		* - part_index
+		  - | Must pass valid partition index value.
+
+	Returns:
+		| **on success:** Boolean value ``1`` if logical partition ``0`` if not
+		| **on failure:** ``(uint8_t)-1`` or ``UINT8_MAX``
+
+=========================================================================================================================================
+
+==============================
+uprov_device_get_part_extended
+==============================
+
+.. c:function:: uint8_t uprov_device_get_part_extended(struct uprov_device *device, const size_t part_index);
+
+| Returns a boolean value determining
+| if the partition is extended or not.
+|
+| ``1`` if extended
+| ``0`` if not extended
+|
+| Only set if disk is MBR.
+
+	.. list-table::
+		:header-rows: 1
+
+		* - Param
+		  - Decription
+		* - device
+		  - | Pointer to a valid ``struct`` :c:struct:`uprov_device`.
+		* - part_index
+		  - | Must pass valid partition index value.
+
+	Returns:
+		| **on success:** Boolean value ``1`` if logical partition ``0`` if not
+		| **on failure:** ``(uint8_t)-1`` or ``UINT8_MAX``
+
+=========================================================================================================================================
+
 .. _calloc(3): https://www.man7.org/linux/man-pages/man3/malloc.3.html
 .. _free(3): https://www.man7.org/linux/man-pages/man3/free.3.html
 .. _GPT_fdisk#Partition_type: https://wiki.archlinux.org/title/GPT_fdisk#Partition_type
