@@ -1194,8 +1194,11 @@ uint8_t
 uprov_device_get_part_logical (struct uprov_device *device,
                                const size_t part_index)
 {
-	if (!device)
+	if (!device || \
+	    p_uprov_device_check_part_index(device, part_index))
+	{
 		return UINT8_MAX;
+	}
 
 	return device->parts[part_index].logical;
 }
@@ -1205,8 +1208,11 @@ uint8_t
 uprov_device_get_part_extended (struct uprov_device *device,
                                 const size_t part_index)
 {
-	if (!device)
+	if (!device || \
+	    p_uprov_device_check_part_index(device, part_index))
+	{
 		return UINT8_MAX;
+	}
 
 	return device->parts[part_index].extended;
 }
@@ -1216,8 +1222,11 @@ const char *
 uprov_device_get_part_fstype (struct uprov_device *device,
                               const size_t part_index)
 {
-	if (!device)
+	if (!device || \
+	    p_uprov_device_check_part_index(device, part_index))
+	{
 		return NULL;
+	}
 
 	if (!(*device->parts[part_index].fstype)) {
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
@@ -1233,8 +1242,11 @@ const char *
 uprov_device_get_part_fslabel (struct uprov_device *device,
                                const size_t part_index)
 {
-	if (!device)
+	if (!device || \
+	    p_uprov_device_check_part_index(device, part_index))
+	{
 		return NULL;
+	}
 
 	if (!(*device->parts[part_index].fslabel)) {
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
@@ -1251,8 +1263,8 @@ uprov_device_get_part_partlabel (struct uprov_device *device,
                                  const size_t part_index)
 {
 	if (!device || \
-	    p_uprov_device_check_part_index(device, part_index) || \
-	    p_uprov_device_check_is_gpt(device))
+	    p_uprov_device_check_is_gpt(device) || \
+	    p_uprov_device_check_part_index(device, part_index))
 	{
 		return NULL;
 	}
@@ -1287,8 +1299,8 @@ uprov_device_get_part_type_code_string (struct uprov_device *device,
                                         const size_t part_index)
 {
 	if (!device || \
-	    p_uprov_device_check_part_index(device, part_index) || \
-	    p_uprov_device_check_is_gpt(device))
+	    p_uprov_device_check_is_gpt(device) || \
+	    p_uprov_device_check_part_index(device, part_index))
 	{
 		return NULL;
 	}
