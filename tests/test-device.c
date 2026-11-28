@@ -730,16 +730,28 @@ test_device_get_part_fstype (void UDO_UNUSED **state)
 	const char *fstype = NULL;
 	struct uprov_device *device = NULL;
 
-	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
-	assert_non_null(device);
-
 	fstype = uprov_device_get_part_fstype(NULL, 0);
 	assert_null(fstype);
 
-	fstype = uprov_device_get_part_fstype(device, 1);
-	assert_non_null(fstype);
+	device = p_device_create_mbr_disk();
+	assert_non_null(device);
 
-	uprov_device_destroy(device);
+	fstype = uprov_device_get_part_fstype(device, 8);
+	assert_null(fstype);
+
+	fstype = uprov_device_get_part_fstype(device, 2);
+	assert_string_equal(fstype, "vfat");
+
+	device = p_device_create_gpt_disk(device);
+	assert_non_null(device);
+
+	fstype = uprov_device_get_part_fstype(device, 8);
+	assert_null(fstype);
+
+	fstype = uprov_device_get_part_fstype(device, 2);
+	assert_string_equal(fstype, "ext4");
+
+	remove(DISK_FILE);
 }
 
 
