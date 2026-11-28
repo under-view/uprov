@@ -823,21 +823,27 @@ test_device_get_part_type_code (void UDO_UNUSED **state)
 	uint32_t type_code = UINT32_MAX;
 	struct uprov_device *device = NULL;
 
-	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
-	assert_non_null(device);
-
 	type_code = uprov_device_get_part_type_code(NULL, 0);
 	assert_uint_equal(type_code, UINT32_MAX);
 
-	/*
-	 * TODO: update test so that disk type
-	 * and partitions are created during the test.
-	 *
-	 * type_code = uprov_device_get_part_type_code(device, 1);
-	 * assert_uint_equal(type_code, UINT32_MAX);
-	 */
+	device = p_device_create_mbr_disk();
+	assert_non_null(device);
+
+	type_code = uprov_device_get_part_type_code(device, 9);
+	assert_uint_equal(type_code, UINT32_MAX);
+
+	type_code = uprov_device_get_part_type_code(device, 1);
+	assert_uint_equal(type_code, 0xEF);
+
+	type_code = uprov_device_get_part_type_code(device, 3);
+	assert_uint_equal(type_code, 0x85);
+
+	type_code = uprov_device_get_part_type_code(device, 4);
+	assert_uint_equal(type_code, 0x83);
 
 	uprov_device_destroy(device);
+
+	remove(DISK_FILE);
 }
 
 

@@ -1012,6 +1012,19 @@ p_uprov_device_check_is_gpt (struct uprov_device *device)
 }
 
 
+static uint8_t
+p_uprov_device_check_mbr (struct uprov_device *device)
+{
+	if ((uint8_t)UDO_STRTOU(device->ptable_type) == IS_GPT) {
+		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
+		                  "Not an MBR disk\n");
+		return 1;
+	}
+
+	return 0;
+}
+
+
 static const char *
 p_device_get_part_name_format (const char *fname)
 {
@@ -1258,12 +1271,10 @@ uint32_t
 uprov_device_get_part_type_code (struct uprov_device *device,
                                  const size_t part_index)
 {
-	if (!device)
-		return UINT32_MAX;
-
-	if (UDO_STRTOU(device->ptable_type) == IS_GPT) {
-		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
-		                  "Not an MBR disk\n");
+	if (!device || \
+	    p_uprov_device_check_mbr(device) || \
+	    p_uprov_device_check_part_index(device, part_index))
+	{
 		return UINT32_MAX;
 	}
 
