@@ -47,6 +47,18 @@ Functions
 #. :c:func:`uprov_device_get_part_size_bytes`
 #. :c:func:`uprov_device_get_part_size_kilobytes`
 #. :c:func:`uprov_device_get_part_size_megabytes`
+#. :c:func:`uprov_device_get_part_size_gigabytes`
+#. :c:func:`uprov_device_get_part_logical`
+#. :c:func:`uprov_device_get_part_extended`
+#. :c:func:`uprov_device_get_part_fstype`
+#. :c:func:`uprov_device_get_part_fslabel`
+#. :c:func:`uprov_device_get_part_partlabel`
+#. :c:func:`uprov_device_get_part_type_code`
+#. :c:func:`uprov_device_get_part_type_code_string`
+#. :c:func:`uprov_device_destroy`
+#. :c:func:`uprov_device_destroy_parts`
+#. :c:func:`uprov_device_get_sizeof`
+#. :c:func:`uprov_device_str_to_bytes`
 
 API Documentation
 ~~~~~~~~~~~~~~~~~
