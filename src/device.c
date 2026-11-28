@@ -1265,10 +1265,12 @@ uprov_device_get_part_type_code_string (struct uprov_device *device,
                                         const size_t part_index)
 {
 	if (!device || \
-	    !(*device->parts[part_index].type.code_str))
+	    p_uprov_device_check_part_index(device, part_index))
+	{
 		return NULL;
+	}
 
-	if (UDO_STRTOU(device->ptable_type) != IS_GPT) {
+	if ((uint8_t)UDO_STRTOU(device->ptable_type) != IS_GPT) {
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
 		                  "Not a GPT disk\n");
 		return NULL;

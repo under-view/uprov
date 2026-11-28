@@ -847,21 +847,27 @@ test_device_get_part_type_code_string (void UDO_UNUSED **state)
 	const char *type_code_str = NULL;
 	struct uprov_device *device = NULL;
 
-	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
-	assert_non_null(device);
-
 	type_code_str = uprov_device_get_part_type_code_string(NULL, 0);
 	assert_null(type_code_str);
 
-	/*
-	 * TODO: update test so that disk type
-	 * and partitions are created during the test.
-	 *
-	 * type_code_str = uprov_device_get_part_type_code_string(NULL, 0);
-	 * assert_non_null(type_code_str);
-	 */
+	device = p_device_create_gpt_disk(NULL);
+	assert_non_null(device);
+
+	type_code_str = uprov_device_get_part_type_code_string(device, 8);
+	assert_null(type_code_str);
+
+	type_code_str = uprov_device_get_part_type_code_string(device, 0);
+	assert_string_equal(type_code_str, "21686148-6449-6E6F-744E-656564454649");
+
+	type_code_str = uprov_device_get_part_type_code_string(device, 1);
+	assert_string_equal(type_code_str, "C12A7328-F81F-11D2-BA4B-00A0C93EC93B");
+
+	type_code_str = uprov_device_get_part_type_code_string(device, 2);
+	assert_string_equal(type_code_str, "0FC63DAF-8483-4772-8E79-3D69D8477DE4");
 
 	uprov_device_destroy(device);
+
+	remove(DISK_FILE);
 }
 
 /************************************
