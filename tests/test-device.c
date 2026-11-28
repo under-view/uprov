@@ -761,21 +761,31 @@ test_device_get_part_fslabel (void UDO_UNUSED **state)
 	const char *fslabel = NULL;
 	struct uprov_device *device = NULL;
 
-	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
-	assert_non_null(device);
-
 	fslabel = uprov_device_get_part_fslabel(NULL, 0);
 	assert_null(fslabel);
 
-	/*
-	 * TODO: update test so that disk type
-	 * and partitions are created during the test.
-	 *
-	 * fslabel = uprov_device_get_part_partlabel(device, 1);
-	 * assert_non_null(fslabel);
-	 */
+	device = p_device_create_mbr_disk();
+	assert_non_null(device);
 
-	uprov_device_destroy(device);
+	fslabel = uprov_device_get_part_fslabel(device, 8);
+	assert_null(fslabel);
+
+	fslabel = uprov_device_get_part_fslabel(device, 2);
+	assert_string_equal(fslabel, "LABEL_THREE");
+
+	fslabel = uprov_device_get_part_fslabel(device, 3);
+	assert_null(fslabel);
+
+	device = p_device_create_gpt_disk(device);
+	assert_non_null(device);
+
+	fslabel = uprov_device_get_part_fslabel(device, 8);
+	assert_null(fslabel);
+
+	fslabel = uprov_device_get_part_fslabel(device, 3);
+	assert_string_equal(fslabel, "ROOTFS");
+
+	remove(DISK_FILE);
 }
 
 
