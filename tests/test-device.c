@@ -751,6 +751,8 @@ test_device_get_part_fstype (void UDO_UNUSED **state)
 	fstype = uprov_device_get_part_fstype(device, 2);
 	assert_string_equal(fstype, "ext4");
 
+	uprov_device_destroy(device);
+
 	remove(DISK_FILE);
 }
 
@@ -785,6 +787,8 @@ test_device_get_part_fslabel (void UDO_UNUSED **state)
 	fslabel = uprov_device_get_part_fslabel(device, 3);
 	assert_string_equal(fslabel, "ROOTFS");
 
+	uprov_device_destroy(device);
+
 	remove(DISK_FILE);
 }
 
@@ -795,21 +799,21 @@ test_device_get_part_partlabel (void UDO_UNUSED **state)
 	const char *partlabel = NULL;
 	struct uprov_device *device = NULL;
 
-	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
-	assert_non_null(device);
-
 	partlabel = uprov_device_get_part_partlabel(NULL, 0);
 	assert_null(partlabel);
 
-	/*
-	 * TODO: update test so that disk type
-	 * and partitions are created during the test.
-	 *
-	 * partlabel = uprov_device_get_part_partlabel(device, 1);
-	 * assert_non_null(partlabel);
-	 */
+	device = p_device_create_gpt_disk(NULL);
+	assert_non_null(device);
+
+	partlabel = uprov_device_get_part_partlabel(device, 8);
+	assert_null(partlabel);
+
+	partlabel = uprov_device_get_part_partlabel(device, 2);
+	assert_string_equal(partlabel, "GRUB_DATA");
 
 	uprov_device_destroy(device);
+
+	remove(DISK_FILE);
 }
 
 

@@ -484,6 +484,12 @@ p_device_create_part (struct uprov_device *device,
 							(UDO_STRTOU(temp) == 315) ? \
 							&(char){'\0'} : temp, \
 							FSLABEL_MAX);
+						if (!mbr) {
+							memcpy(&(part->partlabel[0]), \
+								(UDO_STRTOU(temp) == 315) ? \
+								&(char){'\0'} : temp, \
+								PARTLABEL_MAX);
+						}
 						break;
 					default:
 						break;
@@ -847,7 +853,7 @@ uprov_device_repart_part (struct uprov_device *device,
 	gpt = UDO_STRTOU(device->ptable_type);
 	total_sectors = fdisk_get_nsectors(fdisk.ctx);
 
-	if (gpt) {
+	if (gpt == IS_GPT) {
 		p_device_parts_resize_gpt(device, fdisk.ctx, p, total_sectors);
 	} else {
 		p_device_parts_resize_mbr(device, fdisk.ctx, p, total_sectors);
@@ -1221,7 +1227,7 @@ uprov_device_get_part_partlabel (struct uprov_device *device,
 	if (!device)
 		return NULL;
 
-	if (UDO_STRTOU(device->ptable_type) != IS_GPT) {
+	if ((uint8_t)UDO_STRTOU(device->ptable_type) != IS_GPT) {
 		udo_log_set_error(device, UDO_LOG_ERR_UNCOMMON, \
 		                  "Not a GPT disk\n");
 		return NULL;
