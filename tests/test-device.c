@@ -682,16 +682,21 @@ test_device_get_part_logical (void UDO_UNUSED **state)
 	uint8_t logical = 0;
 	struct uprov_device *device = NULL;
 
-	device = uprov_device_create(NULL, DISK_FILE, FDISK_ASKTYPE_NONE);
-	assert_non_null(device);
-
 	logical = uprov_device_get_part_logical(NULL, 0);
 	assert_true(logical == UINT8_MAX);
 
-	logical = uprov_device_get_part_logical(device, 1);
-	assert_true(logical == 0 || logical == 1);
+	device = p_device_create_mbr_disk();
+	assert_non_null(device);
+
+	logical = uprov_device_get_part_logical(device, 2);
+	assert_true(logical == 0);
+
+	logical = uprov_device_get_part_logical(device, 5);
+	assert_true(logical == 1);
 
 	uprov_device_destroy(device);
+
+	remove(DISK_FILE);
 }
 
 
