@@ -479,7 +479,11 @@ p_device_create_part (struct uprov_device *device,
 						memcpy(&(part->fstype[0]), temp, FSTYPE_MAX);
 						break;
 					case 5: /* Partition file system label */
-						memcpy(&(part->fslabel[0]), temp, FSLABEL_MAX);
+						/* String NULL has as hash of 315 */
+						memcpy(&(part->fslabel[0]), \
+							(UDO_STRTOU(temp) == 315) ? \
+							&(char){'\0'} : temp, \
+							FSLABEL_MAX);
 						break;
 					default:
 						break;
