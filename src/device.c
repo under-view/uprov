@@ -421,7 +421,8 @@ p_device_create_part (struct uprov_device *device,
                       const uint8_t mbr,
                       const char *part_string,
                       size_t *part_index,
-                      uint16_t *len)
+                      uint16_t *len,
+                      uint8_t *extended_found)
 {
 	size_t part_num = 0;
 
@@ -463,6 +464,12 @@ p_device_create_part (struct uprov_device *device,
 					case 3: /* Partition type code */
 						if (mbr) {
 							part->type.code = strtoul(temp, NULL, 16);
+							if (*extended_found) {
+								part->logical = 1;
+							} else if (part->type.code == 0x85) {
+								*extended_found = 1;
+								part->extended = 1;
+							}
 						} else {
 							memcpy(&(part->type.code_str[0]), \
 								temp, TYPE_CODE_STR_MAX);
@@ -500,9 +507,9 @@ p_device_parse_part_string (struct uprov_device *device,
                             const char *part_string,
                             size_t *part_index)
 {
-	uint8_t mbr = 0;
-
 	uint16_t word = 0, len = 0;
+
+	uint8_t mbr = 0, extended_found = 0;
 
 	while (*part_string) {
 		switch (*part_string) {
@@ -527,7 +534,8 @@ p_device_parse_part_string (struct uprov_device *device,
 				break;
 			case 369: /* PART: */
 				part_string++; /* Remove ':' character */
-				p_device_create_part(device, mbr, part_string, part_index, &len);
+				p_device_create_part(device, mbr, part_string, \
+					part_index, &len, &extended_found);
 
 				if (part_index) /* Only want to iterate 1 partition */
 					return 0;
